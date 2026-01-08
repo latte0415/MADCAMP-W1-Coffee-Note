@@ -8,7 +8,7 @@ class Note {
     final String comment;
     final String? image;
     final int score;
-    final DateTime recordedAt;
+    final DateTime drankAt;
     final DateTime createdAt;
     final DateTime updatedAt;
 
@@ -22,6 +22,10 @@ class Note {
         required this.comment,
         this.image,
         required this.score,
-        required this.recordedAt,
-    })
+        required this.drankAt,
+        DateTime? createdAt,
+        DateTime? updatedAt,
+        }) : this.createdAt = createdAt ?? DateTime.now(),
+             this.updatedAt = updatedAt ?? DateTime.now();
+
 }

@@ -2,7 +2,6 @@
 - 커피 향/맛 노트테이킹: 이미지 + 텍스트 (+ 시간 남으면 지도 API)
 - 노트 자체 스코어링 (개인화): 원하는 acidity, body, bitterness 레벨에 맞는 지난 리뷰 찾아줌 (유사도)
 
-
 # DB 스키마
 id: UUID, PK
 location: text (현재는 카페 이름, 추후 새로운 column 추가해서 API 연결할 수도 있음)
