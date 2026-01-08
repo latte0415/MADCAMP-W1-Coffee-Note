@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import '../repositories/note_repository.dart';
+import '../services/note_service.dart';
 import '../models/note.dart';
 
 class DbTestPage extends StatefulWidget {
@@ -11,7 +11,6 @@ class DbTestPage extends StatefulWidget {
 }
 
 class _DbTestPageState extends State<DbTestPage> {
-  final _repository = NoteRepository.instance;
   List<Note> _notes = [];
 
   @override
@@ -21,7 +20,7 @@ class _DbTestPageState extends State<DbTestPage> {
   }
 
   Future<void> _loadNotes() async {
-    final notes = await _repository.getAllNotes();
+    final notes = await NoteService.instance.getAllNotes();
     setState(() {
       _notes = notes;
     });
@@ -40,7 +39,7 @@ class _DbTestPageState extends State<DbTestPage> {
       drankAt: DateTime.now(),
     );
 
-    await _repository.createNote(note);
+    await NoteService.instance.createNote(note);
     _loadNotes();
   }
 
@@ -58,7 +57,7 @@ class _DbTestPageState extends State<DbTestPage> {
       createdAt: note.createdAt,
     );
 
-    await _repository.updateNote(updatedNote);
+    await NoteService.instance.updateNote(updatedNote);
     _loadNotes();
   }
 
@@ -82,7 +81,7 @@ class _DbTestPageState extends State<DbTestPage> {
     );
 
     if (confirmed == true) {
-      await _repository.deleteNote(id);
+      await NoteService.instance.deleteNote(id);
       _loadNotes();
     }
   }
