@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../services/note_service.dart';
 import '../models/note.dart';
+import '../models/sort_option.dart';
 
 class DbTestPage extends StatefulWidget {
   const DbTestPage({super.key});
@@ -12,6 +13,7 @@ class DbTestPage extends StatefulWidget {
 
 class _DbTestPageState extends State<DbTestPage> {
   List<Note> _notes = [];
+  SortOption _currentSortOption = const DateSortOption(ascending: false);
 
   @override
   void initState() {
@@ -20,10 +22,125 @@ class _DbTestPageState extends State<DbTestPage> {
   }
 
   Future<void> _loadNotes() async {
-    final notes = await NoteService.instance.getAllNotes();
+    final notes = await NoteService.instance.getAllNotes(_currentSortOption);
     setState(() {
       _notes = notes;
     });
+  }
+
+  Future<void> _createTestData() async {
+    final now = DateTime.now();
+    final testNotes = [
+      // 다양한 점수와 날짜를 가진 테스트 데이터
+      Note(
+        id: const Uuid().v4(),
+        location: '스타벅스 강남점',
+        menu: '아메리카노',
+        levelAcidity: 5,
+        levelBody: 3,
+        levelBitterness: 4,
+        comment: '맛있어요',
+        score: 5,
+        drankAt: now.subtract(const Duration(days: 10)),
+      ),
+      Note(
+        id: const Uuid().v4(),
+        location: '투썸플레이스',
+        menu: '카페라떼',
+        levelAcidity: 3,
+        levelBody: 5,
+        levelBitterness: 2,
+        comment: '그냥 그래요',
+        score: 2,
+        drankAt: now.subtract(const Duration(days: 5)),
+      ),
+      Note(
+        id: const Uuid().v4(),
+        location: '이디야커피',
+        menu: '바닐라라떼',
+        levelAcidity: 2,
+        levelBody: 4,
+        levelBitterness: 3,
+        comment: '최고예요!',
+        score: 4,
+        drankAt: now.subtract(const Duration(days: 15)),
+      ),
+      Note(
+        id: const Uuid().v4(),
+        location: '할리스커피',
+        menu: '콜드브루',
+        levelAcidity: 4,
+        levelBody: 5,
+        levelBitterness: 5,
+        comment: '별로예요',
+        score: 1,
+        drankAt: now.subtract(const Duration(days: 2)),
+      ),
+      Note(
+        id: const Uuid().v4(),
+        location: '컴포즈커피',
+        menu: '카푸치노',
+        levelAcidity: 3,
+        levelBody: 3,
+        levelBitterness: 3,
+        comment: '무난해요',
+        score: 3,
+        drankAt: now.subtract(const Duration(days: 7)),
+      ),
+      Note(
+        id: const Uuid().v4(),
+        location: '메가커피',
+        menu: '에스프레소',
+        levelAcidity: 5,
+        levelBody: 2,
+        levelBitterness: 4,
+        comment: '좋아요',
+        score: 4,
+        drankAt: now.subtract(const Duration(days: 1)),
+      ),
+      Note(
+        id: const Uuid().v4(),
+        location: '빽다방',
+        menu: '아이스 아메리카노',
+        levelAcidity: 2,
+        levelBody: 2,
+        levelBitterness: 2,
+        comment: '괜찮아요',
+        score: 3,
+        drankAt: now.subtract(const Duration(days: 20)),
+      ),
+      Note(
+        id: const Uuid().v4(),
+        location: '카페베네',
+        menu: '카라멜 마키아토',
+        levelAcidity: 1,
+        levelBody: 4,
+        levelBitterness: 1,
+        comment: '최고!',
+        score: 5,
+        drankAt: now.subtract(const Duration(days: 3)),
+      ),
+    ];
+
+    for (final note in testNotes) {
+      await NoteService.instance.createNote(note);
+    }
+
+    _loadNotes();
+  }
+
+  Future<void> _sortByDate(bool ascending) async {
+    setState(() {
+      _currentSortOption = DateSortOption(ascending: ascending);
+    });
+    _loadNotes();
+  }
+
+  Future<void> _sortByScore(bool ascending) async {
+    setState(() {
+      _currentSortOption = ScoreSortOption(ascending: ascending);
+    });
+    _loadNotes();
   }
 
   Future<void> _createNote() async {
@@ -92,9 +209,95 @@ class _DbTestPageState extends State<DbTestPage> {
       appBar: AppBar(title: const Text('DB 테스트')),
       body: Column(
         children: [
+          // 테스트 데이터 생성 버튼
+          ElevatedButton(
+            onPressed: _createTestData,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('테스트 데이터 생성 (다양한 점수/날짜)'),
+          ),
+          const SizedBox(height: 8),
+          // 기본 노트 생성 버튼
           ElevatedButton(
             onPressed: _createNote,
             child: const Text('노트 생성'),
+          ),
+          const SizedBox(height: 8),
+          // 정렬 옵션 버튼들
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  const Text('날짜순', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _sortByDate(false),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _currentSortOption is DateSortOption && !_currentSortOption.ascending
+                              ? Colors.green
+                              : null,
+                        ),
+                        child: const Text('↓ 최신순'),
+                      ),
+                      const SizedBox(width: 4),
+                      ElevatedButton(
+                        onPressed: () => _sortByDate(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _currentSortOption is DateSortOption && _currentSortOption.ascending
+                              ? Colors.green
+                              : null,
+                        ),
+                        child: const Text('↑ 오래된순'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  const Text('점수순', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _sortByScore(false),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _currentSortOption is ScoreSortOption && !_currentSortOption.ascending
+                              ? Colors.green
+                              : null,
+                        ),
+                        child: const Text('↓ 높은순'),
+                      ),
+                      const SizedBox(width: 4),
+                      ElevatedButton(
+                        onPressed: () => _sortByScore(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _currentSortOption is ScoreSortOption && _currentSortOption.ascending
+                              ? Colors.green
+                              : null,
+                        ),
+                        child: const Text('↑ 낮은순'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // 현재 정렬 상태 표시
+          Container(
+            padding: const EdgeInsets.all(8),
+            color: Colors.grey[200],
+            child: Text(
+              '현재 정렬: ${_currentSortOption is DateSortOption ? "날짜" : "점수"} (${_currentSortOption.ascending ? "오름차순" : "내림차순"})',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           Expanded(
             child: _notes.isEmpty

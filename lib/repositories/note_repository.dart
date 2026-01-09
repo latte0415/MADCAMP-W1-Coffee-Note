@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/note.dart';
+import '../models/sort_option.dart';
 
 class NoteRepository {
   static final NoteRepository instance = NoteRepository._init();
@@ -37,7 +38,7 @@ class NoteRepository {
         comment TEXT NOT NULL,
         image TEXT,
         score INTEGER NOT NULL,
-        recorded_at TEXT NOT NULL,
+        drank_at TEXT NOT NULL,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       )
@@ -45,9 +46,9 @@ class NoteRepository {
   }
 
   // CRUD 메서드들
-  Future<List<Note>> getAllNotes() async {
+  Future<List<Note>> getAllNotes(SortOption sortOption) async {
     final db = await database;
-    final maps = await db.query('notes', orderBy: 'created_at DESC');
+    final maps = await db.query('notes', orderBy: sortOption.toSqlOrderBy());
     return _mapsToNotes(maps);
   }
 
@@ -130,25 +131,6 @@ class NoteRepository {
     return result > 0;
   }
 
-//   // 정렬 메서드
-//   Future<List<Note>> getNotesSortedByDate({bool ascending = true}) async {
-//     final db = await database;
-//     final maps = await db.query(
-//       'notes',
-//       orderBy: 'recorded_at ${ascending ? 'ASC' : 'DESC'}',
-//     );
-//     return _mapsToNotes(maps);
-//   }
-
-//   Future<List<Note>> getNotesSortedByScore({bool ascending = true}) async {
-//     final db = await database;
-//     final maps = await db.query(
-//       'notes',
-//       orderBy: 'score ${ascending ? 'ASC' : 'DESC'}',
-//     );
-//     return _mapsToNotes(maps);
-//   }
-
   // 매핑용 헬퍼 메서드들
   Map<String, dynamic> _noteToMap(Note note) {
         return {
@@ -161,7 +143,7 @@ class NoteRepository {
             'comment': note.comment,
             'image': note.image,
             'score': note.score,
-            'recorded_at': note.drankAt.toIso8601String(),
+            'drank_at': note.drankAt.toIso8601String(),
             'created_at': note.createdAt.toIso8601String(),
             'updated_at': note.updatedAt.toIso8601String(),
         };
@@ -178,7 +160,7 @@ class NoteRepository {
             comment: map['comment'] as String,    
             image: map['image'] as String?,
             score: map['score'] as int,
-            drankAt: DateTime.parse(map['recorded_at']),
+            drankAt: DateTime.parse(map['drank_at']),
             createdAt: DateTime.parse(map['created_at']),
             updatedAt: DateTime.parse(map['updated_at']),
         );
