@@ -63,8 +63,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
 
-      //  home: const MainPage(),
-      home: DbTestPage(),
+       home: const MainPage(),
+      // home: DbTestPage(),
     );
   }
 }
