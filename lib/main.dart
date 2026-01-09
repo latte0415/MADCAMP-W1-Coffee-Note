@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'main_page.dart';
 import 'pages/db_test_page.dart';
 
 void main() {
@@ -31,8 +32,9 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      home: DbTestPage(),
+
+      home: const MainPage(),
+//       home: DbTestPage(),
     );
   }
 }
