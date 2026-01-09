@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/list_page.dart';
+import 'pages/modals/creation_modal.dart';
 import 'pages/gallery_page.dart';
 import 'pages/recommendation_page.dart';
 
@@ -51,14 +52,14 @@ class _MainPageState extends State<MainPage> {
         // 추가 버튼 (1-1-0 기능으로 연결 예정)
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            // showModalBottomSheet(
-            //   context: context,
-            //   isScrollControlled: true, // 키보드 가림 방지 및 높이 조절
-            //   shape: const RoundedRectangleBorder(
-            //     borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-            //   ),
-            //   builder: (context) => const NoteCreatePopup(),
-            // ).then((_) => setState(() {})); // 팝업 닫히면 리스트 새로고침
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true, // 키보드 가림 방지 및 높이 조절
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+              ),
+              builder: (context) => const NoteCreatePopup(),
+            ).then((_) => setState(() {})); // 팝업 닫히면 리스트 새로고침
           },
           backgroundColor: Theme.of(context).primaryColor,
           tooltip: 'Add Note',
