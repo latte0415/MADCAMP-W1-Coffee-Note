@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../models/note.dart';        // Note 모델 파일 경로
 import '../../services/note_service.dart'; // NoteService 파일 경로
 import 'package:uuid/uuid.dart';
+import 'dart:io'; // image 추가
+import 'package:image_picker/image_picker.dart'; // image 추가
+import '../../services/image_service.dart'; // image 추가
 
 class NoteCreatePopup extends StatefulWidget {
   const NoteCreatePopup({super.key});
@@ -18,11 +21,41 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
   final TextEditingController _dateController = TextEditingController(
       text: DateTime.now().toString().split(' ')[0] // "2026-01-09" 형식
   );
+  XFile? _selectedImage; // image 변수
 
   double _acidity = 5;
   double _body = 5;
   double _bitterness = 5;
   int _score = 3;
+  void _showImagePicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('갤러리에서 선택'),
+              onTap: () async {
+                final img = await ImageService.instance.pickImage(ImageSource.gallery);
+                if (img != null) setState(() => _selectedImage = img);
+                if (mounted) Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('카메라로 촬영'),
+              onTap: () async {
+                final img = await ImageService.instance.pickImage(ImageSource.camera);
+                if (img != null) setState(() => _selectedImage = img);
+                if (mounted) Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +86,38 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                 ],
               ),
               const Divider(),
+
+              // [추가] 이미지 선택 영역 UI
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text("커피 사진", style: TextStyle(fontSize: 14, color: Colors.grey)),
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: _showImagePicker,
+                child: Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: _selectedImage != null
+                      ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(File(_selectedImage!.path), fit: BoxFit.cover),
+                  )
+                      : const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt, color: Colors.grey, size: 40),
+                      Text("사진 추가하기", style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
 
               // 텍스트 입력창 섹션
               _buildTextField("카페 이름", _cafeController),
@@ -100,7 +165,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                         borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: _submitNote,
-                  child: const Text("생성하기", style: TextStyle(
+                  child: const Text("Note 등록하기", style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold)),
@@ -146,20 +211,25 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     );
   }
 
-  // 생성 로직 호출
+  // [수정] 생성 로직: ImageService 연동
   void _submitNote() async {
     if (_cafeController.text.isEmpty || _menuController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("카페와 메뉴를 입력해주세요!")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("카페와 메뉴를 입력해주세요!")));
       return;
     }
 
     try {
-      // 텍스트를 DateTime으로 변환 시도
       DateTime parsedDate = DateTime.parse(_dateController.text);
+      final String noteId = const Uuid().v4(); // [수정] ID를 먼저 생성 (파일 이름용)
+      String? savedImagePath;
+
+      // [추가] 이미지가 선택되었다면 물리적 경로에 저장
+      if (_selectedImage != null) {
+        savedImagePath = await ImageService.instance.saveImage(_selectedImage!, noteId);
+      }
 
       final newNote = Note(
-        id: const Uuid().v4(),
+        id: noteId,
         location: _cafeController.text,
         menu: _menuController.text,
         comment: _commentController.text,
@@ -168,18 +238,17 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
         levelBitterness: _bitterness.toInt(),
         score: _score,
         drankAt: parsedDate,
+        image: savedImagePath, // [추가] 저장된 경로 DB 필드에 할당
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      await NoteService.instance.createNote(newNote); // 생성 호출 [cite: 1-0-0]
-      if (mounted) Navigator.pop(context); // 팝업 해제 [cite: 1-0-0]
+      await NoteService.instance.createNote(newNote);
+      if (mounted) Navigator.pop(context);
     } catch (e) {
-      // [해결] await NoteService 이후에 발생할 수 있는 상황이므로 mounted 체크 추가
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("날짜 형식이 올바르지 않습니다 (YYYY-MM-DD)")),
+        const SnackBar(content: Text("날짜 형식이 올바르지 않거나 오류가 발생했습니다.")),
       );
     }
   }
