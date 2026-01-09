@@ -81,7 +81,7 @@ class NoteService {
         final diff = sqrt(diffAcidity + diffBody + diffBitterness);
         
         // 각 값이 1-10 범위이므로 최대 차이는 9지만 10으로 가정
-        const maxDiff = sqrt(300.0);
+        final maxDiff = sqrt(300.0);
         
         // 유사도: 1.0 (완전 일치) ~ 0.0 (완전 불일치)
         final similarity = 1.0 - (diff / maxDiff);
