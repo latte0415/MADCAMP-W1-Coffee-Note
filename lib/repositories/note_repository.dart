@@ -129,26 +129,6 @@ class NoteRepository {
     );
     return result > 0;
   }
-
-//   // 정렬 메서드
-//   Future<List<Note>> getNotesSortedByDate({bool ascending = true}) async {
-//     final db = await database;
-//     final maps = await db.query(
-//       'notes',
-//       orderBy: 'recorded_at ${ascending ? 'ASC' : 'DESC'}',
-//     );
-//     return _mapsToNotes(maps);
-//   }
-
-//   Future<List<Note>> getNotesSortedByScore({bool ascending = true}) async {
-//     final db = await database;
-//     final maps = await db.query(
-//       'notes',
-//       orderBy: 'score ${ascending ? 'ASC' : 'DESC'}',
-//     );
-//     return _mapsToNotes(maps);
-//   }
-
   // 매핑용 헬퍼 메서드들
   Map<String, dynamic> _noteToMap(Note note) {
         return {
