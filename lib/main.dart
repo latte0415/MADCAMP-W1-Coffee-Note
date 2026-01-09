@@ -6,35 +6,35 @@ import 'services/note_service.dart'; // [추가]
 import 'package:uuid/uuid.dart'; // [추가] uuid 패키지 필요
 import '../../models/sort_option.dart';
 
-// void main() {
-//   runApp(const MyApp());
-// }
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // 앱 실행 시 딱 한 번만 실행되는 테스트 코드
-  final service = NoteService.instance;
-  final notes = await service.getAllNotes(const DateSortOption());
-
-  if (notes.isEmpty) {
-    await service.createNote(Note(
-      id: "test_${DateTime.now().millisecondsSinceEpoch}",
-      location: "쥬스킹",
-      menu: "아아",
-      levelAcidity: 6,
-      levelBody: 2,
-      levelBitterness: 3,
-      comment: "낫배드~",
-      score: 3,
-      drankAt: DateTime.now(),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ));
-  }
-
+void main() {
   runApp(const MyApp());
 }
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//
+//   // 앱 실행 시 딱 한 번만 실행되는 테스트 코드
+//   final service = NoteService.instance;
+//   final notes = await service.getAllNotes(const DateSortOption());
+//
+//   if (notes.isEmpty) {
+//     await service.createNote(Note(
+//       id: "test_${DateTime.now().millisecondsSinceEpoch}",
+//       location: "쥬스킹",
+//       menu: "아아",
+//       levelAcidity: 6,
+//       levelBody: 2,
+//       levelBitterness: 3,
+//       comment: "낫배드~",
+//       score: 3,
+//       drankAt: DateTime.now(),
+//       createdAt: DateTime.now(),
+//       updatedAt: DateTime.now(),
+//     ));
+//   }
+//
+//   runApp(const MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

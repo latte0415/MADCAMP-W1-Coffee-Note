@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../../models/note.dart';
 import '../../models/sort_option.dart'; // [추가]
 import '../../services/note_service.dart';
+import '../pages/modals/details_modal.dart';
 
-// [변경] StatefulWidget으로 전환
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
 
@@ -12,7 +12,7 @@ class ListPage extends StatefulWidget {
 }
 
 class ListPageState extends State<ListPage> {
-  // [추가] 외부(MainPage)에서 이 함수를 부르면 리스트가 새로고침됩니다.
+  // 외부(MainPage)에서 이 함수를 부르면 리스트가 새로고침됩니다.
   void refreshNotes() {
     setState(() {
       // FutureBuilder가 _getSortedNotes()를 다시 호출하게 유도합니다.
@@ -80,10 +80,6 @@ class ListPageState extends State<ListPage> {
 
               final notes = snapshot.data!;
               return ListView.builder(
-                // [추가] 항상 스크롤이 가능하도록 강제합니다.
-                physics: const AlwaysScrollableScrollPhysics(),
-                // [추가] 자식 높이에 맞춰 크기를 조절합니다.
-                shrinkWrap: true,
                 itemCount: notes.length,
                 itemBuilder: (context, index) {
                   return _buildCoffeeCard(notes[index]);
@@ -152,48 +148,65 @@ class ListPageState extends State<ListPage> {
   }
 
   Widget _buildCoffeeCard(Note note) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(note.menu, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Row(
-                  children: [
-                    const Icon(Icons.star, color: Colors.amber, size: 20),
-                    Text(" ${note.score}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(note.comment, style: const TextStyle(fontSize: 14, color: Colors.black87)),
-            const SizedBox(height: 4),
-            Text(note.location, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _levelText("산미", note.levelAcidity),
-                _levelText("바디", note.levelBody),
-                _levelText("쓴맛", note.levelBitterness),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(note.drankAt.toString().split(' ')[0],
-                style: const TextStyle(color: Colors.grey, fontSize: 11)),
-          ],
+      // 리스트 노트 클릭 시 detail modal 연결
+      return GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent, // 모서리 곡선을 위해 투명 배경 설정
+              builder: (context) => NoteDetailsModal(note: note),
+            ).then((result) {
+              // 수정 후 '저장'을 눌러 true가 반환되면 목록을 새로고침합니다.
+              if (result == true) {
+                refreshNotes();
+              }
+            });
+          },
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        elevation: 1,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(note.menu, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 20),
+                      Text(" ${note.score}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(note.comment, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+              const SizedBox(height: 4),
+              Text(note.location, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _levelText("산미", note.levelAcidity),
+                  _levelText("바디", note.levelBody),
+                  _levelText("쓴맛", note.levelBitterness),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(note.drankAt.toString().split(' ')[0],
+                  style: const TextStyle(color: Colors.grey, fontSize: 11)),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  // 수치 정보를 표시하는 스타일을 재사용 가능하게 모듈화
   Widget _levelText(String label, int value) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),

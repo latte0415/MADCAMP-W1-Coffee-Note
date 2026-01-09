@@ -18,14 +18,14 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<ListPageState> _listPageKey = GlobalKey<ListPageState>();
   final GlobalKey<GalleryPageState> _galleryPageKey = GlobalKey<GalleryPageState>();
 
-  // [추가] 각 인덱스에 맞는 화면 리스트
+  // 각 인덱스에 맞는 화면 리스트
   List<Widget> get _pages => [
     ListPage(key: _listPageKey),
     GalleryPage(key: _galleryPageKey),
     const Center(child: Text('3-0-0 RECOMMENDATION 화면')),
   ];
 
-  // [추가] 탭을 클릭할 때 실행될 함수
+  // 탭을 클릭할 때 실행될 함수
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -35,14 +35,15 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      // 상단바
+      appBar: AppBar(
           title: const Text('COFFEE NOTE'),
           centerTitle: true,
         ),
-        // [변경] TabBarView 대신, 선택된 인덱스의 페이지를 보여줍니다.
+
         body: _pages[_selectedIndex],
 
-        // [추가] 화면 아래에 네비게이션 바를 배치합니다.
+        // 탭 선택: 화면 아래에 네비게이션 바를 배치합니다.
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex, // 현재 눌린 버튼 표시
           onTap: _onItemTapped,         // 클릭 시 인덱스 변경 함수 호출
@@ -53,7 +54,7 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
 
-        // 추가 버튼 (1-1-0 기능으로 연결 예정)
+        // (+) 노트 추가 버튼 (creation으로 연결)
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             showModalBottomSheet(
@@ -67,7 +68,7 @@ class _MainPageState extends State<MainPage> {
               ),
               builder: (context) => const NoteCreatePopup(),
             ).then((_) {
-              // [핵심] 팝업이 닫히면 ListPage 내부의 함수를 강제로 실행시킵니다.
+              // [핵심] 팝업이 닫히면 ListPage 내부의 함수를 강제로 실행시킵니다. (새로고침)
               _listPageKey.currentState?.refreshNotes();
             });
           },
