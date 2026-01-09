@@ -8,10 +8,17 @@ class ListPage extends StatefulWidget {
   const ListPage({super.key});
 
   @override
-  State<ListPage> createState() => _ListPageState();
+  State<ListPage> createState() => ListPageState();
 }
 
-class _ListPageState extends State<ListPage> {
+class ListPageState extends State<ListPage> {
+  // [추가] 외부(MainPage)에서 이 함수를 부르면 리스트가 새로고침됩니다.
+  void refreshNotes() {
+    setState(() {
+      // FutureBuilder가 _getSortedNotes()를 다시 호출하게 유도합니다.
+    });
+  }
+
   // [추가] 현재 선택된 정렬 옵션 상태 (기본값: 날짜 최신순)
   SortOption _currentSort = const DateSortOption(ascending: false);
 
@@ -73,6 +80,10 @@ class _ListPageState extends State<ListPage> {
 
               final notes = snapshot.data!;
               return ListView.builder(
+                // [추가] 항상 스크롤이 가능하도록 강제합니다.
+                physics: const AlwaysScrollableScrollPhysics(),
+                // [추가] 자식 높이에 맞춰 크기를 조절합니다.
+                shrinkWrap: true,
                 itemCount: notes.length,
                 itemBuilder: (context, index) {
                   return _buildCoffeeCard(notes[index]);
