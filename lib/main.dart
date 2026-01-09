@@ -1,8 +1,37 @@
 import 'package:flutter/material.dart';
 import 'main_page.dart';
 import 'pages/db_test_page.dart';
+import 'models/note.dart'; // [추가]
+import 'services/note_service.dart'; // [추가]
+import 'package:uuid/uuid.dart'; // [추가] uuid 패키지 필요
 
-void main() {
+// void main() {
+//   runApp(const MyApp());
+// }
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 앱 실행 시 딱 한 번만 실행되는 테스트 코드
+  final service = NoteService.instance;
+  final notes = await service.getAllNotes();
+
+  if (notes.isEmpty) {
+    await service.createNote(Note(
+      id: "test_${DateTime.now().millisecondsSinceEpoch}",
+      location: "케빈커피 당산점",
+      menu: "오렌지 아메리카노",
+      levelAcidity: 3,
+      levelBody: 2,
+      levelBitterness: 5,
+      comment: "오렌지가 상큼해요",
+      score: 2,
+      drankAt: DateTime.now(),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    ));
+  }
+
   runApp(const MyApp());
 }
 
@@ -33,8 +62,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
 
-      home: const MainPage(),
-//       home: DbTestPage(),
+       home: const MainPage(),
+   //    home: DbTestPage(),
     );
   }
 }
