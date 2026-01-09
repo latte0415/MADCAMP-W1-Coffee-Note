@@ -130,6 +130,17 @@ class NoteRepository {
     );
     return result > 0;
   }
+  // 추가 기능 구현: 검색
+  Future<List<Note>> searchNotes(String query, SortOption sortOption) async {
+    final db = await database;
+    final maps = await db.query(
+      'notes', 
+      where: 'location LIKE ? OR menu LIKE ? OR comment LIKE ?', 
+      whereArgs: ['%$query%', '%$query%', '%$query%'], 
+      orderBy: sortOption.toSqlOrderBy()
+    );
+    return _mapsToNotes(maps);
+  }
 
   // 매핑용 헬퍼 메서드들
   Map<String, dynamic> _noteToMap(Note note) {

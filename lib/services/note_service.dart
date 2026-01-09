@@ -46,4 +46,8 @@ class NoteService {
         // DB에서 노트 삭제
         return await NoteRepository.instance.deleteNote(id);
     }
+
+    Future<List<Note>> searchNotes(String query, SortOption sortOption) async {
+        return await NoteRepository.instance.searchNotes(query, sortOption);
+    }
 }
