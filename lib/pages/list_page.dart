@@ -1,9 +1,35 @@
 import 'package:flutter/material.dart';
 import '../../models/note.dart';
+import '../../models/sort_option.dart'; // [추가]
 import '../../services/note_service.dart';
 
-class ListPage extends StatelessWidget {
+// [변경] StatefulWidget으로 전환
+class ListPage extends StatefulWidget {
   const ListPage({super.key});
+
+  @override
+  State<ListPage> createState() => _ListPageState();
+}
+
+class _ListPageState extends State<ListPage> {
+  // [추가] 현재 선택된 정렬 옵션 상태 (기본값: 날짜 최신순)
+  SortOption _currentSort = const DateSortOption(ascending: false);
+
+  // [추가] 데이터를 가져와서 현재 옵션에 맞게 정렬하는 함수
+  Future<List<Note>> _getSortedNotes() async {
+    final notes = await NoteService.instance.getAllNotes(_currentSort);
+
+    if (_currentSort is DateSortOption) {
+      notes.sort((a, b) => _currentSort.ascending
+          ? a.drankAt.compareTo(b.drankAt)
+          : b.drankAt.compareTo(a.drankAt));
+    } else if (_currentSort is ScoreSortOption) {
+      notes.sort((a, b) => _currentSort.ascending
+          ? a.score.compareTo(b.score)
+          : b.score.compareTo(a.score));
+    }
+    return notes;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +41,10 @@ class ListPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _sortButton(context, "날짜순"),
+              // [변경] 각 버튼에 정렬 객체를 전달
+              _sortButton("날짜순", const DateSortOption(ascending: false)),
               const SizedBox(width: 8),
-              _sortButton(context, "Score순"),
+              _sortButton("Score순", const ScoreSortOption(ascending: false)),
             ],
           ),
         ),
@@ -25,7 +52,8 @@ class ListPage extends StatelessWidget {
         // 2. FutureBuilder 영역
         Expanded(
           child: FutureBuilder<List<Note>>(
-            future: NoteService.instance.getAllNotes(),
+            // [변경] 직접 Service를 부르지 않고 정렬 로직이 포함된 함수 호출
+            future: _getSortedNotes(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -57,6 +85,36 @@ class ListPage extends StatelessWidget {
     );
   }
 
+  // [변경] context를 직접 쓰지 않고 클래스 멤버로 사용하며, 정렬 옵션을 인자로 받음
+  Widget _sortButton(String label, SortOption option) {
+    // 현재 선택된 정렬 타입인지 확인 (is 연산자로 타입 비교)
+    bool isSelected = (_currentSort.runtimeType == option.runtimeType);
+    Color primaryColor = Theme.of(context).primaryColor;
+
+    return OutlinedButton(
+      onPressed: () {
+        // [핵심] 버튼 클릭 시 상태 변경 및 UI 갱신
+        setState(() {
+          _currentSort = option;
+        });
+      },
+      style: OutlinedButton.styleFrom(
+        shape: const StadiumBorder(),
+        // 선택되었을 때 배경색을 보라색으로 채움
+        backgroundColor: isSelected ? primaryColor : Colors.transparent,
+        side: BorderSide(color: primaryColor),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          // 선택되었을 때 글자색을 흰색으로 변경
+          color: isSelected ? Colors.white : primaryColor,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyGuideCard() {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -71,16 +129,11 @@ class ListPage extends StatelessWidget {
           children: [
             const Icon(Icons.coffee_outlined, size: 48, color: Colors.grey),
             const SizedBox(height: 16),
-            const Text(
-              "아직 작성된 노트가 없어요",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
-            ),
+            const Text("아직 작성된 노트가 없어요",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: 8),
-            const Text(
-              "하단의 + 버튼을 눌러\n첫 번째 커피 노트를 만들어보세요!",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
+            const Text("하단의 + 버튼을 눌러\n첫 번째 커피 노트를 만들어보세요!",
+                textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.grey)),
           ],
         ),
       ),
@@ -134,23 +187,6 @@ class ListPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
       child: Text("$label $value", style: const TextStyle(fontSize: 12)),
-    );
-  }
-
-  Widget _sortButton(BuildContext context, String label) {
-    return OutlinedButton(
-      onPressed: () {},
-      style: OutlinedButton.styleFrom(
-        shape: const StadiumBorder(),
-        side: BorderSide(color: Theme.of(context).primaryColor),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Theme.of(context).primaryColor,
-          fontSize: 12,
-        ),
-      ),
     );
   }
 }

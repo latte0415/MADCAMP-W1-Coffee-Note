@@ -11,7 +11,7 @@ class DateSortOption extends SortOption {
 
     @override
     String toSqlOrderBy() {
-        return 'drank_at ${ascending ? 'ASC' : 'DESC'}';
+        return 'drankAt ${ascending ? 'ASC' : 'DESC'}';
     }
 }
 

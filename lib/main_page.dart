@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'pages/list_page.dart';
-// import 'pages/gallery_page.dart';
-// import 'pages/recommendation_page.dart';
+import 'pages/gallery_page.dart';
+import 'pages/recommendation_page.dart';
 
-class MainPage extends StatefulWidget { // [수정] 이름을 MainPage로 변경
+class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
   @override
@@ -33,14 +33,6 @@ class _MainPageState extends State<MainPage> {
         appBar: AppBar(
           title: const Text('COFFEE NOTE'),
           centerTitle: true,
-          // 탭 버튼들 (상단 네비게이션 바 역할)
-          // bottom: const TabBar(
-          //   tabs: [
-          //     Tab(icon: Icon(Icons.list_alt), text: 'LIST'),
-          //     Tab(icon: Icon(Icons.grid_view), text: 'GALLERY'),
-          //     Tab(icon: Icon(Icons.auto_awesome), text: 'RECO'),
-          //   ],
-          // ),
         ),
         // [변경] TabBarView 대신, 선택된 인덱스의 페이지를 보여줍니다.
         body: _pages[_selectedIndex],
@@ -56,11 +48,21 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
 
-        // 공통 추가 버튼 (1-1-0 기능으로 연결 예정)
+        // 추가 버튼 (1-1-0 기능으로 연결 예정)
         floatingActionButton: FloatingActionButton(
-          onPressed: () {}, // 지금은 숫자가 올라가지만, 나중에 노트 추가로 바꿀 거예요!
+          onPressed: () {
+            // showModalBottomSheet(
+            //   context: context,
+            //   isScrollControlled: true, // 키보드 가림 방지 및 높이 조절
+            //   shape: const RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+            //   ),
+            //   builder: (context) => const NoteCreatePopup(),
+            // ).then((_) => setState(() {})); // 팝업 닫히면 리스트 새로고침
+          },
+          backgroundColor: Theme.of(context).primaryColor,
           tooltip: 'Add Note',
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       );
   }

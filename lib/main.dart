@@ -4,6 +4,7 @@ import 'pages/db_test_page.dart';
 import 'models/note.dart'; // [추가]
 import 'services/note_service.dart'; // [추가]
 import 'package:uuid/uuid.dart'; // [추가] uuid 패키지 필요
+import '../../models/sort_option.dart';
 
 // void main() {
 //   runApp(const MyApp());
@@ -14,7 +15,7 @@ void main() async {
 
   // 앱 실행 시 딱 한 번만 실행되는 테스트 코드
   final service = NoteService.instance;
-  final notes = await service.getAllNotes();
+  final notes = await service.getAllNotes(const DateSortOption());
 
   if (notes.isEmpty) {
     await service.createNote(Note(
