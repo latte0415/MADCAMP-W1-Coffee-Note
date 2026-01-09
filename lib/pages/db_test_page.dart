@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/note_service.dart';
+import '../services/image_service.dart';
 import '../models/note.dart';
 import '../models/sort_option.dart';
 
@@ -144,23 +147,78 @@ class _DbTestPageState extends State<DbTestPage> {
   }
 
   Future<void> _createNote() async {
+    // 이미지 선택 다이얼로그
+    final imageSource = await _showImageSourceDialog();
+    XFile? selectedImage;
+    
+    if (imageSource != null) {
+      selectedImage = await ImageService.instance.pickImage(imageSource);
+    }
+
+    final noteId = const Uuid().v4();
+    String? imagePath;
+
+    // 이미지가 선택된 경우 저장
+    if (selectedImage != null) {
+      imagePath = await ImageService.instance.saveImage(selectedImage, noteId);
+    }
+
     final note = Note(
-      id: const Uuid().v4(),
+      id: noteId,
       location: '테스트 카페',
       menu: '아메리카노',
       levelAcidity: 3,
       levelBody: 4,
       levelBitterness: 2,
       comment: '테스트',
-      score: 8,
+      score: 3,
       drankAt: DateTime.now(),
+      image: imagePath,
     );
 
     await NoteService.instance.createNote(note);
     _loadNotes();
   }
 
+  Future<ImageSource?> _showImageSourceDialog() async {
+    return await showDialog<ImageSource>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('이미지 선택'),
+        content: const Text('이미지를 선택하세요'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, ImageSource.gallery),
+            child: const Text('갤러리'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, ImageSource.camera),
+            child: const Text('카메라'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, null),
+            child: const Text('취소'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _updateNote(Note note) async {
+    // 이미지 변경 여부 확인
+    final imageSource = await _showImageSourceDialog();
+    XFile? selectedImage;
+    String? imagePath = note.image;
+
+    if (imageSource != null) {
+      selectedImage = await ImageService.instance.pickImage(imageSource);
+      
+      // 새 이미지가 선택된 경우 저장
+      if (selectedImage != null) {
+        imagePath = await ImageService.instance.saveImage(selectedImage, note.id);
+      }
+    }
+
     final updatedNote = Note(
       id: note.id,
       location: note.location,
@@ -172,6 +230,7 @@ class _DbTestPageState extends State<DbTestPage> {
       score: note.score + 1 > 5 ? 5 : note.score + 1,
       drankAt: note.drankAt,
       createdAt: note.createdAt,
+      image: imagePath,
     );
 
     await NoteService.instance.updateNote(updatedNote);
@@ -209,96 +268,107 @@ class _DbTestPageState extends State<DbTestPage> {
       appBar: AppBar(title: const Text('DB 테스트')),
       body: Column(
         children: [
-          // 테스트 데이터 생성 버튼
-          ElevatedButton(
-            onPressed: _createTestData,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('테스트 데이터 생성 (다양한 점수/날짜)'),
-          ),
-          const SizedBox(height: 8),
-          // 기본 노트 생성 버튼
-          ElevatedButton(
-            onPressed: _createNote,
-            child: const Text('노트 생성'),
-          ),
-          const SizedBox(height: 8),
-          // 정렬 옵션 버튼들
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
+          // 상단 버튼 영역 (스크롤 가능)
+          Expanded(
+            flex: 0,
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  const Text('날짜순', style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
+                  // 테스트 데이터 생성 버튼
+                  ElevatedButton(
+                    onPressed: _createTestData,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('테스트 데이터 생성 (다양한 점수/날짜)'),
+                  ),
+                  const SizedBox(height: 8),
+                  // 기본 노트 생성 버튼
+                  ElevatedButton(
+                    onPressed: _createNote,
+                    child: const Text('노트 생성'),
+                  ),
+                  const SizedBox(height: 8),
+                  // 정렬 옵션 버튼들
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ElevatedButton(
-                        onPressed: () => _sortByDate(false),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentSortOption is DateSortOption && !_currentSortOption.ascending
-                              ? Colors.green
-                              : null,
-                        ),
-                        child: const Text('↓ 최신순'),
+                      Column(
+                        children: [
+                          const Text('날짜순', style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => _sortByDate(false),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _currentSortOption is DateSortOption && !_currentSortOption.ascending
+                                      ? Colors.green
+                                      : null,
+                                ),
+                                child: const Text('↓ 최신순'),
+                              ),
+                              const SizedBox(width: 4),
+                              ElevatedButton(
+                                onPressed: () => _sortByDate(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _currentSortOption is DateSortOption && _currentSortOption.ascending
+                                      ? Colors.green
+                                      : null,
+                                ),
+                                child: const Text('↑ 오래된순'),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 4),
-                      ElevatedButton(
-                        onPressed: () => _sortByDate(true),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentSortOption is DateSortOption && _currentSortOption.ascending
-                              ? Colors.green
-                              : null,
-                        ),
-                        child: const Text('↑ 오래된순'),
+                      Column(
+                        children: [
+                          const Text('점수순', style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => _sortByScore(false),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _currentSortOption is ScoreSortOption && !_currentSortOption.ascending
+                                      ? Colors.green
+                                      : null,
+                                ),
+                                child: const Text('↓ 높은순'),
+                              ),
+                              const SizedBox(width: 4),
+                              ElevatedButton(
+                                onPressed: () => _sortByScore(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _currentSortOption is ScoreSortOption && _currentSortOption.ascending
+                                      ? Colors.green
+                                      : null,
+                                ),
+                                child: const Text('↑ 낮은순'),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-              Column(
-                children: [
-                  const Text('점수순', style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => _sortByScore(false),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentSortOption is ScoreSortOption && !_currentSortOption.ascending
-                              ? Colors.green
-                              : null,
-                        ),
-                        child: const Text('↓ 높은순'),
-                      ),
-                      const SizedBox(width: 4),
-                      ElevatedButton(
-                        onPressed: () => _sortByScore(true),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _currentSortOption is ScoreSortOption && _currentSortOption.ascending
-                              ? Colors.green
-                              : null,
-                        ),
-                        child: const Text('↑ 낮은순'),
-                      ),
-                    ],
+                  const SizedBox(height: 8),
+                  // 현재 정렬 상태 표시
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    color: Colors.grey[200],
+                    child: Text(
+                      '현재 정렬: ${_currentSortOption is DateSortOption ? "날짜" : "점수"} (${_currentSortOption.ascending ? "오름차순" : "내림차순"})',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // 현재 정렬 상태 표시
-          Container(
-            padding: const EdgeInsets.all(8),
-            color: Colors.grey[200],
-            child: Text(
-              '현재 정렬: ${_currentSortOption is DateSortOption ? "날짜" : "점수"} (${_currentSortOption.ascending ? "오름차순" : "내림차순"})',
-              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
+          // 노트 리스트 영역 (스크롤 가능)
           Expanded(
             child: _notes.isEmpty
                 ? const Center(child: Text('노트가 없습니다.'))
@@ -343,8 +413,36 @@ class _DbTestPageState extends State<DbTestPage> {
                                     '수정일',
                                     '${note.updatedAt.year}-${note.updatedAt.month.toString().padLeft(2, '0')}-${note.updatedAt.day.toString().padLeft(2, '0')} ${note.updatedAt.hour.toString().padLeft(2, '0')}:${note.updatedAt.minute.toString().padLeft(2, '0')}',
                                   ),
-                                  if (note.image != null)
-                                    _buildInfoRow('이미지', note.image!),
+                                  if (note.image != null) ...[
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      '이미지:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(
+                                        File(note.image!),
+                                        width: double.infinity,
+                                        height: 200,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            height: 200,
+                                            color: Colors.grey[300],
+                                            child: const Center(
+                                              child: Icon(Icons.broken_image, size: 48),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                  ],
                                   const SizedBox(height: 16),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
