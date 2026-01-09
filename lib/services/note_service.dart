@@ -1,3 +1,4 @@
+import 'dart:math';
 import '../repositories/note_repository.dart';
 import '../models/note.dart';
 import '../models/sort_option.dart';
@@ -50,4 +51,43 @@ class NoteService {
     Future<List<Note>> searchNotes(String query, SortOption sortOption) async {
         return await NoteRepository.instance.searchNotes(query, sortOption);
     }
+
+    Future<List<Note>> getRecommendedNotes(
+        int acidity,
+        int body,
+        int bitterness, {
+        int limit = 5,
+    }) async {
+        final allNotes = await getAllNotes(const ScoreSortOption(ascending: false));
+
+        final notesWithSimilarity = allNotes.map((note) {
+            final similarity = _calculateSimilarity(note, acidity, body, bitterness);
+            return (note: note, similarity: similarity);
+        }).toList();
+
+        notesWithSimilarity.sort((a, b) => b.similarity.compareTo(a.similarity));
+        
+        return notesWithSimilarity
+            .take(limit)
+            .map((item) => item.note)
+            .toList();
+    }
+
+    double _calculateSimilarity(Note note, int acidity, int body, int bitterness) {
+        final diffAcidity = pow(note.levelAcidity - acidity, 2).toDouble();
+        final diffBody = pow(note.levelBody - body, 2).toDouble();
+        final diffBitterness = pow(note.levelBitterness - bitterness, 2).toDouble();
+
+        final diff = sqrt(diffAcidity + diffBody + diffBitterness);
+        
+        // 각 값이 1-10 범위이므로 최대 차이는 9지만 10으로 가정
+        const maxDiff = sqrt(300.0);
+        
+        // 유사도: 1.0 (완전 일치) ~ 0.0 (완전 불일치)
+        final similarity = 1.0 - (diff / maxDiff);
+        
+        // 음수 방지 (이론적으로는 발생하지 않지만 안전장치)
+        return similarity.clamp(0.0, 1.0);
+    }
+
 }
