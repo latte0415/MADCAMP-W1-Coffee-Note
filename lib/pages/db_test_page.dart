@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,9 @@ class DbTestPage extends StatefulWidget {
 class _DbTestPageState extends State<DbTestPage> {
   List<Note> _notes = [];
   SortOption _currentSortOption = const DateSortOption(ascending: false);
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -24,11 +28,47 @@ class _DbTestPageState extends State<DbTestPage> {
     _loadNotes();
   }
 
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadNotes() async {
-    final notes = await NoteService.instance.getAllNotes(_currentSortOption);
+    List<Note> notes;
+    if (_searchQuery.trim().isEmpty) {
+      // 검색어가 없으면 전체 노트 가져오기
+      notes = await NoteService.instance.getAllNotes(_currentSortOption);
+    } else {
+      // 검색어가 있으면 검색 실행
+      notes = await NoteService.instance.searchNotes(_searchQuery.trim(), _currentSortOption);
+    }
     setState(() {
       _notes = notes;
     });
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+    
+    // 이전 타이머 취소
+    _searchDebounce?.cancel();
+    
+    // 500ms 후에 검색 실행 (debounce)
+    _searchDebounce = Timer(const Duration(milliseconds: 500), () {
+      _loadNotes();
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {
+      _searchQuery = '';
+    });
+    _loadNotes();
   }
 
   Future<void> _createTestData() async {
@@ -37,89 +77,89 @@ class _DbTestPageState extends State<DbTestPage> {
       // 다양한 점수와 날짜를 가진 테스트 데이터
       Note(
         id: const Uuid().v4(),
-        location: '스타벅스 강남점',
-        menu: '아메리카노',
+        location: 'Starbucks Gangnam',
+        menu: 'Americano',
         levelAcidity: 5,
         levelBody: 3,
         levelBitterness: 4,
-        comment: '맛있어요',
+        comment: 'Delicious',
         score: 5,
         drankAt: now.subtract(const Duration(days: 10)),
       ),
       Note(
         id: const Uuid().v4(),
-        location: '투썸플레이스',
-        menu: '카페라떼',
+        location: 'Twosome Place',
+        menu: 'Cafe Latte',
         levelAcidity: 3,
         levelBody: 5,
         levelBitterness: 2,
-        comment: '그냥 그래요',
+        comment: 'Just okay',
         score: 2,
         drankAt: now.subtract(const Duration(days: 5)),
       ),
       Note(
         id: const Uuid().v4(),
-        location: '이디야커피',
-        menu: '바닐라라떼',
+        location: 'EDIYA Coffee',
+        menu: 'Vanilla Latte',
         levelAcidity: 2,
         levelBody: 4,
         levelBitterness: 3,
-        comment: '최고예요!',
+        comment: 'The best!',
         score: 4,
         drankAt: now.subtract(const Duration(days: 15)),
       ),
       Note(
         id: const Uuid().v4(),
-        location: '할리스커피',
-        menu: '콜드브루',
+        location: 'Hollys Coffee',
+        menu: 'Cold Brew',
         levelAcidity: 4,
         levelBody: 5,
         levelBitterness: 5,
-        comment: '별로예요',
+        comment: 'Not good',
         score: 1,
         drankAt: now.subtract(const Duration(days: 2)),
       ),
       Note(
         id: const Uuid().v4(),
-        location: '컴포즈커피',
-        menu: '카푸치노',
+        location: 'Compose Coffee',
+        menu: 'Cappuccino',
         levelAcidity: 3,
         levelBody: 3,
         levelBitterness: 3,
-        comment: '무난해요',
+        comment: 'Average',
         score: 3,
         drankAt: now.subtract(const Duration(days: 7)),
       ),
       Note(
         id: const Uuid().v4(),
-        location: '메가커피',
-        menu: '에스프레소',
+        location: 'Mega Coffee',
+        menu: 'Espresso',
         levelAcidity: 5,
         levelBody: 2,
         levelBitterness: 4,
-        comment: '좋아요',
+        comment: 'Good',
         score: 4,
         drankAt: now.subtract(const Duration(days: 1)),
       ),
       Note(
         id: const Uuid().v4(),
-        location: '빽다방',
-        menu: '아이스 아메리카노',
+        location: 'Paik\'s Coffee',
+        menu: 'Iced Americano',
         levelAcidity: 2,
         levelBody: 2,
         levelBitterness: 2,
-        comment: '괜찮아요',
+        comment: 'Not bad',
         score: 3,
         drankAt: now.subtract(const Duration(days: 20)),
       ),
       Note(
         id: const Uuid().v4(),
-        location: '카페베네',
-        menu: '카라멜 마키아토',
+        location: 'Caffe Bene',
+        menu: 'Caramel Macchiato',
         levelAcidity: 1,
         levelBody: 4,
         levelBitterness: 1,
-        comment: '최고!',
+        comment: 'Excellent!',
         score: 5,
         drankAt: now.subtract(const Duration(days: 3)),
       ),
@@ -165,12 +205,12 @@ class _DbTestPageState extends State<DbTestPage> {
 
     final note = Note(
       id: noteId,
-      location: '테스트 카페',
-      menu: '아메리카노',
+      location: 'Test Cafe',
+      menu: 'Americano',
       levelAcidity: 3,
       levelBody: 4,
       levelBitterness: 2,
-      comment: '테스트',
+      comment: 'Test',
       score: 3,
       drankAt: DateTime.now(),
       image: imagePath,
@@ -222,11 +262,11 @@ class _DbTestPageState extends State<DbTestPage> {
     final updatedNote = Note(
       id: note.id,
       location: note.location,
-      menu: '${note.menu} (수정됨)',
+      menu: '${note.menu} (Updated)',
       levelAcidity: note.levelAcidity,
       levelBody: note.levelBody,
       levelBitterness: note.levelBitterness,
-      comment: '${note.comment} - 업데이트 테스트',
+      comment: '${note.comment} - Update test',
       score: note.score + 1 > 5 ? 5 : note.score + 1,
       drankAt: note.drankAt,
       createdAt: note.createdAt,
@@ -268,12 +308,65 @@ class _DbTestPageState extends State<DbTestPage> {
       appBar: AppBar(title: const Text('DB 테스트')),
       body: Column(
         children: [
+          // 검색바
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.search,
+              enableInteractiveSelection: true,
+              enableSuggestions: true,
+              autocorrect: true,
+              obscureText: false,
+              maxLines: 1,
+              textCapitalization: TextCapitalization.none,
+              decoration: InputDecoration(
+                hintText: '카페명, 메뉴, 코멘트로 검색...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: _clearSearch,
+                        tooltip: '검색 초기화',
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+              onChanged: _onSearchChanged,
+            ),
+          ),
           // 상단 버튼 영역 (스크롤 가능)
           Expanded(
             flex: 0,
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  // 검색 결과 표시
+                  if (_searchQuery.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      color: Colors.blue[50],
+                      child: Row(
+                        children: [
+                          Icon(Icons.search, size: 16, color: Colors.blue[700]),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '"$_searchQuery" 검색 결과: ${_notes.length}개',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   // 테스트 데이터 생성 버튼
                   ElevatedButton(
                     onPressed: _createTestData,
