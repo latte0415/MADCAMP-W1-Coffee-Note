@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main_page.dart';
-import 'pages/db_test_page.dart';
+import 'pages/db_note_test_page.dart';
+import 'pages/db_detail_test_page.dart';
 import 'models/note.dart'; // [추가]
 import 'services/note_service.dart'; // [추가]
 import 'package:uuid/uuid.dart'; // [추가] uuid 패키지 필요
@@ -64,7 +65,8 @@ class MyApp extends StatelessWidget {
       ),
 
        home: const MainPage(),
-      // home: DbTestPage(),
+      // home: DbNoteTestPage(),
+      // home: DbDetailTestPage(),
     );
   }
 }

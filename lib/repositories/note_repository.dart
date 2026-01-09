@@ -1,48 +1,16 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import '../models/note.dart';
 import '../models/sort_option.dart';
+import '../database/database_manager.dart';
 
 class NoteRepository {
   static final NoteRepository instance = NoteRepository._init();
-  static Database? _database;
 
   NoteRepository._init();
 
+  /// DatabaseManager를 통해 공통 DB 인스턴스 사용
   Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDB('notes.db');
-    return _database!;
-  }
-
-  Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
-  }
-
-  Future<void> _createDB(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE notes (
-        id TEXT PRIMARY KEY,
-        location TEXT NOT NULL,
-        menu TEXT NOT NULL,
-        level_acidity INTEGER NOT NULL,
-        level_body INTEGER NOT NULL,
-        level_bitterness INTEGER NOT NULL,
-        comment TEXT NOT NULL,
-        image TEXT,
-        score INTEGER NOT NULL,
-        drank_at TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      )
-    ''');
+    return await DatabaseManager.instance.database;
   }
 
   // CRUD 메서드들

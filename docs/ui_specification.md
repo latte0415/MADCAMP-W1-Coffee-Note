@@ -12,7 +12,7 @@ level_bitterness: int (1~10)
 comment: text (한줄평 느낌. 텍스트 수 제한 필요)
 image: img
 score: int (1~5)
-recorded_at: (유저가 기록한 날짜. 시간은 X)
+drank_at: (유저가 마신 날짜. 시간은 X)
 created_at
 updated_at
 
@@ -83,7 +83,7 @@ updated_at
 - 탭 진입 마다 개인 취향을 선택 (or default?)
 - 선택한 취향에 따라 작성한 노트 노출 (score 대로 정렬)
 2. 구성 요소
-- 개인 취향 선택 창
+- 개인 취향 선택 창 (총 3개 슬라이드 존재)
   - slider 요소를 사용하여 원하는 컴포넌트 값 조절
   - 선택한 컴포넌트 값에 따라 필터 → 하단에 노트 노출
 - 선택한 취향에 따른 노트
