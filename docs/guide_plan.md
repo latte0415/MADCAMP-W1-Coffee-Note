@@ -25,10 +25,26 @@ drank_at: (유저가 마신 날짜. 시간은 X)
 created_at
 updated_at
 
-
 ## 데이터 구조 개선
 - 상세한 커피 정보에 대해서는 아래의 정보 포함할 예정
 1. 생산지(국가/지역)
 2. 로스팅 포인트
 3. 품종
 4. 추출 방식(에스프레소/필터/콜드브루 등)
+### User Defined Type 정의 (ENUM)
+1. process_type: WASHED, NATURAL, PULPED_NATURAL, HONEY, ETC
+2. roasting_point_type: LIGHT, MEDIUM, MEDIUM_DARK, DARK, ETC
+3. method_type: ESPRESSO, FILTER, COLD_BREW, ETC
+### 스키마 설계 (테이블명: coffee_details)
+- id: uuid, pk
+- note_id: FK(notes.id), NOT NULL
+- origin_country: TEXT
+- origin_region: TEXT
+- variety: TEXT
+- process: process_type(User defined type)
+- process_text: TEXT
+- roasting_point: roasting_point_type(User defined type)
+- roasting_point_text: TEXT
+- method: method_type(User defined type)
+- method_text: TEXT
+* enum은 있는테 text는 null이면 안된다는 제약 조건 필요

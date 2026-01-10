@@ -12,7 +12,7 @@ level_bitterness: int (1~10)
 comment: text (한줄평 느낌. 텍스트 수 제한 필요)
 image: img
 score: int (1~5)
-recorded_at: (유저가 기록한 날짜. 시간은 X)
+drank_at: (유저가 마신 날짜. 시간은 X)
 created_at
 updated_at
 
