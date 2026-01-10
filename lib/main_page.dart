@@ -14,10 +14,14 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
+  // creation 후 새로고침을 위한 global 선언
+  final GlobalKey<ListPageState> _listPageKey = GlobalKey<ListPageState>();
+  final GlobalKey<GalleryPageState> _galleryPageKey = GlobalKey<GalleryPageState>();
+
   // [추가] 각 인덱스에 맞는 화면 리스트
   List<Widget> get _pages => [
-    const ListPage(),
-    const Center(child: Text('2-0-0 GALLERY 화면')),
+    ListPage(key: _listPageKey),
+    GalleryPage(key: _galleryPageKey),
     const Center(child: Text('3-0-0 RECOMMENDATION 화면')),
   ];
 
@@ -55,11 +59,17 @@ class _MainPageState extends State<MainPage> {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true, // 키보드 가림 방지 및 높이 조절
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+              ),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
               ),
               builder: (context) => const NoteCreatePopup(),
-            ).then((_) => setState(() {})); // 팝업 닫히면 리스트 새로고침
+            ).then((_) {
+              // [핵심] 팝업이 닫히면 ListPage 내부의 함수를 강제로 실행시킵니다.
+              _listPageKey.currentState?.refreshNotes();
+            });
           },
           backgroundColor: Theme.of(context).primaryColor,
           tooltip: 'Add Note',
