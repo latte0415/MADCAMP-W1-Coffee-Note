@@ -23,8 +23,9 @@ class DatabaseManager {
 
         return await openDatabase(
             path,
-            version: 1,
+            version: 2,
             onCreate: _createTables,
+            onUpgrade: _onUpgrade,
         );
     }
 
@@ -61,9 +62,20 @@ class DatabaseManager {
                 roasting_point TEXT NOT NULL,
                 roasting_point_text TEXT,
                 method TEXT NOT NULL,
-                method_text TEXT
+                method_text TEXT,
+                tasting_notes TEXT
             )
         ''');
+    }
+
+    /// 데이터베이스 업그레이드 처리
+    Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+        if (oldVersion < 2) {
+            // 버전 1에서 2로 업그레이드: tasting_notes 컬럼 추가
+            await db.execute('''
+                ALTER TABLE details ADD COLUMN tasting_notes TEXT
+            ''');
+        }
     }
 
     /// 데이터베이스 연결 종료 (테스트용)

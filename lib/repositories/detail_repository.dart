@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+import 'dart:convert';
 import '../models/detail.dart';
 import '../models/enums/process_type.dart';
 import '../models/enums/roasting_point_type.dart';
@@ -108,10 +109,27 @@ class DetailRepository {
             'roasting_point_text': detail.roastingPointText,
             'method': detail.method.toDbValue(),  // enum을 DB 값으로 변환
             'method_text': detail.methodText,
+            'tasting_notes': detail.tastingNotes != null && detail.tastingNotes!.isNotEmpty
+                ? jsonEncode(detail.tastingNotes)
+                : null,
         };
     }
 
     Detail _mapToDetail(Map<String, dynamic> map) {
+        List<String>? tastingNotes;
+        final tastingNotesStr = map['tasting_notes'] as String?;
+        if (tastingNotesStr != null && tastingNotesStr.isNotEmpty) {
+            try {
+                final decoded = jsonDecode(tastingNotesStr);
+                if (decoded is List) {
+                    tastingNotes = decoded.cast<String>();
+                }
+            } catch (e) {
+                // JSON 파싱 실패 시 null로 설정 (기존 데이터 호환성)
+                tastingNotes = null;
+            }
+        }
+
         return Detail(
             id: map['id'] as String,
             noteId: map['note_id'] as String,
@@ -124,6 +142,7 @@ class DetailRepository {
             roastingPointText: map['roasting_point_text'] as String?,
             method: MethodType.fromDbValue(map['method'] as String),  // DB 값에서 enum으로 변환
             methodText: map['method_text'] as String?,
+            tastingNotes: tastingNotes,
         );
     }
 }

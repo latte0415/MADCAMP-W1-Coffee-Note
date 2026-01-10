@@ -14,6 +14,7 @@ class Detail {
     final String? roastingPointText;
     final MethodType method;
     final String? methodText;
+    final List<String>? tastingNotes;
 
     Detail({
         required this.id,
@@ -27,5 +28,6 @@ class Detail {
         this.roastingPointText,
         required this.method,
         this.methodText,
+        this.tastingNotes,
     });
 }
