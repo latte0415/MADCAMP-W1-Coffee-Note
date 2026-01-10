@@ -57,15 +57,15 @@ class _MainPageState extends State<MainPage> {
         // (+) 노트 추가 버튼 (creation으로 연결)
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            showModalBottomSheet(
+            showDialog(
               context: context,
-              isScrollControlled: true, // 키보드 가림 방지 및 높이 조절
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.8,
-              ),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-              ),
+              // isScrollControlled: true, // 키보드 가림 방지 및 높이 조절
+              // constraints: BoxConstraints(
+              //   maxHeight: MediaQuery.of(context).size.height * 0.8,
+              // ),
+              // shape: const RoundedRectangleBorder(
+              //   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+              // ),
               builder: (context) => const NoteCreatePopup(),
             ).then((_) {
               // [핵심] 팝업이 닫히면 ListPage 내부의 함수를 강제로 실행시킵니다. (새로고침)

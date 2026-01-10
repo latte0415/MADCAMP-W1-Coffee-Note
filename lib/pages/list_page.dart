@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../models/note.dart';
-import '../../models/sort_option.dart'; // [추가]
+import '../../models/sort_option.dart';
 import '../../services/note_service.dart';
 import '../pages/modals/details_modal.dart';
+// detail table 추가를 위한 import
+import '../../services/detail_service.dart';
+import '../../models/detail.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -19,10 +22,10 @@ class ListPageState extends State<ListPage> {
     });
   }
 
-  // [추가] 현재 선택된 정렬 옵션 상태 (기본값: 날짜 최신순)
+  // 현재 선택된 정렬 옵션 상태 (기본값: 날짜 최신순)
   SortOption _currentSort = const DateSortOption(ascending: false);
 
-  // [추가] 데이터를 가져와서 현재 옵션에 맞게 정렬하는 함수
+  // 데이터를 가져와서 현재 옵션에 맞게 정렬하는 함수
   Future<List<Note>> _getSortedNotes() async {
     final notes = await NoteService.instance.getAllNotes(_currentSort);
 
@@ -172,6 +175,7 @@ class ListPageState extends State<ListPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 1. 헤더: 메뉴명 & 별점
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -197,6 +201,32 @@ class ListPageState extends State<ListPage> {
                 ],
               ),
               const SizedBox(height: 8),
+              // detail 정보 표시
+              FutureBuilder<Detail?>(
+                future: DetailService.instance.getDetailByNoteId(note.id), // noteId로 조회
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data != null) {
+                    final d = snapshot.data!;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Wrap( // 칸이 부족하면 다음 줄로 넘어가도록 Wrap 사용
+                        spacing: 6,
+                        children: [
+                          if (d.originCountry != null && d.originCountry!.isNotEmpty)
+                            _infoBadge(d.originCountry!),
+                          if (d.variety != null && d.variety!.isNotEmpty)
+                            _infoBadge(d.variety!),
+                          _infoBadge(d.process.displayName),
+                          _infoBadge(d.roastingPoint.displayName),
+                          _infoBadge(d.method.displayName),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink(); // 데이터 없으면 공간 차지 안 함
+                },
+              ),
+              const SizedBox(height: 8),
               Text(note.drankAt.toString().split(' ')[0],
                   style: const TextStyle(color: Colors.grey, fontSize: 11)),
             ],
@@ -211,6 +241,28 @@ class ListPageState extends State<ListPage> {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
       child: Text("$label $value", style: const TextStyle(fontSize: 12)),
+    );
+  }
+
+  // detail 정보 노출하는 배지 위젯
+  Widget _infoBadge(String text) {
+    final Color themeColor = Theme.of(context).primaryColor;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: themeColor.withOpacity(0.1), // 배경은 연하게
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: themeColor.withOpacity(0.5)), // 테두리
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+            fontSize: 10,
+            color: themeColor, // 글자색을 테마색으로
+            fontWeight: FontWeight.bold
+        ),
+      ),
     );
   }
 }
