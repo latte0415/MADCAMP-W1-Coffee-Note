@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'pages/list_page.dart';
 import 'pages/modals/creation_modal.dart';
 import 'pages/gallery_page.dart';
-import 'pages/recommendation_page.dart';
+import 'pages/ai_guide_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -12,6 +12,10 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  // 디자인 시스템 색상 상수
+  static const Color _primaryDark = Color(0xFF2B1E1A);
+  static const Color _background = Color(0xFFFFFFFF);
+
   int _selectedIndex = 0;
 
   // creation 후 새로고침을 위한 global 선언
@@ -22,7 +26,7 @@ class _MainPageState extends State<MainPage> {
   List<Widget> get _pages => [
     ListPage(key: _listPageKey),
     GalleryPage(key: _galleryPageKey),
-    const Center(child: Text('3-0-0 RECOMMENDATION 화면')),
+    const AiGuidePage(),
   ];
 
   // 탭을 클릭할 때 실행될 함수
@@ -47,10 +51,12 @@ class _MainPageState extends State<MainPage> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex, // 현재 눌린 버튼 표시
           onTap: _onItemTapped,         // 클릭 시 인덱스 변경 함수 호출
+          selectedItemColor: _primaryDark,
+          unselectedItemColor: Colors.grey,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'LIST'),
             BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: 'GALLERY'),
-            BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: 'RECO'),
+            BottomNavigationBarItem(icon: Icon(Icons.auto_awesome), label: 'AI 가이드'),
           ],
         ),
 
@@ -72,9 +78,9 @@ class _MainPageState extends State<MainPage> {
               _listPageKey.currentState?.refreshNotes();
             });
           },
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: _primaryDark,
           tooltip: 'Add Note',
-          child: const Icon(Icons.add, color: Colors.white),
+          child: const Icon(Icons.add, color: _background),
         ),
       );
   }

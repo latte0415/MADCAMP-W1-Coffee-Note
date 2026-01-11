@@ -91,3 +91,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  fonts:
+    - family: NanumSquareOTF
+      fonts:
+        - asset: fonts/NanumSquareR.otf
+          weight: 400
+        - asset: fonts/NanumSquareB.otf
+          weight: 700
