@@ -1,0 +1,779 @@
+/* gallery (2-0-0) */
+
+position: relative;
+width: 1080px;
+height: 2400px;
+
+background: #FFFFFF;
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: -1px;
+top: 0px;
+
+
+
+/* Rectangle 63 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: -1px;
+top: 540px;
+
+
+
+/* Rectangle 63 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: -1px;
+top: 1080px;
+
+
+
+/* Rectangle 63 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: -1px;
+top: 1620px;
+
+
+
+/* Rectangle 63 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: 539px;
+top: 0px;
+
+
+
+/* Rectangle 63 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: 539px;
+top: 540px;
+
+
+
+/* Rectangle 68 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* Rectangle 69 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: rgba(0, 0, 0, 0.59);
+
+
+/* 2026-01-02 */
+
+position: absolute;
+left: 12.41%;
+right: 37.59%;
+top: 89.44%;
+bottom: 2.41%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 300;
+font-size: 40px;
+line-height: 45px;
+
+color: #FFFFFF;
+
+
+
+/* famicons:calendar-sharp */
+
+position: absolute;
+height: 38px;
+left: 3.52%;
+right: 89.44%;
+top: 485px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 6.25%;
+right: 6.25%;
+top: 6.25%;
+bottom: 6.25%;
+
+background: #FFFFFF;
+
+
+/* mdi:location */
+
+position: absolute;
+height: 44px;
+left: 2.96%;
+right: 88.89%;
+top: 428px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 8.33%;
+bottom: 8.33%;
+
+background: #FFFFFF;
+
+
+/* 본투비클래식 본점 */
+
+position: absolute;
+left: 11.85%;
+right: 23.15%;
+top: 79.26%;
+bottom: 12.59%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 300;
+font-size: 40px;
+line-height: 45px;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* 에티오피아 예가체프 워시드 */
+
+position: absolute;
+left: 4.44%;
+right: 4.44%;
+top: 6.3%;
+bottom: 71.85%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 55px;
+line-height: 70px;
+/* or 127% */
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* Group 43 */
+
+position: absolute;
+left: 1.3%;
+right: 57.78%;
+top: 35%;
+bottom: 37.04%;
+
+
+
+/* 산미 */
+
+position: absolute;
+left: 1.3%;
+right: 80.41%;
+top: 35%;
+bottom: 56.34%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 35px;
+line-height: 40px;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* 바디 */
+
+position: absolute;
+left: 1.3%;
+right: 80.41%;
+top: 44.65%;
+bottom: 46.69%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 35px;
+line-height: 40px;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* 쓴맛 */
+
+position: absolute;
+left: 1.3%;
+right: 80.41%;
+top: 54.3%;
+bottom: 37.04%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 35px;
+line-height: 40px;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Rectangle 14 */
+
+position: absolute;
+left: 20.5%;
+right: 76.98%;
+top: 35.39%;
+bottom: 58.7%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 21 */
+
+position: absolute;
+left: 20.5%;
+right: 76.98%;
+top: 44.85%;
+bottom: 49.25%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 28 */
+
+position: absolute;
+left: 20.5%;
+right: 76.98%;
+top: 54.69%;
+bottom: 39.4%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 15 */
+
+position: absolute;
+left: 23.7%;
+right: 73.78%;
+top: 35.39%;
+bottom: 58.7%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 22 */
+
+position: absolute;
+left: 23.7%;
+right: 73.78%;
+top: 44.85%;
+bottom: 49.25%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 29 */
+
+position: absolute;
+left: 23.7%;
+right: 73.78%;
+top: 54.69%;
+bottom: 39.4%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 16 */
+
+position: absolute;
+left: 26.9%;
+right: 70.58%;
+top: 35.39%;
+bottom: 58.7%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 30 */
+
+position: absolute;
+left: 26.9%;
+right: 70.58%;
+top: 54.69%;
+bottom: 39.4%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 17 */
+
+position: absolute;
+left: 30.1%;
+right: 67.38%;
+top: 35.39%;
+bottom: 58.7%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 31 */
+
+position: absolute;
+left: 30.1%;
+right: 67.38%;
+top: 54.69%;
+bottom: 39.4%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 18 */
+
+position: absolute;
+left: 33.31%;
+right: 64.18%;
+top: 35.39%;
+bottom: 58.7%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 32 */
+
+position: absolute;
+left: 33.31%;
+right: 64.18%;
+top: 54.69%;
+bottom: 39.4%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 19 */
+
+position: absolute;
+left: 36.51%;
+right: 60.98%;
+top: 35.39%;
+bottom: 58.7%;
+
+background: #FFFFFF;
+
+
+/* Rectangle 20 */
+
+position: absolute;
+left: 39.71%;
+right: 57.78%;
+top: 35.39%;
+bottom: 58.7%;
+
+background: #FFFFFF;
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: 539px;
+top: 1080px;
+
+
+
+/* Rectangle 63 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* image_component */
+
+position: absolute;
+width: 540px;
+height: 540px;
+left: 539px;
+top: 1620px;
+
+
+
+/* Rectangle 63 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(image.png);
+
+
+/* Rectangle 51 */
+
+position: absolute;
+width: 1080px;
+height: 327px;
+left: 0px;
+top: 1776px;
+
+background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
+
+
+/* Group 1 */
+
+position: absolute;
+width: 289px;
+height: 131.08px;
+left: 743px;
+top: 1915px;
+
+
+
+/* Rectangle 2 */
+
+position: absolute;
+width: 289px;
+height: 131.08px;
+left: 743px;
+top: 1915px;
+
+background: #2B1E1A;
+border-radius: 85px;
+
+
+/* 기록하기 */
+
+position: absolute;
+width: 198px;
+height: 43.95px;
+left: 789px;
+top: 1954px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 50px;
+line-height: 57px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* navigation_bar */
+
+position: absolute;
+width: 1080px;
+height: 295px;
+left: 0px;
+top: 2103px;
+
+
+
+/* Rectangle 1 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #FFFFFF;
+box-shadow: 0px -5px 20px rgba(0, 0, 0, 0.25);
+
+
+/* library */
+
+position: absolute;
+height: 112px;
+left: 13.15%;
+right: 76.48%;
+top: 48px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 6.25%;
+right: 81.25%;
+top: 18.75%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 21.88%;
+right: 53.12%;
+top: 43.75%;
+bottom: 21.88%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 21.88%;
+right: 53.12%;
+top: 31.25%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 31.25%;
+top: 9.38%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 71.09%;
+right: 6.25%;
+top: 18.75%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* gallery */
+
+position: absolute;
+height: 138px;
+left: 43.8%;
+right: 43.43%;
+top: 34px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 20.83%;
+bottom: 20.83%;
+
+background: #2B1E1A;
+
+
+/* ai_guide */
+
+position: absolute;
+height: 106px;
+left: 76.94%;
+right: 13.24%;
+top: 50px;
+
+
+
+/* Group */
+
+position: absolute;
+left: 8.73%;
+right: 8.33%;
+top: 8.33%;
+bottom: 0.78%;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 50.32%;
+right: 46.2%;
+top: 96.43%;
+bottom: 0.78%;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.73%;
+right: 8.33%;
+top: 8.33%;
+bottom: 8.73%;
+
+background: #2B1E1A;
+
+
+/* 라이브러리 */
+
+position: absolute;
+left: 9.07%;
+right: 72.5%;
+top: 60.12%;
+bottom: 22.02%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 45px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* 갤러리 */
+
+position: absolute;
+left: 44.44%;
+right: 44.63%;
+top: 60.12%;
+bottom: 22.02%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 45px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* AI 가이드 */
+
+position: absolute;
+left: 73.7%;
+right: 9.91%;
+top: 60.12%;
+bottom: 22.02%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 45px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* Rectangle 70 */
+
+position: absolute;
+width: 1082px;
+height: 331px;
+left: -3px;
+top: 0px;
+
+background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);
