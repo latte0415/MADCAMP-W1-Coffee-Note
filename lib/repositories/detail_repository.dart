@@ -100,14 +100,13 @@ class DetailRepository {
         return {
             'id': detail.id,
             'note_id': detail.noteId,
-            'origin_country': detail.originCountry,
-            'origin_region': detail.originRegion,
+            'origin_location': detail.originLocation,
             'variety': detail.variety,
-            'process': detail.process.toDbValue(),  // enum을 DB 값으로 변환
+            'process': detail.process?.toDbValue(),  // enum을 DB 값으로 변환 (nullable)
             'process_text': detail.processText,
-            'roasting_point': detail.roastingPoint.toDbValue(),  // enum을 DB 값으로 변환
+            'roasting_point': detail.roastingPoint?.toDbValue(),  // enum을 DB 값으로 변환 (nullable)
             'roasting_point_text': detail.roastingPointText,
-            'method': detail.method.toDbValue(),  // enum을 DB 값으로 변환
+            'method': detail.method?.toDbValue(),  // enum을 DB 값으로 변환 (nullable)
             'method_text': detail.methodText,
             'tasting_notes': detail.tastingNotes != null && detail.tastingNotes!.isNotEmpty
                 ? jsonEncode(detail.tastingNotes)
@@ -133,14 +132,19 @@ class DetailRepository {
         return Detail(
             id: map['id'] as String,
             noteId: map['note_id'] as String,
-            originCountry: map['origin_country'] as String?,
-            originRegion: map['origin_region'] as String?,
+            originLocation: map['origin_location'] as String?,
             variety: map['variety'] as String?,
-            process: ProcessType.fromDbValue(map['process'] as String),  // DB 값에서 enum으로 변환
+            process: map['process'] != null 
+                ? ProcessType.fromDbValue(map['process'] as String)  // DB 값에서 enum으로 변환
+                : null,
             processText: map['process_text'] as String?,
-            roastingPoint: RoastingPointType.fromDbValue(map['roasting_point'] as String),  // DB 값에서 enum으로 변환
+            roastingPoint: map['roasting_point'] != null
+                ? RoastingPointType.fromDbValue(map['roasting_point'] as String)  // DB 값에서 enum으로 변환
+                : null,
             roastingPointText: map['roasting_point_text'] as String?,
-            method: MethodType.fromDbValue(map['method'] as String),  // DB 값에서 enum으로 변환
+            method: map['method'] != null
+                ? MethodType.fromDbValue(map['method'] as String)  // DB 값에서 enum으로 변환
+                : null,
             methodText: map['method_text'] as String?,
             tastingNotes: tastingNotes,
         );
