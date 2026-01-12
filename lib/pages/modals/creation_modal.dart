@@ -662,7 +662,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
         final newDetail = Detail(
           id: const Uuid().v4(),
           noteId: noteId,
-          originCountry: _countryController.text.isEmpty ? null : _countryController.text,
+          originLocation: _countryController.text.isEmpty ? null : _countryController.text,
           variety: _varietyController.text.isEmpty ? null : _varietyController.text,
           process: _selectedProcess,
           processText: _selectedProcess == ProcessType.etc && _processTextController.text.isNotEmpty

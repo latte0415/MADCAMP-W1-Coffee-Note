@@ -68,7 +68,7 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
     if (detail != null && mounted) {
       setState(() {
         _detail = detail;
-        _countryController.text = detail.originCountry ?? "";
+        _countryController.text = detail.originLocation ?? "";
         _varietyController.text = detail.variety ?? "";
         _selectedProcess = detail.process ?? ProcessType.washed;
         _selectedRoasting = detail.roastingPoint ?? RoastingPointType.medium;
@@ -107,8 +107,8 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
     final updatedDetail = Detail(
       id: _detail?.id ?? const Uuid().v4(), // 기존게 없으면 새로 생성
       noteId: widget.note.id,
-      originCountry: _countryController.text,
-      variety: _varietyController.text,
+      originLocation: _countryController.text.isEmpty ? null : _countryController.text,
+      variety: _varietyController.text.isEmpty ? null : _varietyController.text,
       process: _selectedProcess,
       roastingPoint: _selectedRoasting,
       method: _selectedMethod,

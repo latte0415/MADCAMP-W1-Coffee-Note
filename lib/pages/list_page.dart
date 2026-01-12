@@ -556,15 +556,21 @@ class ListPageState extends State<ListPage> {
   Widget _buildDetailInfo(Detail detail, double scale) {
     final infoList = <String>[];
     
-    if (detail.originCountry != null && detail.originCountry!.isNotEmpty) {
-      infoList.add(detail.originCountry!);
+    if (detail.originLocation != null && detail.originLocation!.isNotEmpty) {
+      infoList.add(detail.originLocation!);
     }
     if (detail.variety != null && detail.variety!.isNotEmpty) {
       infoList.add(detail.variety!);
     }
-    infoList.add(detail.process.displayName);
-    infoList.add(detail.roastingPoint.displayName);
-    infoList.add(detail.method.displayName);
+    if (detail.process != null) {
+      infoList.add(detail.process!.displayName);
+    }
+    if (detail.roastingPoint != null) {
+      infoList.add(detail.roastingPoint!.displayName);
+    }
+    if (detail.method != null) {
+      infoList.add(detail.method!.displayName);
+    }
 
     return Wrap(
       spacing: 10 * scale,
