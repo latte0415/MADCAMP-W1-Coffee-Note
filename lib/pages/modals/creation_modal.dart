@@ -11,6 +11,8 @@ import '../../models/enums/process_type.dart';
 import '../../models/enums/roasting_point_type.dart';
 import '../../models/enums/method_type.dart';
 import 'dart:convert';
+import '../../theme/app_colors.dart';
+import '../../theme/app_spacing.dart';
 
 class NoteCreatePopup extends StatefulWidget {
   const NoteCreatePopup({super.key});
@@ -20,10 +22,6 @@ class NoteCreatePopup extends StatefulWidget {
 }
 
 class _NoteCreatePopupState extends State<NoteCreatePopup> {
-  // 디자인 시스템 색상 상수
-  static const Color _primaryDark = Color(0xFF2B1E1A);
-  static const Color _background = Color(0xFFFFFFFF);
-  static const Color _borderColor = Color.fromRGBO(90, 58, 46, 0.3);
 
   // 입력 데이터 저장을 위한 상태 변수
   final TextEditingController _cafeController = TextEditingController();
@@ -57,6 +55,14 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
   int _score = 3;
 
   List<String> _tastingNotesTags = [];
+
+  // 스케일 팩터 계산
+  double _getScaleFactor(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scaleFactor = screenWidth / AppSpacing.designWidth;
+    // 최소/최대 스케일 팩터 제한 (0.3 ~ 1.2)
+    return scaleFactor.clamp(0.3, 1.2);
+  }
 
   @override
   void dispose() {
@@ -122,6 +128,8 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
 
   @override
   Widget build(BuildContext context) {
+    final scale = _getScaleFactor(context);
+    
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.zero,
@@ -131,10 +139,10 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
           maxHeight: MediaQuery.of(context).size.height * 0.9,
         ),
         decoration: BoxDecoration(
-          color: _background,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(50),
-            topRight: Radius.circular(50),
+          color: AppColors.background,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(50 * scale),
+            topRight: Radius.circular(50 * scale),
           ),
         ),
         child: Column(
@@ -142,97 +150,97 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
           children: [
             // 상단 헤더
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 20),
+              padding: EdgeInsets.symmetric(horizontal: 49 * scale, vertical: 20 * scale),
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.close, color: _primaryDark, size: 30),
+                    icon: Icon(Icons.close, color: AppColors.primaryDark, size: 30 * scale),
                     onPressed: () => Navigator.pop(context),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       "상세 정보",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 60,
+                        fontSize: 60 * scale,
                         fontWeight: FontWeight.w700,
-                        color: _primaryDark,
+                        color: AppColors.primaryDark,
                         letterSpacing: 0.1,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  SizedBox(width: 48 * scale),
                 ],
               ),
             ),
-            const Divider(height: 1),
+            Divider(height: 1 * scale),
             
             // 스크롤 가능한 컨텐츠
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 20),
+                padding: EdgeInsets.symmetric(horizontal: 49 * scale, vertical: 20 * scale),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 이미지 추가하기
-                    _buildImageSection(),
-                    const SizedBox(height: 30),
+                    _buildImageSection(scale),
+                    SizedBox(height: 30 * scale),
                     
                     // 텍스트 입력창
-                    _buildTextField("메뉴명", "메뉴명을 입력하세요.", _menuController),
-                    const SizedBox(height: 20),
-                    _buildTextField("카페명", "카페명을 입력하세요.", _cafeController),
-                    const SizedBox(height: 20),
-                    _buildTextField("날짜명", "날짜를 입력하세요.", _dateController),
-                    const SizedBox(height: 20),
-                    _buildTextField("한줄평", "한줄평을 입력하세요.", _commentController),
-                    const SizedBox(height: 30),
+                    _buildTextField("메뉴명", "메뉴명을 입력하세요.", _menuController, scale),
+                    SizedBox(height: 20 * scale),
+                    _buildTextField("카페명", "카페명을 입력하세요.", _cafeController, scale),
+                    SizedBox(height: 20 * scale),
+                    _buildTextField("날짜명", "날짜를 입력하세요.", _dateController, scale),
+                    SizedBox(height: 20 * scale),
+                    _buildTextField("한줄평", "한줄평을 입력하세요.", _commentController, scale),
+                    SizedBox(height: 30 * scale),
                     
                     // 슬라이더
-                    _buildSlider("산미", _acidity, (v) => setState(() => _acidity = v)),
-                    const SizedBox(height: 20),
-                    _buildSlider("바디", _body, (v) => setState(() => _body = v)),
-                    const SizedBox(height: 20),
-                    _buildSlider("쓴맛", _bitterness, (v) => setState(() => _bitterness = v)),
-                    const SizedBox(height: 30),
+                    _buildSlider("산미", _acidity, (v) => setState(() => _acidity = v), scale),
+                    SizedBox(height: 20 * scale),
+                    _buildSlider("바디", _body, (v) => setState(() => _body = v), scale),
+                    SizedBox(height: 20 * scale),
+                    _buildSlider("쓴맛", _bitterness, (v) => setState(() => _bitterness = v), scale),
+                    SizedBox(height: 30 * scale),
                     
                     // 별점
-                    _buildStarRating(),
-                    const SizedBox(height: 30),
+                    _buildStarRating(scale),
+                    SizedBox(height: 30 * scale),
                     
                     // 상세정보 추가하기 체크박스
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "상세정보 추가하기",
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 30 * scale,
                             fontWeight: FontWeight.w400,
-                            color: _primaryDark,
+                            color: AppColors.primaryDark,
                             letterSpacing: 0.1,
                           ),
                         ),
                         Checkbox(
                           value: _showDetailSection,
                           onChanged: (value) => setState(() => _showDetailSection = value ?? false),
-                          activeColor: _primaryDark,
+                          activeColor: AppColors.primaryDark,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20 * scale),
                     
                     // 상세 정보 섹션
                     if (_showDetailSection) ...[
                       // AI 자동생성 버튼
                       SizedBox(
                         width: double.infinity,
-                        height: 70,
+                        height: 70 * scale,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.grey[300],
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(20 * scale),
                             ),
                           ),
                           onPressed: () {
@@ -240,24 +248,24 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                               const SnackBar(content: Text("NotImplemented")),
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             "AI 자동생성",
                             style: TextStyle(
-                              fontSize: 30,
+                              fontSize: 30 * scale,
                               fontWeight: FontWeight.w400,
-                              color: _primaryDark,
+                              color: AppColors.primaryDark,
                               letterSpacing: 0.1,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20 * scale),
                       
                       // 국가/지역, 품종
-                      _buildTextField("국가/지역", "국가/지역을 입력하세요.", _countryController),
-                      const SizedBox(height: 20),
-                      _buildTextField("품종", "품종을 입력하세요.", _varietyController),
-                      const SizedBox(height: 20),
+                      _buildTextField("국가/지역", "국가/지역을 입력하세요.", _countryController, scale),
+                      SizedBox(height: 20 * scale),
+                      _buildTextField("품종", "품종을 입력하세요.", _varietyController, scale),
+                      SizedBox(height: 20 * scale),
                       
                       // 드롭다운 + 텍스트 입력
                       _buildDropdownWithText<ProcessType>(
@@ -271,8 +279,9 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                             _processTextController.clear();
                           }
                         }),
+                        scale,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20 * scale),
                       _buildDropdownWithText<RoastingPointType>(
                         "로스팅포인트",
                         _selectedRoasting,
@@ -284,8 +293,9 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                             _roastingPointTextController.clear();
                           }
                         }),
+                        scale,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20 * scale),
                       _buildDropdownWithText<MethodType>(
                         "추출방식",
                         _selectedMethod,
@@ -297,68 +307,70 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                             _methodTextController.clear();
                           }
                         }),
+                        scale,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20 * scale),
                       
                       // 테이스팅 노트
                       _buildTextField(
                         "테이스팅 노트",
                         "테이스팅 노트를 입력하세요 (쉼표 또는 띄어쓰기로 구분, 최대 5개)",
                         _tastingNotesController,
+                        scale,
                         onChanged: (_) => _updateTastingNotes(),
                       ),
-                      const SizedBox(height: 15),
+                      SizedBox(height: 15 * scale),
                       // 해시태그 표시
                       if (_tastingNotesTags.isNotEmpty)
                         Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
+                          spacing: 10 * scale,
+                          runSpacing: 10 * scale,
                           children: _tastingNotesTags.map((tag) => Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            padding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 8 * scale),
                             decoration: BoxDecoration(
-                              color: _primaryDark,
-                              borderRadius: BorderRadius.circular(20),
+                              color: AppColors.primaryDark,
+                              borderRadius: BorderRadius.circular(20 * scale),
                             ),
                             child: Text(
                               "#$tag",
-                              style: const TextStyle(
-                                fontSize: 30,
+                              style: TextStyle(
+                                fontSize: 30 * scale,
                                 fontWeight: FontWeight.w400,
-                                color: _background,
+                                color: AppColors.background,
                                 letterSpacing: 0.1,
                               ),
                             ),
                           )).toList(),
                         ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: 30 * scale),
                     ],
                     
-                    const SizedBox(height: 30),
+                    SizedBox(height: 30 * scale),
                     
                     // 기록하기 버튼
                     SizedBox(
                       width: double.infinity,
-                      height: 131,
+                      height: 131 * scale,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _primaryDark,
+                          backgroundColor: AppColors.primaryDark,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(50 * scale),
                           ),
                         ),
                         onPressed: _submitNote,
-                        child: const Text(
+                        child: Text(
                           "기록하기",
                           style: TextStyle(
-                            fontSize: 50,
+                            fontSize: 50 * scale,
                             fontWeight: FontWeight.w400,
-                            color: _background,
+                            color: AppColors.background,
                             letterSpacing: 0.1,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20 * scale),
                   ],
                 ),
               ),
@@ -369,34 +381,34 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     );
   }
 
-  Widget _buildImageSection() {
+  Widget _buildImageSection(double scale) {
     return GestureDetector(
       onTap: _showImagePicker,
       child: Container(
         width: double.infinity,
-        height: 300,
+        height: 300 * scale,
         decoration: BoxDecoration(
           color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: _borderColor, width: 2),
+          borderRadius: BorderRadius.circular(20 * scale),
+          border: Border.all(color: AppColors.border, width: AppSpacing.borderWidth * scale),
         ),
         child: _selectedImage != null
             ? ClipRRect(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18 * scale),
                 child: Image.file(
                   File(_selectedImage!.path),
                   fit: BoxFit.cover,
                 ),
               )
-            : const Column(
+            : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_photo_alternate, color: Colors.grey, size: 60),
-                  SizedBox(height: 10),
+                  Icon(Icons.add_photo_alternate, color: Colors.grey, size: 60 * scale),
+                  SizedBox(height: 10 * scale),
                   Text(
                     "이미지 추가하기",
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: 30 * scale,
                       color: Colors.grey,
                       letterSpacing: 0.1,
                     ),
@@ -407,58 +419,58 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     );
   }
 
-  Widget _buildTextField(String label, String hint, TextEditingController controller, {ValueChanged<String>? onChanged}) {
+  Widget _buildTextField(String label, String hint, TextEditingController controller, double scale, {ValueChanged<String>? onChanged}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 30,
+          style: TextStyle(
+            fontSize: 30 * scale,
             fontWeight: FontWeight.w400,
-            color: _primaryDark,
+            color: AppColors.primaryDark,
             letterSpacing: 0.1,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10 * scale),
         TextField(
           controller: controller,
           onChanged: onChanged,
-          style: const TextStyle(
-            fontSize: 30,
+          style: TextStyle(
+            fontSize: 30 * scale,
             fontWeight: FontWeight.w400,
-            color: _primaryDark,
+            color: AppColors.primaryDark,
             letterSpacing: 0.1,
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              fontSize: 30,
+              fontSize: 30 * scale,
               color: Colors.grey[400],
               letterSpacing: 0.1,
             ),
             filled: true,
-            fillColor: _background,
+            fillColor: AppColors.background,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _borderColor, width: 2),
+              borderRadius: BorderRadius.circular(10 * scale),
+              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _borderColor, width: 2),
+              borderRadius: BorderRadius.circular(10 * scale),
+              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _primaryDark, width: 2),
+              borderRadius: BorderRadius.circular(10 * scale),
+              borderSide: BorderSide(color: AppColors.primaryDark, width: AppSpacing.borderWidth * scale),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            contentPadding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 15 * scale),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSlider(String label, double value, ValueChanged<double> onChanged) {
+  Widget _buildSlider(String label, double value, ValueChanged<double> onChanged, double scale) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -467,31 +479,31 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 30,
+              style: TextStyle(
+                fontSize: 30 * scale,
                 fontWeight: FontWeight.w400,
-                color: _primaryDark,
+                color: AppColors.primaryDark,
                 letterSpacing: 0.1,
               ),
             ),
             Text(
               "${value.toInt()}",
-              style: const TextStyle(
-                fontSize: 30,
+              style: TextStyle(
+                fontSize: 30 * scale,
                 fontWeight: FontWeight.w400,
-                color: _primaryDark,
+                color: AppColors.primaryDark,
                 letterSpacing: 0.1,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10 * scale),
         Slider(
           value: value,
           min: 1,
           max: 10,
           divisions: 9,
-          activeColor: _primaryDark,
+          activeColor: AppColors.primaryDark,
           inactiveColor: Colors.grey[300],
           onChanged: onChanged,
         ),
@@ -499,20 +511,20 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     );
   }
 
-  Widget _buildStarRating() {
+  Widget _buildStarRating(double scale) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "별점",
           style: TextStyle(
-            fontSize: 30,
+            fontSize: 30 * scale,
             fontWeight: FontWeight.w400,
-            color: _primaryDark,
+            color: AppColors.primaryDark,
             letterSpacing: 0.1,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10 * scale),
         Row(
           children: List.generate(5, (index) => IconButton(
             padding: EdgeInsets.zero,
@@ -520,7 +532,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
             icon: Icon(
               index < _score ? Icons.star : Icons.star_border,
               color: Colors.amber,
-              size: 50,
+              size: 50 * scale,
             ),
             onPressed: () => setState(() => _score = index + 1),
           )),
@@ -535,6 +547,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     List<T> items,
     TextEditingController textController,
     ValueChanged<T?> onChanged,
+    double scale,
   ) {
     bool isEtc = false;
     if (value is ProcessType && value == ProcessType.etc) {
@@ -550,37 +563,37 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 30,
+          style: TextStyle(
+            fontSize: 30 * scale,
             fontWeight: FontWeight.w400,
-            color: _primaryDark,
+            color: AppColors.primaryDark,
             letterSpacing: 0.1,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10 * scale),
         DropdownButtonFormField<T>(
           value: value,
           decoration: InputDecoration(
             filled: true,
-            fillColor: _background,
+            fillColor: AppColors.background,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _borderColor, width: 2),
+              borderRadius: BorderRadius.circular(10 * scale),
+              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _borderColor, width: 2),
+              borderRadius: BorderRadius.circular(10 * scale),
+              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _primaryDark, width: 2),
+              borderRadius: BorderRadius.circular(10 * scale),
+              borderSide: BorderSide(color: AppColors.primaryDark, width: AppSpacing.borderWidth * scale),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            contentPadding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 15 * scale),
           ),
-          style: const TextStyle(
-            fontSize: 30,
+          style: TextStyle(
+            fontSize: 30 * scale,
             fontWeight: FontWeight.w400,
-            color: _primaryDark,
+            color: AppColors.primaryDark,
             letterSpacing: 0.1,
           ),
           items: items.map((item) {
@@ -602,8 +615,8 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
           onChanged: onChanged,
         ),
         if (isEtc) ...[
-          const SizedBox(height: 15),
-          _buildTextField("$label 직접 입력", "$label을 직접 입력하세요.", textController),
+          SizedBox(height: 15 * scale),
+          _buildTextField("$label 직접 입력", "$label을 직접 입력하세요.", textController, scale),
         ],
       ],
     );

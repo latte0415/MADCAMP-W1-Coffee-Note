@@ -6,6 +6,10 @@ import '../../services/note_service.dart';
 import 'modals/details_modal.dart';
 import '../../services/detail_service.dart';
 import '../../models/detail.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_spacing.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_component_styles.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -15,10 +19,6 @@ class ListPage extends StatefulWidget {
 }
 
 class ListPageState extends State<ListPage> {
-  // 디자인 시스템 색상 상수
-  static const Color _primaryDark = Color(0xFF2B1E1A);
-  static const Color _background = Color(0xFFFFFFFF);
-  static const Color _borderColor = Color.fromRGBO(90, 58, 46, 0.3);
 
   // 외부(MainPage)에서 이 함수를 부르면 리스트가 새로고침됩니다.
   void refreshNotes() {
@@ -38,6 +38,14 @@ class ListPageState extends State<ListPage> {
   int? _filterAcidity;
   int? _filterBody;
   int? _filterBitterness;
+
+  // 스케일 팩터 계산
+  double _getScaleFactor(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scaleFactor = screenWidth / AppSpacing.designWidth;
+    // 최소/최대 스케일 팩터 제한 (0.3 ~ 1.2)
+    return scaleFactor.clamp(0.3, 1.2);
+  }
 
   // 데이터를 가져와서 검색, 필터, 정렬을 적용하는 함수
   Future<List<Note>> _getSortedNotes() async {
@@ -118,41 +126,30 @@ class ListPageState extends State<ListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final scale = _getScaleFactor(context);
+    
     return Column(
       children: [
+        SizedBox(height: 20 * scale),
         // 검색창
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 20),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.horizontalPadding * scale,
+            vertical: 20 * scale,
+          ),
           child: TextField(
-            style: const TextStyle(
-              fontSize: 50,
-              fontWeight: FontWeight.w400,
-              color: _primaryDark,
-              letterSpacing: 0.1,
-            ),
-            decoration: InputDecoration(
+            style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale),
+            decoration: AppComponentStyles.textInputDecoration(
               hintText: "검색어를 입력하세요.",
-              hintStyle: TextStyle(
-                fontSize: 50,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey[400],
-                letterSpacing: 0.1,
+            ).copyWith(
+              hintStyle: AppTextStyles.bodyText.copyWith(
+                fontSize: 25 * scale,
+                color: AppColors.primaryText.withOpacity(0.5),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 30 * scale,
+                vertical: 25 * scale,
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
             ),
             onChanged: (value) {
               setState(() {
@@ -164,7 +161,10 @@ class ListPageState extends State<ListPage> {
 
         // 상세 필터 토글
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 10),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.horizontalPadding * scale,
+            vertical: 10 * scale,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -181,17 +181,12 @@ class ListPageState extends State<ListPage> {
                 },
                 icon: Icon(
                   _showDetailFilter ? Icons.expand_less : Icons.expand_more,
-                  color: _primaryDark,
-                  size: 30,
+                  color: AppColors.primaryDark,
+                  size: 30 * scale,
                 ),
-                label: const Text(
+                label: Text(
                   "상세필터",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w400,
-                    color: _primaryDark,
-                    letterSpacing: 0.1,
-                  ),
+                  style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale),
                 ),
               ),
               if (_showDetailFilter && 
@@ -206,14 +201,9 @@ class ListPageState extends State<ListPage> {
                       _filterBitterness = null;
                     });
                   },
-                  child: const Text(
+                  child: Text(
                     "초기화",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w400,
-                      color: _primaryDark,
-                      letterSpacing: 0.1,
-                    ),
+                    style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale),
                   ),
                 ),
             ],
@@ -223,32 +213,40 @@ class ListPageState extends State<ListPage> {
         // 상세 필터 슬라이더 (spread 상태)
         if (_showDetailFilter) ...[
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 10),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.horizontalPadding * scale,
+              vertical: 10 * scale,
+            ),
             child: Container(
-              decoration: BoxDecoration(
-                color: _background,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: _borderColor, width: 2),
+              decoration: AppComponentStyles.filterAreaDecoration.copyWith(
+                borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSmall * scale),
+                border: Border.all(
+                  color: AppColors.border,
+                  width: AppSpacing.borderWidth * scale,
+                ),
               ),
-              padding: const EdgeInsets.all(30),
+              padding: EdgeInsets.all(30 * scale),
               child: Column(
                 children: [
                   _buildFilterSlider(
                     '산미',
                     (_filterAcidity ?? 5).toDouble(),
                     (value) => setState(() => _filterAcidity = value.toInt()),
+                    scale,
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: 30 * scale),
                   _buildFilterSlider(
                     '바디',
                     (_filterBody ?? 5).toDouble(),
                     (value) => setState(() => _filterBody = value.toInt()),
+                    scale,
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: 30 * scale),
                   _buildFilterSlider(
                     '쓴맛',
                     (_filterBitterness ?? 5).toDouble(),
                     (value) => setState(() => _filterBitterness = value.toInt()),
+                    scale,
                   ),
                 ],
               ),
@@ -258,13 +256,16 @@ class ListPageState extends State<ListPage> {
 
         // 정렬 버튼
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 10),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.horizontalPadding * scale,
+            vertical: 10 * scale,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _sortButton("최신순", const DateSortOption(ascending: false)),
-              const SizedBox(width: 20),
-              _sortButton("별점순", const ScoreSortOption(ascending: false)),
+              _sortButton("최신순", const DateSortOption(ascending: false), scale),
+              SizedBox(width: 20 * scale),
+              _sortButton("별점순", const ScoreSortOption(ascending: false), scale),
             ],
           ),
         ),
@@ -284,21 +285,26 @@ class ListPageState extends State<ListPage> {
 
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 49),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.horizontalPadding * scale,
+                  ),
                   children: [
-                    _buildEmptyGuideCard(),
+                    _buildEmptyGuideCard(scale),
                   ],
                 );
               }
 
               final notes = snapshot.data!;
               return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 20),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.horizontalPadding * scale,
+                  vertical: 20 * scale,
+                ),
                 itemCount: notes.length,
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 30),
-                    child: _buildNoteCard(notes[index]),
+                    padding: EdgeInsets.only(bottom: 30 * scale),
+                    child: _buildNoteCard(notes[index], scale),
                   );
                 },
               );
@@ -309,7 +315,7 @@ class ListPageState extends State<ListPage> {
     );
   }
 
-  Widget _sortButton(String label, SortOption option) {
+  Widget _sortButton(String label, SortOption option, double scale) {
     bool isSelected = (_currentSort.runtimeType == option.runtimeType);
 
     return GestureDetector(
@@ -319,55 +325,55 @@ class ListPageState extends State<ListPage> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+        padding: EdgeInsets.symmetric(horizontal: 30 * scale, vertical: 15 * scale),
         decoration: BoxDecoration(
-          color: isSelected ? _primaryDark : Colors.grey[400],
-          borderRadius: BorderRadius.circular(26),
+          color: isSelected ? AppColors.primaryDark : Colors.grey[400],
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusLarge * scale),
         ),
         child: Text(
           label,
-          style: const TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w400,
-            color: _background,
-            letterSpacing: 0.1,
-          ),
+          style: AppTextStyles.bodyTextWhite.copyWith(fontSize: 30 * scale),
         ),
       ),
     );
   }
 
-  Widget _buildEmptyGuideCard() {
+  Widget _buildEmptyGuideCard(double scale) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 20),
+      margin: EdgeInsets.symmetric(vertical: 20 * scale),
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[300]!, width: 1),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSmall * scale),
+        side: BorderSide(
+          color: AppColors.border,
+          width: AppSpacing.borderWidth * scale,
+        ),
       ),
       child: Container(
-        padding: const EdgeInsets.all(40),
+        padding: EdgeInsets.all(40 * scale),
         child: Column(
           children: [
-            const Icon(Icons.coffee_outlined, size: 60, color: Colors.grey),
-            const SizedBox(height: 20),
-            const Text(
+            Icon(
+              Icons.coffee_outlined,
+              size: 60 * scale,
+              color: AppColors.border,
+            ),
+            SizedBox(height: 20 * scale),
+            Text(
               "아직 작성된 노트가 없어요",
-              style: TextStyle(
-                fontSize: 30,
+              style: AppTextStyles.bodyText.copyWith(
+                fontSize: 30 * scale,
                 fontWeight: FontWeight.w700,
-                color: Colors.grey,
-                letterSpacing: 0.1,
+                color: AppColors.border,
               ),
             ),
-            const SizedBox(height: 15),
-            const Text(
+            SizedBox(height: 15 * scale),
+            Text(
               "하단의 + 버튼을 눌러\n첫 번째 커피 노트를 만들어보세요!",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 25,
-                color: Colors.grey,
-                letterSpacing: 0.1,
+              style: AppTextStyles.bodyText.copyWith(
+                fontSize: 25 * scale,
+                color: AppColors.border,
               ),
             ),
           ],
@@ -376,25 +382,27 @@ class ListPageState extends State<ListPage> {
     );
   }
 
-  Widget _buildNoteCard(Note note) {
-    return GestureDetector(
-      onTap: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
+  Widget _buildNoteCard(Note note, double scale) {
+      return GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder: (context) => NoteDetailsModal(note: note),
-        ).then((result) {
-          if (result == true) {
-            refreshNotes();
-          }
-        });
-      },
+              builder: (context) => NoteDetailsModal(note: note),
+            ).then((result) {
+              if (result == true) {
+                refreshNotes();
+              }
+            });
+          },
       child: Container(
-        decoration: BoxDecoration(
-          color: _background,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: _borderColor, width: 2),
+        decoration: AppComponentStyles.noteCardDecoration.copyWith(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSmall * scale),
+          border: Border.all(
+            color: AppColors.border,
+            width: AppSpacing.borderWidth * scale,
+          ),
         ),
         child: FutureBuilder<Detail?>(
           future: DetailService.instance.getDetailByNoteId(note.id),
@@ -403,61 +411,75 @@ class ListPageState extends State<ListPage> {
             final detail = detailSnapshot.data;
 
             return Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20 * scale),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 왼쪽: 카페명, 날짜, 메뉴명, 한줄평 (+ 상세 정보)
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                         // 카페명
-                        Text(
-                          note.location,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w300,
-                            color: Color(0xFF262626),
-                            letterSpacing: 0.1,
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              size: 24 * scale,
+                              color: AppColors.primaryText,
+                            ),
+                            SizedBox(width: 8 * scale),
+                            Text(
+                              note.location,
+                              style: AppTextStyles.bodyText.copyWith(
+                                fontSize: 30 * scale,
+                                fontWeight: FontWeight.w300,
+                                color: AppColors.primaryText,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8 * scale),
                         // 날짜
-                        Text(
-                          note.drankAt.toString().split(' ')[0],
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w300,
-                            color: Color(0xFF262626),
-                            letterSpacing: 0.1,
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              size: 24 * scale,
+                              color: AppColors.primaryText,
+                            ),
+                            SizedBox(width: 8 * scale),
+                            Text(
+                              note.drankAt.toString().split(' ')[0],
+                              style: AppTextStyles.bodyText.copyWith(
+                                fontSize: 30 * scale,
+                                fontWeight: FontWeight.w300,
+                                color: AppColors.primaryText,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 15),
+                        SizedBox(height: 15 * scale),
                         // 메뉴명
                         Text(
                           note.menu,
-                          style: const TextStyle(
-                            fontSize: 50,
-                            fontWeight: FontWeight.w700,
-                            color: _primaryDark,
-                            letterSpacing: 0.1,
+                          style: AppTextStyles.largeTitle.copyWith(
+                            fontSize: 50 * scale,
+                            color: AppColors.primaryDark,
                           ),
                         ),
                         // 상세 정보 (detail_included의 경우)
                         if (hasDetail && detail != null) ...[
-                          const SizedBox(height: 10),
-                          _buildDetailInfo(detail),
+                          SizedBox(height: 10 * scale),
+                          _buildDetailInfo(detail, scale),
                         ],
-                        const SizedBox(height: 15),
+                        SizedBox(height: 15 * scale),
                         // 한줄평
                         Text(
                           note.comment,
-                          style: const TextStyle(
-                            fontSize: 35,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF262626),
-                            letterSpacing: 0.1,
+                          style: AppTextStyles.bodyText.copyWith(
+                            fontSize: 35 * scale,
+                            color: AppColors.primaryText,
                           ),
                         ),
                         // 해시태그 (detail_included의 경우, 오른쪽 하단)
@@ -465,25 +487,26 @@ class ListPageState extends State<ListPage> {
                             detail != null && 
                             detail.tastingNotes != null && 
                             detail.tastingNotes!.isNotEmpty) ...[
-                          const SizedBox(height: 15),
+                          SizedBox(height: 15 * scale),
                           Align(
                             alignment: Alignment.centerRight,
                             child: Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
+                              spacing: 10 * scale,
+                              runSpacing: 10 * scale,
                               children: detail.tastingNotes!.take(5).map((tag) => Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: _primaryDark,
-                                  borderRadius: BorderRadius.circular(20),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20 * scale,
+                                  vertical: 8 * scale,
+                                ),
+                                decoration: AppComponentStyles.hashtagDecoration.copyWith(
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.borderRadiusLarge * scale,
+                                  ),
                                 ),
                                 child: Text(
                                   "#$tag",
-                                  style: const TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w400,
-                                    color: _background,
-                                    letterSpacing: 0.1,
+                                  style: AppComponentStyles.hashtagTextStyle.copyWith(
+                                    fontSize: 30 * scale,
                                   ),
                                 ),
                               )).toList(),
@@ -493,23 +516,31 @@ class ListPageState extends State<ListPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  SizedBox(width: 20 * scale),
                   // 오른쪽: 산미, 바디, 쓴맛 수치
                   Container(
-                    width: 200,
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: _background,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _borderColor, width: 2),
+                    width: 200 * scale,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20 * scale,
+                      vertical: 20 * scale,
+                    ),
+                    decoration: AppComponentStyles.filterAreaDecoration.copyWith(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.borderRadiusSmall * scale,
+                      ),
+                      border: Border.all(
+                        color: AppColors.border,
+                        width: AppSpacing.borderWidth * scale,
+                      ),
                     ),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildLevelDisplay("산미", note.levelAcidity),
-                        const SizedBox(height: 25),
-                        _buildLevelDisplay("바디", note.levelBody),
-                        const SizedBox(height: 25),
-                        _buildLevelDisplay("쓴맛", note.levelBitterness),
+                        _buildLevelDisplay("산미", note.levelAcidity, scale),
+                        SizedBox(height: 20 * scale),
+                        _buildLevelDisplay("바디", note.levelBody, scale),
+                        SizedBox(height: 20 * scale),
+                        _buildLevelDisplay("쓴맛", note.levelBitterness, scale),
                       ],
                     ),
                   ),
@@ -518,11 +549,11 @@ class ListPageState extends State<ListPage> {
             );
           },
         ),
-      ),
-    );
-  }
+                      ),
+                    );
+                  }
 
-  Widget _buildDetailInfo(Detail detail) {
+  Widget _buildDetailInfo(Detail detail, double scale) {
     final infoList = <String>[];
     
     if (detail.originCountry != null && detail.originCountry!.isNotEmpty) {
@@ -536,47 +567,54 @@ class ListPageState extends State<ListPage> {
     infoList.add(detail.method.displayName);
 
     return Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 10 * scale,
+      runSpacing: 10 * scale,
       children: infoList.map((info) => Text(
         info,
-        style: const TextStyle(
-          fontSize: 30,
+        style: AppTextStyles.bodyText.copyWith(
+          fontSize: 30 * scale,
           fontWeight: FontWeight.w300,
-          color: Color(0xFF262626),
-          letterSpacing: 0.1,
+          color: AppColors.primaryText,
         ),
       )).toList(),
     );
   }
 
-  Widget _buildLevelDisplay(String label, int value) {
+  Widget _buildLevelDisplay(String label, int value, double scale) {
     final starCount = (value / 2).ceil(); // 1-10을 1-5 별로 변환
     
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w400,
-            color: _primaryDark,
-            letterSpacing: 0.1,
+        Flexible(
+          flex: 2,
+          child: Text(
+            label,
+            style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(5, (index) => Container(
-            width: 20,
-            height: 20,
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            decoration: BoxDecoration(
-              color: index < starCount ? _primaryDark : Colors.transparent,
-              border: Border.all(color: _primaryDark, width: 2),
-              borderRadius: BorderRadius.circular(4),
-            ),
-          )),
+        SizedBox(width: 6 * scale),
+        Flexible(
+          flex: 3,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(5, (index) => Container(
+              width: 10 * scale,
+              height: 10 * scale,
+              margin: EdgeInsets.only(right: index < 4 ? 1 * scale : 0),
+              decoration: BoxDecoration(
+                color: index < starCount ? AppColors.primaryDark : Colors.transparent,
+                border: Border.all(
+                  color: AppColors.primaryDark,
+                  width: AppSpacing.borderWidth * scale,
+                ),
+                borderRadius: BorderRadius.circular(1.5 * scale),
+              ),
+            )),
+          ),
         ),
       ],
     );
@@ -587,6 +625,7 @@ class ListPageState extends State<ListPage> {
     String label,
     double value,
     ValueChanged<double> onChanged,
+    double scale,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -596,31 +635,29 @@ class ListPageState extends State<ListPage> {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 30,
+              style: AppTextStyles.bodyText.copyWith(
+                fontSize: 30 * scale,
                 fontWeight: FontWeight.w700,
-                color: _primaryDark,
-                letterSpacing: 0.1,
+                color: AppColors.primaryDark,
               ),
             ),
             Text(
               "${value.toInt()}",
-              style: const TextStyle(
-                fontSize: 30,
+              style: AppTextStyles.bodyText.copyWith(
+                fontSize: 30 * scale,
                 fontWeight: FontWeight.w700,
-                color: _primaryDark,
-                letterSpacing: 0.1,
+                color: AppColors.primaryDark,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10 * scale),
         Slider(
           value: value,
           min: 1,
           max: 10,
           divisions: 9,
-          activeColor: _primaryDark,
+          activeColor: AppColors.primaryDark,
           inactiveColor: Colors.grey[300],
           onChanged: onChanged,
         ),

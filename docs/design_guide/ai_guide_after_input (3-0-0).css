@@ -1,0 +1,1266 @@
+/* ai_guide_after_input (3-0-0) */
+
+position: relative;
+width: 1080px;
+height: 2400px;
+
+background: #FFFFFF;
+
+
+/* Rectangle 51 */
+
+position: absolute;
+width: 1080px;
+height: 327px;
+left: 0px;
+top: 1776px;
+
+background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%);
+
+
+/* Group 2 */
+
+position: absolute;
+width: 352px;
+height: 91px;
+left: 613px;
+top: 383px;
+
+
+
+/* Rectangle 2 */
+
+position: absolute;
+width: 352px;
+height: 91px;
+left: 613px;
+top: 383px;
+
+background: #2B1E1A;
+border-radius: 85px;
+
+
+/* 가이드 받기 */
+
+position: absolute;
+width: 241px;
+height: 31px;
+left: 669px;
+top: 406px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 45px;
+line-height: 51px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* navigation_bar */
+
+position: absolute;
+width: 1080px;
+height: 295px;
+left: 0px;
+top: 2103px;
+
+
+
+/* Rectangle 1 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #FFFFFF;
+box-shadow: 0px -5px 20px rgba(0, 0, 0, 0.25);
+
+
+/* library */
+
+position: absolute;
+height: 112px;
+left: 13.15%;
+right: 76.48%;
+top: 48px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 6.25%;
+right: 81.25%;
+top: 18.75%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 21.88%;
+right: 53.12%;
+top: 43.75%;
+bottom: 21.88%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 21.88%;
+right: 53.12%;
+top: 31.25%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 31.25%;
+top: 9.38%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* Vector */
+
+position: absolute;
+left: 71.09%;
+right: 6.25%;
+top: 18.75%;
+bottom: 9.38%;
+
+border: 1px solid #2B1E1A;
+
+
+/* gallery */
+
+position: absolute;
+height: 138px;
+left: 43.8%;
+right: 43.43%;
+top: 34px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 20.83%;
+bottom: 20.83%;
+
+background: #2B1E1A;
+
+
+/* ai_guide */
+
+position: absolute;
+height: 106px;
+left: 76.94%;
+right: 13.24%;
+top: 50px;
+
+
+
+/* Group */
+
+position: absolute;
+left: 8.73%;
+right: 8.33%;
+top: 8.33%;
+bottom: 0.78%;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 50.32%;
+right: 46.2%;
+top: 96.43%;
+bottom: 0.78%;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.73%;
+right: 8.33%;
+top: 8.33%;
+bottom: 8.73%;
+
+background: #2B1E1A;
+
+
+/* 라이브러리 */
+
+position: absolute;
+left: 9.07%;
+right: 72.5%;
+top: 60.12%;
+bottom: 22.02%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 45px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* 갤러리 */
+
+position: absolute;
+left: 44.44%;
+right: 44.63%;
+top: 60.12%;
+bottom: 22.02%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 45px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* AI 가이드 */
+
+position: absolute;
+left: 73.7%;
+right: 9.91%;
+top: 60.12%;
+bottom: 22.02%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 45px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* Frame 27 */
+
+position: absolute;
+width: 852px;
+height: 94px;
+left: calc(50% - 852px/2 - 1px);
+top: 140px;
+
+
+
+/* 과테말라 엘 소코로 마르세예사 워시드 */
+
+position: absolute;
+width: 852px;
+height: 90px;
+left: 0px;
+top: 44px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 40px;
+line-height: 45px;
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* Line 10 */
+
+position: absolute;
+width: 852px;
+height: 0px;
+left: 0px;
+top: 94px;
+
+border: 1px solid #000000;
+
+
+/* 커피에 대한 정보를 입력해주세요. */
+
+position: absolute;
+width: 762px;
+height: 51px;
+left: 202px;
+top: 98px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 45px;
+line-height: 51px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* * 국가/지역, 품종, 로스팅 포인트, 가공 방식 등을 자세히 입력할수록 더 정확한 테이스팅 노트를 추측할 수 있습니다. */
+
+position: absolute;
+width: 852px;
+height: 68px;
+left: 113px;
+top: 251px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 30px;
+line-height: 34px;
+letter-spacing: 0.1em;
+
+color: #262626;
+
+
+
+/* ai_guide */
+
+position: absolute;
+height: 75px;
+left: 10.46%;
+right: 82.59%;
+top: 79px;
+
+
+
+/* Group */
+
+position: absolute;
+left: 8.73%;
+right: 8.33%;
+top: 8.33%;
+bottom: 0.78%;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 50.32%;
+right: 46.2%;
+top: 96.43%;
+bottom: 0.78%;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.73%;
+right: 8.33%;
+top: 8.33%;
+bottom: 8.73%;
+
+background: #2B1E1A;
+
+
+/* guide_tap */
+
+position: absolute;
+width: 852px;
+height: 1426px;
+left: 113px;
+top: 538px;
+
+
+
+/* Rectangle 71 */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 1299px;
+left: 0%;
+right: 0%;
+top: 0px;
+
+background: #FFFFFF;
+border: 2px solid #2B1E1A;
+border-radius: 50px;
+
+
+/* Rectangle 8 */
+
+position: absolute;
+height: 423px;
+left: 3.4%;
+right: 2.58%;
+top: 849px;
+
+background: #F1F1F1;
+border-radius: 20px;
+
+
+/* Frame 38 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 10px;
+
+position: absolute;
+height: 94px;
+left: 3.4%;
+right: 2.46%;
+top: 44px;
+
+
+
+/* 국가/지역 */
+
+width: 802px;
+height: 34px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* 과테말라 */
+
+width: 802px;
+height: 40px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 35px;
+line-height: 40px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Line 10 */
+
+width: 802px;
+height: 0px;
+
+border: 1px solid #000000;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 34 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 10px;
+
+position: absolute;
+height: 94px;
+left: 3.4%;
+right: 35.09%;
+top: 300px;
+
+
+
+/* 가공 방식 */
+
+width: 524px;
+height: 34px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* 알 수 없음 */
+
+width: 524px;
+height: 40px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 35px;
+line-height: 40px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: rgba(43, 30, 26, 0.27);
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Line 10 */
+
+width: 524px;
+height: 0px;
+
+border: 1px solid #000000;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 28 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 10px;
+
+position: absolute;
+height: 94px;
+left: 3.4%;
+right: 2.46%;
+top: 172px;
+
+
+
+/* 품종 */
+
+width: 802px;
+height: 34px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* 알 수 없음 */
+
+width: 802px;
+height: 40px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 35px;
+line-height: 40px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: rgba(43, 30, 26, 0.27);
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Line 10 */
+
+width: 802px;
+height: 0px;
+
+border: 1px solid #000000;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 35 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 9px;
+
+position: absolute;
+height: 92px;
+left: 3.4%;
+right: 35.09%;
+top: 428px;
+
+
+
+/* 로스팅 포인트 */
+
+width: 524px;
+height: 34px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* 알 수 없음 */
+
+width: 524px;
+height: 40px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 35px;
+line-height: 40px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: rgba(43, 30, 26, 0.27);
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Line 10 */
+
+width: 524px;
+height: 0px;
+
+border: 1px solid #000000;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 36 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 10px;
+
+position: absolute;
+height: 94px;
+left: 3.4%;
+right: 35.09%;
+top: 556px;
+
+
+
+/* 추출 방식 */
+
+width: 524px;
+height: 34px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* 워시드 */
+
+width: 524px;
+height: 40px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 35px;
+line-height: 40px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Line 10 */
+
+width: 524px;
+height: 0px;
+
+border: 1px solid #000000;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 37 */
+
+position: absolute;
+height: 94px;
+left: 3.4%;
+right: 2.58%;
+top: 695px;
+
+
+
+/* 테이스팅 노트 */
+
+position: absolute;
+width: 851px;
+height: 34px;
+left: 0px;
+top: 0px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* Line 10 */
+
+position: absolute;
+width: 801px;
+height: 0px;
+left: 0px;
+top: 109px;
+
+border: 1px solid #000000;
+
+
+/* Group 44 */
+
+position: absolute;
+width: 156px;
+height: 56px;
+left: 0px;
+top: 44px;
+
+
+
+/* Rectangle 2 */
+
+position: absolute;
+left: 0%;
+right: 80.52%;
+top: 46.81%;
+bottom: -6.38%;
+
+background: #2B1E1A;
+border-radius: 20px;
+
+
+/* #시트러스 */
+
+position: absolute;
+left: 0%;
+right: 80.52%;
+top: 59.57%;
+bottom: 14.89%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 30px;
+line-height: 34px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* Group 45 */
+
+position: absolute;
+width: 140px;
+height: 56px;
+left: 172px;
+top: 44px;
+
+
+
+/* Rectangle 2 */
+
+position: absolute;
+left: 21.47%;
+right: 61.05%;
+top: 46.81%;
+bottom: -6.38%;
+
+background: #2B1E1A;
+border-radius: 20px;
+
+
+/* #오렌지 */
+
+position: absolute;
+left: 21.47%;
+right: 61.05%;
+top: 59.57%;
+bottom: 14.89%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 30px;
+line-height: 34px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* Group 46 */
+
+position: absolute;
+width: 91px;
+height: 56px;
+left: 328px;
+top: 44px;
+
+
+
+/* Rectangle 2 */
+
+position: absolute;
+left: 40.95%;
+right: 47.69%;
+top: 46.81%;
+bottom: -6.38%;
+
+background: #2B1E1A;
+border-radius: 20px;
+
+
+/* #꿀 */
+
+position: absolute;
+left: 40.95%;
+right: 47.69%;
+top: 59.57%;
+bottom: 14.89%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 30px;
+line-height: 34px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* Group 47 */
+
+position: absolute;
+width: 136px;
+height: 56px;
+left: 435px;
+top: 44px;
+
+
+
+/* Rectangle 2 */
+
+position: absolute;
+left: 54.31%;
+right: 28.71%;
+top: 46.81%;
+bottom: -6.38%;
+
+background: #2B1E1A;
+border-radius: 20px;
+
+
+/* #카라멜 */
+
+position: absolute;
+left: 54.31%;
+right: 28.71%;
+top: 59.57%;
+bottom: 14.89%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 30px;
+line-height: 34px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
+
+
+/* 센서리 가이드 */
+
+position: absolute;
+height: 34px;
+left: 6.46%;
+right: 6.46%;
+top: 876px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+letter-spacing: 0.1em;
+
+color: #2B1E1A;
+
+
+
+/* 이 커피는 첫 모금에서 깨끗하고 밝은 산미가 느껴지며, 전체적으로 깔끔한 인상을 줍니다. 마실 때는 오렌지나 레몬 같은 시트러스 계열의 향과, 뒤따라오는 은은한 꿀·카라멜 같은 단 단향에 집중해 보세요. 천천히 식으면서 단맛이 더 또렷해지는 변화도 함께 음미하면 좋습니다. */
+
+position: absolute;
+height: 306px;
+left: 6.46%;
+right: 6.46%;
+top: 950px;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 30px;
+line-height: 34px;
+letter-spacing: 0.1em;
+
+color: #000000;
+
+
+
+/* dropdown */
+
+position: absolute;
+height: 62px;
+left: 68.78%;
+right: 2.46%;
+top: 326px;
+
+
+
+/* Rectangle 59 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #E7E7E7;
+border-radius: 10px;
+
+
+/* 다크 */
+
+position: absolute;
+left: 10%;
+right: 3.46%;
+top: 24.19%;
+bottom: 20.97%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #4E4E4E;
+
+
+
+/* Polygon 1 */
+
+position: absolute;
+left: 10.77%;
+right: 81.15%;
+top: 30.65%;
+bottom: 33.87%;
+
+background: #676767;
+transform: matrix(1, 0, 0, -1, 0, 0);
+
+
+/* dropdown */
+
+position: absolute;
+height: 62px;
+left: 68.78%;
+right: 2.46%;
+top: 454px;
+
+
+
+/* Rectangle 59 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #E7E7E7;
+border-radius: 10px;
+
+
+/* 다크 */
+
+position: absolute;
+left: 10%;
+right: 3.46%;
+top: 24.19%;
+bottom: 20.97%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #4E4E4E;
+
+
+
+/* Polygon 1 */
+
+position: absolute;
+left: 10.77%;
+right: 81.15%;
+top: 30.65%;
+bottom: 33.87%;
+
+background: #676767;
+transform: matrix(1, 0, 0, -1, 0, 0);
+
+
+/* dropdown */
+
+position: absolute;
+height: 62px;
+left: 68.78%;
+right: 2.46%;
+top: 582px;
+
+
+
+/* Rectangle 59 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #E7E7E7;
+border-radius: 10px;
+
+
+/* 다크 */
+
+position: absolute;
+left: 10%;
+right: 3.46%;
+top: 24.19%;
+bottom: 20.97%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 34px;
+/* identical to box height */
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #4E4E4E;
+
+
+
+/* Polygon 1 */
+
+position: absolute;
+left: 10.77%;
+right: 81.15%;
+top: 30.65%;
+bottom: 33.87%;
+
+background: #676767;
+transform: matrix(1, 0, 0, -1, 0, 0);
+
+
+/* Group 3 */
+
+position: absolute;
+left: 52.93%;
+right: 0%;
+top: 93.62%;
+bottom: 0%;
+
+
+
+/* Rectangle 2 */
+
+position: absolute;
+left: 52.93%;
+right: 0%;
+top: 93.62%;
+bottom: 0%;
+
+background: #2B1E1A;
+border-radius: 85px;
+
+
+/* 이어서 기록하기 */
+
+position: absolute;
+left: 56.46%;
+right: 3.52%;
+top: 95.16%;
+bottom: 2.66%;
+
+font-family: 'NanumSquareOTF';
+font-style: normal;
+font-weight: 400;
+font-size: 45px;
+line-height: 51px;
+text-align: center;
+letter-spacing: 0.1em;
+
+color: #FFFFFF;
+
