@@ -8,7 +8,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_text_styles.dart';
 import '../../theme/app_component_styles.dart';
-import '../../widget/list_widget.dart';
+import '../../widget/page_widget.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});

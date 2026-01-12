@@ -192,11 +192,11 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                       ),
                       child: Column(
                         children: [
-                          buildLevelDisplay("산미", note.levelAcidity, scale),
+                          buildLevelDisplay("산미", note.levelAcidity, scale, AppColors.primaryDark),
                           SizedBox(height: 20 * scale),
-                          buildLevelDisplay("바디", note.levelBody, scale),
+                          buildLevelDisplay("바디", note.levelBody, scale, AppColors.primaryDark),
                           SizedBox(height: 20 * scale),
-                          buildLevelDisplay("쓴맛", note.levelBitterness, scale),
+                          buildLevelDisplay("쓴맛", note.levelBitterness, scale, AppColors.primaryDark),
                         ],
                       ),
                     ),
@@ -255,7 +255,7 @@ Widget buildDetailInfo(Detail detail, double scale) {
 }
 
 /// 4. 레벨 표시 (막대 그래프)
-Widget buildLevelDisplay(String label, int value, double scale) {
+Widget buildLevelDisplay(String label, int value, double scale, Color color) {
   final starCount = (value / 2).ceil();
   return Row(
     mainAxisAlignment: MainAxisAlignment.start,
@@ -263,7 +263,14 @@ Widget buildLevelDisplay(String label, int value, double scale) {
     children: [
       Flexible(
         flex: 2,
-        child: Text(label, style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale), overflow: TextOverflow.ellipsis),
+        child: Text(
+            label,
+            style: AppTextStyles.bodyText.copyWith(
+                fontSize: 25 * scale, // 갤러리/리스트 공용을 위해 크기 살짝 조정
+                color: color // 2. 글자 색상 적용 [cite: 1-1-0]
+            ),
+            overflow: TextOverflow.ellipsis
+        ),
       ),
       SizedBox(width: 10 * scale),
       Row(
@@ -273,7 +280,8 @@ Widget buildLevelDisplay(String label, int value, double scale) {
             height: 28 * scale,
             margin: EdgeInsets.only(right: 6 * scale),
             decoration: BoxDecoration(
-              color: AppColors.primaryDark,
+              // color: AppColors.primaryDark,
+              color: color,
               borderRadius: BorderRadius.circular(2 * scale),
             ),
           );

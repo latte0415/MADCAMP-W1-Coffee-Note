@@ -4,6 +4,9 @@ import '../models/note.dart';
 import '../models/sort_option.dart';
 import '../services/note_service.dart';
 import '../pages/modals/details_modal.dart';
+import '../../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
+import '../../widget/page_widget.dart';
 
 class GalleryPage extends StatefulWidget {
   const GalleryPage({super.key});
@@ -13,6 +16,9 @@ class GalleryPage extends StatefulWidget {
 }
 
 class GalleryPageState extends State<GalleryPage> {
+  // 현재 오버레이가 켜져 있는 노트의 ID를 저장
+  String? _activeNoteId;
+
   // 외부(MainPage)에서 새로고침할 수 있도록 함수 공개
   void refresh() {
     setState(() {});
@@ -45,103 +51,148 @@ class GalleryPageState extends State<GalleryPage> {
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(2),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 1, // 세로로 약간 긴 형태
+            crossAxisCount: 2,
+            crossAxisSpacing: 2,
+            mainAxisSpacing: 2,
+            childAspectRatio: 1, // 정사각형
           ),
           itemCount: notesWithImage.length,
           itemBuilder: (context, index) {
             final note = notesWithImage[index];
-            return _buildGalleryItem(note);
+            // return _buildGalleryItem(note);
+            return _GalleryTile(
+              note: note,
+              // 현재 이 노트의 ID가 활성화된 ID와 같은지 확인 [cite: 1-1-0]
+              isSelected: _activeNoteId == note.id,
+              onTap: () {
+                setState(() {
+                  // 이미 선택된 걸 다시 누르면 닫고, 아니면 해당 ID를 활성화 [cite: 1-1-0]
+                  _activeNoteId = note.id;
+                });
+              },
+              onRefresh: refresh,
+            );
           },
         );
       },
     );
   }
+}
 
-  Widget _buildGalleryItem(Note note) {
+// 개별 아이템의 클릭 상태를 관리하기 위한 내부 위젯 [cite: 1-1-0]
+class _GalleryTile extends StatefulWidget {
+  final Note note;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final VoidCallback onRefresh;
+
+  const _GalleryTile({
+    required this.note,
+    required this.isSelected,
+    required this.onTap,
+    required this.onRefresh
+  });
+
+  @override
+  State<_GalleryTile> createState() => _GalleryTileState();
+}
+
+class _GalleryTileState extends State<_GalleryTile> {
+  // bool _showInfo = false; // 정보 표시 여부 상태 [cite: 1-1-0]
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = ( MediaQuery.of(context).size.width/ AppSpacing.designWidth ).clamp(0.3, 1.2);
+
     return GestureDetector(
-      // 클릭 시 상세 모달 표시 및 새로고침 로직
+      // 1. 한번 클릭: 정보 오버레이 토글 [cite: 1-1-0]
       onTap: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) => NoteDetailsModal(note: note),
-        ).then((result) {
-          if (result == true) {
-            refresh(); // 수정 저장 후 돌아오면 갤러리 갱신
-          }
-        });
+        if (widget.isSelected) {
+          // [변경] 이미 선택된 상태에서 또 클릭하면 상세 모달 오픈 [cite: 1-1-0]
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => NoteDetailsModal(note: widget.note),
+          ).then((result) {
+            if (result == true) widget.onRefresh();
+          });
+        } else {
+          // 선택되지 않은 상태라면 부모에게 나를 선택해달라고 알림
+          widget.onTap();
+        }
       },
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 2,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // 1. 이미지 영역
-                Expanded(
-                  child: note.image != null && note.image!.isNotEmpty
-                      ? Image.file(
-                    File(note.image!),
-                    fit: BoxFit.cover,
-                  )
-                      : Container(
-                    color: Colors.grey[100],
-                    child: const Icon(Icons.coffee, color: Colors.grey, size: 40),
-                  ),
-                ),
 
-                // 2. 텍스트 및 상세 정보 영역
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 기본 레이어: 사진 [cite: 1-1-0]
+          Image.file(
+            File(widget.note.image!),
+            fit: BoxFit.cover,
+          ),
+
+          // 오버레이 레이어: 검정 배경에 정보 표시 (토글 시에만 등장) [cite: 1-1-0]
+          if (widget.isSelected)
+            Container(
+              color: Colors.black.withOpacity(0.7), // 짙은 검정 오버레이 [cite: 1-1-0]
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                // 메뉴명, 맛 정보, 카페명, 마신 날짜 정보 나열
+                  Text(
+                    widget.note.menu,
+                    textAlign: TextAlign.start,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+                  ),
+                  const SizedBox(height: 15),
+
+                  // 2. 맛 정보 (산미, 바디, 쓴맛 막대 바) [cite: 1-1-0]
+                  buildLevelDisplay("산미", widget.note.levelAcidity, scale * 1.5, Colors.white),
+                  const SizedBox(height: 4),
+                  buildLevelDisplay("바디", widget.note.levelBody, scale * 1.5, Colors.white),
+                  const SizedBox(height: 4),
+                  buildLevelDisplay("쓴맛", widget.note.levelBitterness, scale * 1.5, Colors.white),
+
+                  const Spacer(),
+
+                  // 3. 카페명
+                  Row(
                     children: [
-                      const SizedBox(height: 4),
-                      Text(
-                        note.comment.isEmpty ? "한줄평을 작성하지 않았어요 :(" : note.comment,
-                        maxLines: 1, // 갤러리는 공간이 좁아 1줄 권장 [cite: 1-1-0]
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      const Icon(Icons.location_on, size: 15, color: Colors.white70),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          widget.note.location,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white70, fontSize: 15),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
+                  const SizedBox(height: 2),
 
-            // 3. 우측 상단 점수 레이블
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.star, color: Colors.amber, size: 15),
-                    const SizedBox(width: 2),
-                    Text(
-                      '${note.score}',
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+                  // 4. drankAt (날짜) [cite: 1-1-0]
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today, size: 15, color: Colors.white70),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.note.drankAt.toString().split(' ')[0], // YYYY-MM-DD 형식
+                        style: const TextStyle(color: Colors.white70, fontSize: 15),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
