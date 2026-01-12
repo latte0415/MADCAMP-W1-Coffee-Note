@@ -100,8 +100,7 @@ class DetailRepository {
         return {
             'id': detail.id,
             'note_id': detail.noteId,
-            'origin_country': detail.originCountry,
-            'origin_region': detail.originRegion,
+            'origin_location': detail.originLocation,
             'variety': detail.variety,
             'process': detail.process?.toDbValue(),  // enum을 DB 값으로 변환 (nullable)
             'process_text': detail.processText,
@@ -133,8 +132,7 @@ class DetailRepository {
         return Detail(
             id: map['id'] as String,
             noteId: map['note_id'] as String,
-            originCountry: map['origin_country'] as String?,
-            originRegion: map['origin_region'] as String?,
+            originLocation: map['origin_location'] as String?,
             variety: map['variety'] as String?,
             process: map['process'] != null 
                 ? ProcessType.fromDbValue(map['process'] as String)  // DB 값에서 enum으로 변환

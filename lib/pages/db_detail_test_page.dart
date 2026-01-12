@@ -165,11 +165,12 @@ class _DbDetailTestPageState extends State<DbDetailTestPage> {
       final existing = await DetailService.instance.getDetailByNoteId(note.id);
       if (existing != null) continue;
 
+      final country = ['브라질', '에티오피아', '콜롬비아', '케냐', '과테말라'][i % 5];
+      final region = ['세하도', '예가체프', '수프리모', 'AA', '안티구아'][i % 5];
       testDetails.add(Detail(
         id: const Uuid().v4(),
         noteId: note.id,
-        originCountry: ['브라질', '에티오피아', '콜롬비아', '케냐', '과테말라'][i % 5],
-        originRegion: ['세하도', '예가체프', '수프리모', 'AA', '안티구아'][i % 5],
+        originLocation: '$country $region',
         variety: ['아라비카', '게이샤', '버번', '티피카', '카투라'][i % 5],
         process: processTypes[i % processTypes.length],
         processText: '${processTypes[i % processTypes.length].displayName} 처리 방식',
@@ -210,8 +211,7 @@ class _DbDetailTestPageState extends State<DbDetailTestPage> {
     }
 
     final noteIdController = TextEditingController(text: selectedNoteForDetail?.id ?? noteId);
-    final originCountryController = TextEditingController(text: initialDetail?.originCountry ?? '');
-    final originRegionController = TextEditingController(text: initialDetail?.originRegion ?? '');
+    final originLocationController = TextEditingController(text: initialDetail?.originLocation ?? '');
     final varietyController = TextEditingController(text: initialDetail?.variety ?? '');
     final processTextController = TextEditingController(text: initialDetail?.processText ?? '');
     final roastingPointTextController = TextEditingController(text: initialDetail?.roastingPointText ?? '');
@@ -242,21 +242,12 @@ class _DbDetailTestPageState extends State<DbDetailTestPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Origin Country
+                  // Origin Location
                   TextField(
-                    controller: originCountryController,
+                    controller: originLocationController,
                     decoration: const InputDecoration(
-                      labelText: '생산 국가',
-                      hintText: '예: 브라질',
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  // Origin Region
-                  TextField(
-                    controller: originRegionController,
-                    decoration: const InputDecoration(
-                      labelText: '생산 지역',
-                      hintText: '예: 세하도',
+                      labelText: '원산지',
+                      hintText: '예: 브라질 세하도',
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -373,8 +364,7 @@ class _DbDetailTestPageState extends State<DbDetailTestPage> {
                 final detail = Detail(
                   id: initialDetail?.id ?? const Uuid().v4(),
                   noteId: noteIdController.text,
-                  originCountry: originCountryController.text.isEmpty ? null : originCountryController.text,
-                  originRegion: originRegionController.text.isEmpty ? null : originRegionController.text,
+                  originLocation: originLocationController.text.isEmpty ? null : originLocationController.text,
                   variety: varietyController.text.isEmpty ? null : varietyController.text,
                   process: selectedProcess,
                   processText: processTextController.text.isEmpty ? null : processTextController.text,
@@ -577,14 +567,13 @@ class _DbDetailTestPageState extends State<DbDetailTestPage> {
                                   children: [
                                     _buildInfoRow('ID', _currentDetail!.id),
                                     _buildInfoRow('Note ID', _currentDetail!.noteId),
-                                    _buildInfoRow('생산 국가', _currentDetail!.originCountry ?? '(없음)'),
-                                    _buildInfoRow('생산 지역', _currentDetail!.originRegion ?? '(없음)'),
+                                    _buildInfoRow('원산지', _currentDetail!.originLocation ?? '(없음)'),
                                     _buildInfoRow('품종', _currentDetail!.variety ?? '(없음)'),
-                                    _buildInfoRow('처리 방식', _currentDetail!.process.displayName),
+                                    _buildInfoRow('처리 방식', _currentDetail!.process?.displayName ?? '(없음)'),
                                     _buildInfoRow('처리 방식 설명', _currentDetail!.processText ?? '(없음)'),
-                                    _buildInfoRow('로스팅 포인트', _currentDetail!.roastingPoint.displayName),
+                                    _buildInfoRow('로스팅 포인트', _currentDetail!.roastingPoint?.displayName ?? '(없음)'),
                                     _buildInfoRow('로스팅 포인트 설명', _currentDetail!.roastingPointText ?? '(없음)'),
-                                    _buildInfoRow('추출 방식', _currentDetail!.method.displayName),
+                                    _buildInfoRow('추출 방식', _currentDetail!.method?.displayName ?? '(없음)'),
                                     _buildInfoRow('추출 방식 설명', _currentDetail!.methodText ?? '(없음)'),
                                   ],
                                 ),

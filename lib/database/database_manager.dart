@@ -23,7 +23,7 @@ class DatabaseManager {
 
         return await openDatabase(
             path,
-            version: 3,
+            version: 4,
             onCreate: _createTables,
             onUpgrade: _onUpgrade,
         );
@@ -54,8 +54,7 @@ class DatabaseManager {
             CREATE TABLE details (
                 id TEXT PRIMARY KEY,
                 note_id TEXT NOT NULL UNIQUE,
-                origin_country TEXT,
-                origin_region TEXT,
+                origin_location TEXT,
                 variety TEXT,
                 process TEXT,
                 process_text TEXT,
@@ -100,6 +99,58 @@ class DatabaseManager {
                 INSERT INTO details_new 
                 SELECT * FROM details
             ''');
+            await db.execute('DROP TABLE details');
+            await db.execute('ALTER TABLE details_new RENAME TO details');
+        }
+        if (oldVersion < 4) {
+            // 버전 3에서 4로 업그레이드: origin_country와 origin_region을 origin_location으로 통합
+            await db.execute('''
+                CREATE TABLE details_new (
+                    id TEXT PRIMARY KEY,
+                    note_id TEXT NOT NULL UNIQUE,
+                    origin_location TEXT,
+                    variety TEXT,
+                    process TEXT,
+                    process_text TEXT,
+                    roasting_point TEXT,
+                    roasting_point_text TEXT,
+                    method TEXT,
+                    method_text TEXT,
+                    tasting_notes TEXT
+                )
+            ''');
+            // 기존 데이터를 읽어서 origin_location으로 병합
+            final oldData = await db.query('details');
+            for (final row in oldData) {
+                final originCountry = row['origin_country'] as String?;
+                final originRegion = row['origin_region'] as String?;
+                
+                // origin_country와 origin_region을 병합
+                String? originLocation;
+                if (originCountry != null && originCountry.isNotEmpty) {
+                    if (originRegion != null && originRegion.isNotEmpty) {
+                        originLocation = '$originCountry $originRegion';
+                    } else {
+                        originLocation = originCountry;
+                    }
+                } else if (originRegion != null && originRegion.isNotEmpty) {
+                    originLocation = originRegion;
+                }
+                
+                await db.insert('details_new', {
+                    'id': row['id'],
+                    'note_id': row['note_id'],
+                    'origin_location': originLocation,
+                    'variety': row['variety'],
+                    'process': row['process'],
+                    'process_text': row['process_text'],
+                    'roasting_point': row['roasting_point'],
+                    'roasting_point_text': row['roasting_point_text'],
+                    'method': row['method'],
+                    'method_text': row['method_text'],
+                    'tasting_notes': row['tasting_notes'],
+                });
+            }
             await db.execute('DROP TABLE details');
             await db.execute('ALTER TABLE details_new RENAME TO details');
         }
