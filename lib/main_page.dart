@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
-import 'pages/list_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'pages/library_page.dart';
 import 'pages/modals/creation_modal.dart';
 import 'pages/gallery_page.dart';
 import 'pages/ai_guide_page.dart';
 import 'theme/app_colors.dart';
+import 'features/library/controller/library_controller.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
 
   int _selectedIndex = 0;
 
-  // creation 후 새로고침을 위한 global 선언
-  final GlobalKey<ListPageState> _listPageKey = GlobalKey<ListPageState>();
   final GlobalKey<GalleryPageState> _galleryPageKey = GlobalKey<GalleryPageState>();
 
   // 각 인덱스에 맞는 화면 리스트
   List<Widget> get _pages => [
-    ListPage(key: _listPageKey),
+    const LibraryPage(),
     GalleryPage(key: _galleryPageKey),
     const AiGuidePage(),
   ];
@@ -74,8 +74,8 @@ class _MainPageState extends State<MainPage> {
               // ),
               builder: (context) => const NoteCreatePopup(),
             ).then((_) {
-              // [핵심] 팝업이 닫히면 ListPage 내부의 함수를 강제로 실행시킵니다. (새로고침)
-              _listPageKey.currentState?.refreshNotes();
+              // 팝업 닫힌 후 리스트를 다시 로드
+              ref.read(libraryControllerProvider.notifier).refresh();
             });
           },
           backgroundColor: AppColors.primaryDark,

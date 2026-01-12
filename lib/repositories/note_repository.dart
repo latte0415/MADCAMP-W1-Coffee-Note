@@ -4,13 +4,17 @@ import '../models/sort_option.dart';
 import '../database/database_manager.dart';
 
 class NoteRepository {
-  static final NoteRepository instance = NoteRepository._init();
+  /// 기본 싱글턴은 남겨 두되, 주입식 생성을 지원한다.
+  static final NoteRepository instance =
+      NoteRepository(databaseManager: DatabaseManager.instance);
 
-  NoteRepository._init();
+  final DatabaseManager databaseManager;
+
+  NoteRepository({required this.databaseManager});
 
   /// DatabaseManager를 통해 공통 DB 인스턴스 사용
   Future<Database> get database async {
-    return await DatabaseManager.instance.database;
+    return await databaseManager.database;
   }
 
   // CRUD 메서드들
