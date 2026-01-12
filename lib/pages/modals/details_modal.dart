@@ -125,6 +125,7 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
       process: _selectedProcess,
       roastingPoint: _selectedRoasting,
       method: _selectedMethod,
+      tastingNotes: _tastingNotesTags.isNotEmpty ? _tastingNotesTags : null,
     );
 
     await NoteService.instance.updateNote(updatedNote); // Note DB 업데이트
@@ -136,6 +137,18 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
     }
 
     if (mounted) Navigator.pop(context, true); // 성공 신호와 함께 닫기
+  }
+
+  void _handleTastingNotes(String value) {
+    if (value.endsWith(' ') || value.endsWith(',')) {
+      final newTag = value.trim().replaceAll(',', '');
+      if (newTag.isNotEmpty && _tastingNotesTags.length < 5 && !_tastingNotesTags.contains(newTag)) {
+        setState(() => _tastingNotesTags.add(newTag));
+        _tastingNotesController.clear();
+      } else {
+        _tastingNotesController.clear();
+      }
+    }
   }
 
   @override
@@ -176,7 +189,6 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
                 ),
               ],
             ),
-            // const Divider(),
 
             // --- [2. 스크롤 영역] ---
             Expanded(
@@ -261,11 +273,37 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
                         buildDropdown<ProcessType>("가공 방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!)),
                         buildDropdown<RoastingPointType>("로스팅 포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!)),
                         buildDropdown<MethodType>("추출 방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!)),
+                        buildField("테이스팅 노트", _tastingNotesController, true, onChanged: _handleTastingNotes),
                       ] else ...[
                         buildReadOnlyDetail("가공 방식", _selectedProcess.displayName),
                         buildReadOnlyDetail("로스팅", _selectedRoasting.displayName),
                         buildReadOnlyDetail("추출 방식", _selectedMethod.displayName),
+                        const SizedBox(height: 15),
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("테이스팅 노트", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primaryText)),
+                        ),
                       ],
+                      const SizedBox(height: 10),
+                      if (_tastingNotesTags.isNotEmpty)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: _tastingNotesTags.map((tag) => GestureDetector(
+                              onTap: _isEditing ? () => setState(() => _tastingNotesTags.remove(tag)) : null,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryDark,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text("#$tag", style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                              ),
+                            )).toList(),
+                          ),
+                        ),
                       const SizedBox(height: 20),
                     ],
                   ],
