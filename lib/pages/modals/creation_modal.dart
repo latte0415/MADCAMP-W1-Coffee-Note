@@ -6,14 +6,13 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import '../../services/image_service.dart';
 import '../../services/detail_service.dart';
-import '../../services/api_service.dart';
 import '../../models/detail.dart';
 import '../../models/enums/process_type.dart';
 import '../../models/enums/roasting_point_type.dart';
 import '../../models/enums/method_type.dart';
-import 'dart:convert';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
+import '../../widget/popup_widget.dart';
 
 class NoteCreatePopup extends StatefulWidget {
   final Map<String, dynamic>? prefillData;
@@ -58,7 +57,6 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
   int _score = 3;
 
   List<String> _tastingNotesTags = [];
-  bool _isLoadingAI = false;
 
   // 스케일 팩터 계산
   double _getScaleFactor(BuildContext context) {
@@ -124,60 +122,6 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     }
   }
 
-  /// 입력 텍스트를 조합하여 API에 전달할 문자열 생성
-  String _buildInputText() {
-    final parts = <String>[];
-    if (_menuController.text.isNotEmpty) {
-      parts.add(_menuController.text);
-    }
-    if (_cafeController.text.isNotEmpty) {
-      parts.add(_cafeController.text);
-    }
-    if (_commentController.text.isNotEmpty) {
-      parts.add(_commentController.text);
-    }
-    return parts.join(' ');
-  }
-
-  /// AI 자동생성 버튼 클릭 시 호출되는 메서드
-  Future<void> _handleAIAutoFill() async {
-    final inputText = _buildInputText();
-    
-    if (inputText.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('메뉴명, 카페명, 또는 한줄평을 입력해주세요.')),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoadingAI = true;
-    });
-
-    try {
-      final result = await APIService.instance.chatForMapping(inputText);
-      _fillDetailFields(result);
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('AI가 정보를 자동으로 채웠습니다.')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('오류가 발생했습니다: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingAI = false;
-        });
-      }
-    }
-  }
-
   @override
   void dispose() {
     _cafeController.dispose();
@@ -240,100 +184,106 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     );
   }
 
+  void _handleTastingNotes(String value) {
+    if (value.isEmpty) return;
+
+    // 공백(' ')이나 쉼표(',')가 포함되었는지 확인
+    if (value.endsWith(' ') || value.endsWith(',')) {
+      final newTag = value.trim().replaceAll(',', ''); // 공백/쉼표 제거
+
+      if (newTag.isNotEmpty && !_tastingNotesTags.contains(newTag)) {
+        setState(() {
+          if (_tastingNotesTags.length < 5) { // 최대 5개 제한
+            _tastingNotesTags.add(newTag);
+          }
+          _tastingNotesController.clear(); // 입력창 비우기 (태그화 완료)
+        });
+      } else {
+        _tastingNotesController.clear(); // 중복이거나 빈값이면 그냥 비움
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final scale = _getScaleFactor(context);
-    
+
     return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
       child: Container(
-        width: double.infinity,
+        padding: const EdgeInsets.all(20),
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.9,
+          maxWidth: 500,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(50 * scale),
-            topRight: Radius.circular(50 * scale),
-          ),
-        ),
+        // ✅ [수정] 상단바와 스크롤 영역을 하나의 Column으로 묶음
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 상단 헤더
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 49 * scale, vertical: 20 * scale),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.close, color: AppColors.primaryDark, size: 30 * scale),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Expanded(
-                    child: Text(
-                      "상세 정보",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 60 * scale,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDark,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 48 * scale),
-                ],
-              ),
+            // --- [1. 고정 영역] 상단 바 ---
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.close, color: AppColors.primaryDark, size: 24),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const Text(
+                  "기록하기",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(width: 48), // 대칭을 위한 공간
+              ],
             ),
-            Divider(height: 1 * scale),
-            
-            // 스크롤 가능한 컨텐츠
+            // const Divider(height: 20),
+
+            // --- [2. 스크롤 가능한 컨텐츠 영역] ---
             Flexible(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 49 * scale, vertical: 20 * scale),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 이미지 추가하기
+                    // 1. 이미지 추가 영역
                     _buildImageSection(scale),
-                    SizedBox(height: 30 * scale),
-                    
-                    // 텍스트 입력창
-                    _buildTextField("메뉴명", "메뉴명을 입력하세요.", _menuController, scale),
-                    SizedBox(height: 20 * scale),
-                    _buildTextField("카페명", "카페명을 입력하세요.", _cafeController, scale),
-                    SizedBox(height: 20 * scale),
-                    _buildTextField("날짜명", "날짜를 입력하세요.", _dateController, scale),
-                    SizedBox(height: 20 * scale),
-                    _buildTextField("한줄평", "한줄평을 입력하세요.", _commentController, scale),
-                    SizedBox(height: 30 * scale),
-                    
-                    // 슬라이더
-                    _buildSlider("산미", _acidity, (v) => setState(() => _acidity = v), scale),
-                    SizedBox(height: 20 * scale),
-                    _buildSlider("바디", _body, (v) => setState(() => _body = v), scale),
-                    SizedBox(height: 20 * scale),
-                    _buildSlider("쓴맛", _bitterness, (v) => setState(() => _bitterness = v), scale),
-                    SizedBox(height: 30 * scale),
-                    
-                    // 별점
-                    _buildStarRating(scale),
-                    SizedBox(height: 30 * scale),
-                    
-                    // 상세정보 추가하기 체크박스
+                    const SizedBox(height: 20),
+
+                    // 2. 기본 텍스트 입력창 (popup_widget.dart 함수 사용)
+                    buildField("메뉴명", _menuController, true),
+                    buildField("카페명", _cafeController, true),
+                    buildField("날짜", _dateController, true),
+                    const SizedBox(height: 25),
+
+                    // 3. 수치 조절 슬라이더 (popup_widget.dart 함수 사용)
+                    buildSlider(context, "산미", _acidity, (v) => setState(() => _acidity = v), true),
+                    buildSlider(context, "바디", _body, (v) => setState(() => _body = v), true),
+                    buildSlider(context, "쓴맛", _bitterness, (v) => setState(() => _bitterness = v), true),
+                    const SizedBox(height: 20),
+
+                    // 4. 한줄평 및 별점
+                    buildField("한줄평", _commentController, true),
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) => IconButton(
+                        onPressed: () => setState(() => _score = index + 1),
+                        icon: Icon(
+                          index < _score ? Icons.star : Icons.star_border,
+                          color: Colors.amber,
+                          size: 35,
+                        ),
+                      )),
+                    ),
+                    const SizedBox(height: 25),
+
+                    // 5. 상세정보 추가하기 토글 체크박스
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        const Text(
                           "상세정보 추가하기",
-                          style: TextStyle(
-                            fontSize: 30 * scale,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.primaryDark,
-                            letterSpacing: 0.1,
-                          ),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
                         ),
                         Checkbox(
                           value: _showDetailSection,
@@ -342,154 +292,96 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20 * scale),
-                    
-                    // 상세 정보 섹션
+
+                    // --- 6. 상세 정보 섹션 (토글 상태에 따라 노출) ---
                     if (_showDetailSection) ...[
-                      // AI 자동생성 버튼
-                      SizedBox(
-                        width: double.infinity,
-                        height: 70 * scale,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey[300],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20 * scale),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerRight, // 오른쪽 정렬 [cite: 1-1-0]
+                        child: SizedBox(
+                          width: 90,
+                          height: 28,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[200],
+                              elevation: 0,
+                              padding: EdgeInsets.zero, // 내부 여백 제거하여 텍스트에 딱 맞게 설정
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: () { //AI 자동생성 로직 추가
+                            },
+                            child: const Text(
+                              "AI 자동생성",
+                              style: TextStyle(
+                                color: AppColors.primaryDark,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          onPressed: _isLoadingAI ? null : _handleAIAutoFill,
-                          child: _isLoadingAI
-                              ? SizedBox(
-                                  height: 20 * scale,
-                                  width: 20 * scale,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryDark),
-                                  ),
-                                )
-                              : Text(
-                                  "AI 자동생성",
-                                  style: TextStyle(
-                                    fontSize: 30 * scale,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.primaryDark,
-                                    letterSpacing: 0.1,
-                                  ),
-                                ),
                         ),
                       ),
-                      SizedBox(height: 20 * scale),
-                      
-                      // 국가/지역, 품종
-                      _buildTextField("국가/지역", "국가/지역을 입력하세요.", _countryController, scale),
-                      SizedBox(height: 20 * scale),
-                      _buildTextField("품종", "품종을 입력하세요.", _varietyController, scale),
-                      SizedBox(height: 20 * scale),
-                      
-                      // 드롭다운 + 텍스트 입력
-                      _buildDropdownWithText<ProcessType>(
-                        "가공방식",
-                        _selectedProcess,
-                        ProcessType.values,
-                        _processTextController,
-                        (v) => setState(() {
-                          _selectedProcess = v!;
-                          if (v != ProcessType.etc) {
-                            _processTextController.clear();
-                          }
-                        }),
-                        scale,
+                      const SizedBox(height: 20),
+
+                      buildField("국가/지역", _countryController, true),
+                      buildField("품종", _varietyController, true),
+                      const SizedBox(height: 10),
+
+                      buildDropdown<ProcessType>("가공방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!)),
+                      buildDropdown<RoastingPointType>("로스팅포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!)),
+                      buildDropdown<MethodType>("추출방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!)),
+
+                      const SizedBox(height: 15),
+                      buildField(
+                          "테이스팅 노트",
+                          _tastingNotesController,
+                          true,
+                          onChanged: _handleTastingNotes // ✅ 실시간 변환 로직 연결
                       ),
-                      SizedBox(height: 20 * scale),
-                      _buildDropdownWithText<RoastingPointType>(
-                        "로스팅포인트",
-                        _selectedRoasting,
-                        RoastingPointType.values,
-                        _roastingPointTextController,
-                        (v) => setState(() {
-                          _selectedRoasting = v!;
-                          if (v != RoastingPointType.etc) {
-                            _roastingPointTextController.clear();
-                          }
-                        }),
-                        scale,
-                      ),
-                      SizedBox(height: 20 * scale),
-                      _buildDropdownWithText<MethodType>(
-                        "추출방식",
-                        _selectedMethod,
-                        MethodType.values,
-                        _methodTextController,
-                        (v) => setState(() {
-                          _selectedMethod = v!;
-                          if (v != MethodType.etc) {
-                            _methodTextController.clear();
-                          }
-                        }),
-                        scale,
-                      ),
-                      SizedBox(height: 20 * scale),
-                      
-                      // 테이스팅 노트
-                      _buildTextField(
-                        "테이스팅 노트",
-                        "테이스팅 노트를 입력하세요 (쉼표 또는 띄어쓰기로 구분, 최대 5개)",
-                        _tastingNotesController,
-                        scale,
-                        onChanged: (_) => _updateTastingNotes(),
-                      ),
-                      SizedBox(height: 15 * scale),
-                      // 해시태그 표시
+                      const SizedBox(height: 10),
                       if (_tastingNotesTags.isNotEmpty)
                         Wrap(
-                          spacing: 10 * scale,
-                          runSpacing: 10 * scale,
-                          children: _tastingNotesTags.map((tag) => Container(
-                            padding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 8 * scale),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryDark,
-                              borderRadius: BorderRadius.circular(20 * scale),
-                            ),
-                            child: Text(
-                              "#$tag",
-                              style: TextStyle(
-                                fontSize: 30 * scale,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.background,
-                                letterSpacing: 0.1,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _tastingNotesTags.map((tag) => GestureDetector(
+                            onTap: () => setState(() => _tastingNotesTags.remove(tag)), // 터치 시 삭제 기능
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryDark, // 어두운 배경
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                  "#$tag",
+                                  style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)
                               ),
                             ),
                           )).toList(),
                         ),
-                      SizedBox(height: 30 * scale),
+                      const SizedBox(height: 15),
                     ],
-                    
-                    SizedBox(height: 30 * scale),
-                    
-                    // 기록하기 버튼
+
+                    const SizedBox(height: 40),
+
+                    // 7. 기록하기 버튼
                     SizedBox(
                       width: double.infinity,
-                      height: 131 * scale,
+                      height: 55,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryDark,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50 * scale),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                         ),
                         onPressed: _submitNote,
-                        child: Text(
+                        child: const Text(
                           "기록하기",
-                          style: TextStyle(
-                            fontSize: 50 * scale,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.background,
-                            letterSpacing: 0.1,
-                          ),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20 * scale),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -538,209 +430,6 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     );
   }
 
-  Widget _buildTextField(String label, String hint, TextEditingController controller, double scale, {ValueChanged<String>? onChanged}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 30 * scale,
-            fontWeight: FontWeight.w400,
-            color: AppColors.primaryDark,
-            letterSpacing: 0.1,
-          ),
-        ),
-        SizedBox(height: 10 * scale),
-        TextField(
-          controller: controller,
-          onChanged: onChanged,
-          style: TextStyle(
-            fontSize: 30 * scale,
-            fontWeight: FontWeight.w400,
-            color: AppColors.primaryDark,
-            letterSpacing: 0.1,
-          ),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: 30 * scale,
-              color: Colors.grey[400],
-              letterSpacing: 0.1,
-            ),
-            filled: true,
-            fillColor: AppColors.background,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10 * scale),
-              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10 * scale),
-              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10 * scale),
-              borderSide: BorderSide(color: AppColors.primaryDark, width: AppSpacing.borderWidth * scale),
-            ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 15 * scale),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSlider(String label, double value, ValueChanged<double> onChanged, double scale) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 30 * scale,
-                fontWeight: FontWeight.w400,
-                color: AppColors.primaryDark,
-                letterSpacing: 0.1,
-              ),
-            ),
-            Text(
-              "${value.toInt()}",
-              style: TextStyle(
-                fontSize: 30 * scale,
-                fontWeight: FontWeight.w400,
-                color: AppColors.primaryDark,
-                letterSpacing: 0.1,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 10 * scale),
-        Slider(
-          value: value,
-          min: 1,
-          max: 10,
-          divisions: 9,
-          activeColor: AppColors.primaryDark,
-          inactiveColor: Colors.grey[300],
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStarRating(double scale) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "별점",
-          style: TextStyle(
-            fontSize: 30 * scale,
-            fontWeight: FontWeight.w400,
-            color: AppColors.primaryDark,
-            letterSpacing: 0.1,
-          ),
-        ),
-        SizedBox(height: 10 * scale),
-        Row(
-          children: List.generate(5, (index) => IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            icon: Icon(
-              index < _score ? Icons.star : Icons.star_border,
-              color: Colors.amber,
-              size: 50 * scale,
-            ),
-            onPressed: () => setState(() => _score = index + 1),
-          )),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdownWithText<T>(
-    String label,
-    T value,
-    List<T> items,
-    TextEditingController textController,
-    ValueChanged<T?> onChanged,
-    double scale,
-  ) {
-    bool isEtc = false;
-    if (value is ProcessType && value == ProcessType.etc) {
-      isEtc = true;
-    } else if (value is RoastingPointType && value == RoastingPointType.etc) {
-      isEtc = true;
-    } else if (value is MethodType && value == MethodType.etc) {
-      isEtc = true;
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 30 * scale,
-            fontWeight: FontWeight.w400,
-            color: AppColors.primaryDark,
-            letterSpacing: 0.1,
-          ),
-        ),
-        SizedBox(height: 10 * scale),
-        DropdownButtonFormField<T>(
-          value: value,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: AppColors.background,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10 * scale),
-              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10 * scale),
-              borderSide: BorderSide(color: AppColors.border, width: AppSpacing.borderWidth * scale),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10 * scale),
-              borderSide: BorderSide(color: AppColors.primaryDark, width: AppSpacing.borderWidth * scale),
-            ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 15 * scale),
-          ),
-          style: TextStyle(
-            fontSize: 30 * scale,
-            fontWeight: FontWeight.w400,
-            color: AppColors.primaryDark,
-            letterSpacing: 0.1,
-          ),
-          items: items.map((item) {
-            String text = "";
-            if (item is ProcessType) {
-              text = item.displayName;
-            } else if (item is RoastingPointType) {
-              text = item.displayName;
-            } else if (item is MethodType) {
-              text = item.displayName;
-            } else {
-              text = item.toString().split('.').last;
-            }
-            return DropdownMenuItem(
-              value: item,
-              child: Text(text),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
-        if (isEtc) ...[
-          SizedBox(height: 15 * scale),
-          _buildTextField("$label 직접 입력", "$label을 직접 입력하세요.", textController, scale),
-        ],
-      ],
-    );
-  }
-
   void _submitNote() async {
     if (_cafeController.text.isEmpty || _menuController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -776,8 +465,6 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
       await NoteService.instance.createNote(newNote);
 
       if (_showDetailSection) {
-        List<String>? tastingNotes = _tastingNotesTags.isNotEmpty ? _tastingNotesTags : null;
-        
         final newDetail = Detail(
           id: const Uuid().v4(),
           noteId: noteId,
@@ -795,7 +482,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
           methodText: _selectedMethod == MethodType.etc && _methodTextController.text.isNotEmpty
               ? _methodTextController.text
               : null,
-          tastingNotes: tastingNotes,
+          tastingNotes: _tastingNotesTags.isNotEmpty ? _tastingNotesTags : null,
         );
         await DetailService.instance.createDetail(newDetail);
       }
