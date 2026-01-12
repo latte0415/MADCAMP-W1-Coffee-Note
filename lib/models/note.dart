@@ -1,3 +1,5 @@
+import 'sort_option.dart';
+
 class Note {
     final String id;
     final String location;
@@ -28,4 +30,22 @@ class Note {
         }) : this.createdAt = createdAt ?? DateTime.now(),
              this.updatedAt = updatedAt ?? DateTime.now();
 
+}
+
+class NoteQuery {
+    final String? query;
+    final SortOption sortOption;
+    final bool showDetailFilter;
+    final int? acidity;
+    final int? body;
+    final int? bitterness;
+
+    NoteQuery({
+        this.query,
+        required this.sortOption,
+        required this.showDetailFilter,
+        this.acidity,
+        this.body,
+        this.bitterness,
+    });
 }

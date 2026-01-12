@@ -284,7 +284,13 @@ Widget buildLevelDisplay(String label, int value, double scale) {
 }
 
 /// 5. 상세 필터 슬라이더
-Widget buildFilterSlider(String label, double value, ValueChanged<double> onChanged, double scale) {
+Widget buildFilterSlider(
+  String label,
+  double value,
+  ValueChanged<double> onChanged,
+  double scale, {
+  ValueChanged<double>? onChangeEnd,
+}) {
   return Row(
     children: [
       Container(
@@ -307,6 +313,7 @@ Widget buildFilterSlider(String label, double value, ValueChanged<double> onChan
           activeColor: AppColors.primaryDark,
           inactiveColor: Colors.grey[300],
           onChanged: onChanged,
+          onChangeEnd: onChangeEnd,
         ),
       ),
       SizedBox(
