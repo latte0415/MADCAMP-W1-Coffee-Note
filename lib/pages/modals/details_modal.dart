@@ -70,9 +70,9 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
         _detail = detail;
         _countryController.text = detail.originCountry ?? "";
         _varietyController.text = detail.variety ?? "";
-        _selectedProcess = detail.process;
-        _selectedRoasting = detail.roastingPoint;
-        _selectedMethod = detail.method;
+        _selectedProcess = detail.process ?? ProcessType.washed;
+        _selectedRoasting = detail.roastingPoint ?? RoastingPointType.medium;
+        _selectedMethod = detail.method ?? MethodType.filter;
       });
     }
   }

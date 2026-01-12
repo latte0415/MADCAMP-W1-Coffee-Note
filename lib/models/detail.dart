@@ -8,11 +8,11 @@ class Detail {
     final String? originCountry;
     final String? originRegion;
     final String? variety;
-    final ProcessType process;
+    final ProcessType? process;
     final String? processText;
-    final RoastingPointType roastingPoint;
+    final RoastingPointType? roastingPoint;
     final String? roastingPointText;
-    final MethodType method;
+    final MethodType? method;
     final String? methodText;
     final List<String>? tastingNotes;
 
@@ -22,11 +22,11 @@ class Detail {
         this.originCountry,
         this.originRegion,
         this.variety,
-        required this.process,
+        this.process,
         this.processText,
-        required this.roastingPoint,
+        this.roastingPoint,
         this.roastingPointText,
-        required this.method,
+        this.method,
         this.methodText,
         this.tastingNotes,
     });

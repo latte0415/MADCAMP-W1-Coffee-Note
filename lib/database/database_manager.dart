@@ -23,7 +23,7 @@ class DatabaseManager {
 
         return await openDatabase(
             path,
-            version: 2,
+            version: 3,
             onCreate: _createTables,
             onUpgrade: _onUpgrade,
         );
@@ -57,11 +57,11 @@ class DatabaseManager {
                 origin_country TEXT,
                 origin_region TEXT,
                 variety TEXT,
-                process TEXT NOT NULL,
+                process TEXT,
                 process_text TEXT,
-                roasting_point TEXT NOT NULL,
+                roasting_point TEXT,
                 roasting_point_text TEXT,
-                method TEXT NOT NULL,
+                method TEXT,
                 method_text TEXT,
                 tasting_notes TEXT
             )
@@ -75,6 +75,33 @@ class DatabaseManager {
             await db.execute('''
                 ALTER TABLE details ADD COLUMN tasting_notes TEXT
             ''');
+        }
+        if (oldVersion < 3) {
+            // 버전 2에서 3으로 업그레이드: process, roasting_point, method를 nullable로 변경
+            // SQLite는 ALTER TABLE로 NOT NULL 제약을 직접 제거할 수 없으므로
+            // 새 테이블을 생성하고 데이터를 이전하는 방식 사용
+            await db.execute('''
+                CREATE TABLE details_new (
+                    id TEXT PRIMARY KEY,
+                    note_id TEXT NOT NULL UNIQUE,
+                    origin_country TEXT,
+                    origin_region TEXT,
+                    variety TEXT,
+                    process TEXT,
+                    process_text TEXT,
+                    roasting_point TEXT,
+                    roasting_point_text TEXT,
+                    method TEXT,
+                    method_text TEXT,
+                    tasting_notes TEXT
+                )
+            ''');
+            await db.execute('''
+                INSERT INTO details_new 
+                SELECT * FROM details
+            ''');
+            await db.execute('DROP TABLE details');
+            await db.execute('ALTER TABLE details_new RENAME TO details');
         }
     }
 
