@@ -11,6 +11,12 @@ import '../../services/detail_service.dart';
 import '../../models/enums/process_type.dart';
 import '../../models/enums/roasting_point_type.dart';
 import '../../models/enums/method_type.dart';
+// theme 관련 import
+import '../../theme/app_colors.dart';
+import '../../theme/app_spacing.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/app_component_styles.dart';
+import '../../widget/popup_widget.dart';
 
 class NoteDetailsModal extends StatefulWidget {
   final Note note; // 클릭한 노트를 받아옵니다.
@@ -30,6 +36,8 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
   // detail 용 controller
   late TextEditingController _countryController;
   late TextEditingController _varietyController;
+  late TextEditingController _tastingNotesController;
+  List<String> _tastingNotesTags = [];
   Detail? _detail;
 
   ProcessType _selectedProcess = ProcessType.washed;
@@ -40,6 +48,8 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
   String? _currentImagePath;
   late double _acidity, _body, _bitterness;
   late int _score;
+
+  bool _showDetailSection = false;
 
   @override
   void initState() {
@@ -52,6 +62,7 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
     // detail 컨트롤러 초기화
     _countryController = TextEditingController();
     _varietyController = TextEditingController();
+    _tastingNotesController = TextEditingController();
 
     _currentImagePath = widget.note.image;
     _acidity = widget.note.levelAcidity.toDouble();
@@ -70,9 +81,11 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
         _detail = detail;
         _countryController.text = detail.originCountry ?? "";
         _varietyController.text = detail.variety ?? "";
-        _selectedProcess = detail.process ?? ProcessType.washed;
-        _selectedRoasting = detail.roastingPoint ?? RoastingPointType.medium;
-        _selectedMethod = detail.method ?? MethodType.filter;
+        _selectedProcess = detail.process;
+        _selectedRoasting = detail.roastingPoint;
+        _selectedMethod = detail.method;
+        _tastingNotesTags = detail.tastingNotes ?? [];
+        _showDetailSection = false;
       });
     }
   }
@@ -129,11 +142,12 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      insetPadding: const EdgeInsets.all(16),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
       child: Container(
         padding: const EdgeInsets.all(20),
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxWidth: 500,
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
         child: Column( // Column 시작
           mainAxisSize: MainAxisSize.min,
@@ -142,9 +156,9 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(
+                IconButton(
+                  icon: Icon(Icons.close, color: AppColors.primaryDark, size: 16),
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("닫기"),
                 ),
                 Text(
                   _isEditing ? "노트 수정" : "노트 정보",
@@ -162,7 +176,7 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
                 ),
               ],
             ),
-            const Divider(),
+            // const Divider(),
 
             // --- [2. 스크롤 영역] ---
             Expanded(
@@ -175,7 +189,7 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
                       onTap: _changeImage,
                       child: Container(
                         width: double.infinity,
-                        height: 200,
+                        height: 180,
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(12),
@@ -189,20 +203,24 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
                       ),
                     ),
                     if (_isEditing)
-                      const Text("사진을 터치하여 변경", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                      const Text("사진을 터치하여 변경", style: TextStyle(fontSize: 16, color: Colors.grey)),
 
                     // 기본 입력 필드들
-                    _buildField("카페", _cafeController),
-                    _buildField("메뉴", _menuController),
-                    _buildField("한줄평", _commentController),
-                    _buildField("날짜", _dateController),
+                    const SizedBox(height: 20),
+                    buildField("메뉴명", _menuController, _isEditing),
+                    buildField("카페명", _cafeController, _isEditing),
+                    buildField("날짜", _dateController, _isEditing),
 
                     const SizedBox(height: 20),
-                    _buildSlider("산미", _acidity, (v) => setState(() => _acidity = v)),
-                    _buildSlider("바디", _body, (v) => setState(() => _body = v)),
-                    _buildSlider("쓴맛", _bitterness, (v) => setState(() => _bitterness = v)),
+                    buildSlider(context, "산미", _acidity, (v) => setState(() => _acidity = v), _isEditing),
+                    buildSlider(context, "바디", _body, (v) => setState(() => _body = v), _isEditing),
+                    buildSlider(context, "쓴맛", _bitterness, (v) => setState(() => _bitterness = v), _isEditing),
+
+                    const SizedBox(height: 20),
+                    buildField("한줄평", _commentController, _isEditing),
 
                     // 별점 영역
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(5, (index) => IconButton(
@@ -212,25 +230,41 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
                     ),
                     const SizedBox(height: 20),
 
-                    // 상세 정보 섹션
-                    if (_isEditing || _detail != null) ...[
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("상세 정보", style: TextStyle(color: Colors.brown, fontWeight: FontWeight.bold)),
-                      ),
-                      const Divider(),
-                      _buildField("원산지", _countryController),
-                      _buildField("품종", _varietyController),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "상세정보 보기",
+                          style: TextStyle(fontSize: 16, color: AppColors.primaryText, fontWeight: FontWeight.bold),
+                        ),
+                        Checkbox(
+                          value: _showDetailSection,
+                          // ✅ _isEditing 여부와 관계없이 항상 클릭 가능 [cite: 1-1-0]
+                          onChanged: (value) {
+                            setState(() => _showDetailSection = value ?? false);
+                          },
+                          activeColor: AppColors.primaryDark,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    if (_showDetailSection) ...[
+                      // 국가/품종 필드 (기존 촘촘한 양식 유지)
+                      buildField("국가/지역", _countryController, _isEditing),
+                      buildField("품종", _varietyController, _isEditing),
 
                       const SizedBox(height: 10),
+
+                      // 수정 모드 여부에 따른 가공/로스팅/추출 방식 표시 로직 유지 [cite: 1-1-0]
                       if (_isEditing) ...[
-                        _buildDropdown<ProcessType>("가공 방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!)),
-                        _buildDropdown<RoastingPointType>("로스팅 포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!)),
-                        _buildDropdown<MethodType>("추출 방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!)),
+                        buildDropdown<ProcessType>("가공 방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!)),
+                        buildDropdown<RoastingPointType>("로스팅 포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!)),
+                        buildDropdown<MethodType>("추출 방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!)),
                       ] else ...[
-                        _buildReadOnlyDetail("가공 방식", _selectedProcess.displayName),
-                        _buildReadOnlyDetail("로스팅", _selectedRoasting.displayName),
-                        _buildReadOnlyDetail("추출 방식", _selectedMethod.displayName),
+                        buildReadOnlyDetail("가공 방식", _selectedProcess.displayName),
+                        buildReadOnlyDetail("로스팅", _selectedRoasting.displayName),
+                        buildReadOnlyDetail("추출 방식", _selectedMethod.displayName),
                       ],
                       const SizedBox(height: 20),
                     ],
@@ -240,65 +274,6 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildField(String label, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      readOnly: !_isEditing, // [중요] 수정 모드가 아니면 읽기 전용 [cite: 1-1-0]
-      decoration: InputDecoration(labelText: label),
-    );
-  }
-
-  Widget _buildSlider(String label, double value, ValueChanged<double> onChanged) {
-    return Column(
-      children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(label), Text("${value.toInt()}")]),
-        Slider(
-          value: value, min: 1, max: 10, divisions: 9,
-          onChanged: _isEditing ? onChanged : null, // [중요] 수정 모드가 아니면 비활성화 [cite: 1-1-0]
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdown<T>(String label, T value, List<T> items, ValueChanged<T?> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: DropdownButtonFormField<T>(
-        value: value,
-        decoration: InputDecoration(labelText: label),
-        items: items.map((item) {
-          String text = "";
-          if (item is ProcessType) { text = item.displayName; }
-          else if (item is RoastingPointType) { text = item.displayName; }
-          else if (item is MethodType) { text = item.displayName; }
-          return DropdownMenuItem(value: item, child: Text(text));
-        }).toList(),
-        onChanged: onChanged,
-      ),
-    );
-  }
-
-  // 조회 모드일 때 상세 정보를 한 줄로 보여주는 위젯
-  Widget _buildReadOnlyDetail(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          // 라벨 (예: 가공 방식:)
-          Text(
-            "$label: ",
-            style: const TextStyle(color: Colors.grey, fontSize: 13),
-          ),
-          // 실제 값 (예: 워시드)
-          Text(
-            value,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-          ),
-        ],
       ),
     );
   }
