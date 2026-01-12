@@ -37,6 +37,14 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(""),
+        backgroundColor: Colors.white, // 배경색
+        elevation: 0,                 // 그림자 제거해서 깔끔하게 padding 느낌만 주기
+        centerTitle: false,           // 좌측 정렬 (원하시면 true로 변경)
+        toolbarHeight: 10,            // AppBar의 높이 조절 (패딩 느낌 조절)
+      ),
+
       body: _pages[_selectedIndex],
 
         // 탭 선택: 화면 아래에 네비게이션 바를 배치합니다.
