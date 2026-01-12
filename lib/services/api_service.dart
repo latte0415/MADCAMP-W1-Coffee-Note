@@ -55,21 +55,8 @@ class APIService {
       } else {
         throw Exception('서버 오류: ${response.statusCode}');
       }
-    } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        throw Exception('연결 시간이 초과되었습니다. 네트워크를 확인해주세요.');
-      } else if (e.type == DioExceptionType.connectionError) {
-        throw Exception('네트워크 연결에 실패했습니다. 인터넷 연결을 확인해주세요.');
-      } else if (e.response != null) {
-        final statusCode = e.response!.statusCode;
-        final errorMessage = e.response!.data?['detail'] as String? ?? '서버 오류가 발생했습니다.';
-        throw Exception('서버 오류 ($statusCode): $errorMessage');
-      } else {
-        throw Exception('알 수 없는 오류가 발생했습니다: ${e.message}');
-      }
     } catch (e) {
-      throw Exception('요청 처리 중 오류가 발생했습니다: $e');
+      _handleError(e);
     }
   }
 
@@ -93,7 +80,60 @@ class APIService {
       } else {
         throw Exception('서버 오류: ${response.statusCode}');
       }
-    } on DioException catch (e) {
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  /// 센서리 가이드 API 호출 (매핑 결과 + 센서리 가이드)
+  /// 
+  /// [message] 커피 정보가 포함된 사용자 메시지
+  /// 
+  /// Returns 매핑 결과와 센서리 가이드를 포함한 Map
+  /// - mappingResult: Detail 모델 구조에 맞게 파싱된 매핑 결과
+  /// - sensoryGuide: 센서리 가이드 텍스트
+  /// 
+  /// Throws [Exception] 네트워크 오류 또는 서버 오류 발생 시
+  Future<Map<String, dynamic>> chatForSensoryGuide(String message) async {
+    try {
+      final response = await dio.post(
+        '/chat-for-sensory-guide',
+        data: {'message': message},
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        
+        // mapping_result 파싱
+        final mappingResultData = data['mapping_result'] as Map<String, dynamic>?;
+        final mappingResult = mappingResultData != null
+            ? _parseMappingResponse(mappingResultData)
+            : <String, dynamic>{};
+        
+        // sensory_guide 추출
+        final sensoryGuide = data['sensory_guide'] as String? ?? '';
+        
+        return {
+          'mappingResult': mappingResult,
+          'sensoryGuide': sensoryGuide,
+        };
+      } else {
+        throw Exception('서버 오류: ${response.statusCode}');
+      }
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
+  // Private 헬퍼 메서드들
+
+  /// Dio 에러를 처리하고 적절한 Exception을 throw하는 공통 메서드
+  /// 
+  /// [e] 발생한 DioException 또는 일반 Exception
+  /// 
+  /// Throws [Exception] 처리된 에러 메시지와 함께
+  Never _handleError(dynamic e) {
+    if (e is DioException) {
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
         throw Exception('연결 시간이 초과되었습니다. 네트워크를 확인해주세요.');
@@ -106,7 +146,7 @@ class APIService {
       } else {
         throw Exception('알 수 없는 오류가 발생했습니다: ${e.message}');
       }
-    } catch (e) {
+    } else {
       throw Exception('요청 처리 중 오류가 발생했습니다: $e');
     }
   }

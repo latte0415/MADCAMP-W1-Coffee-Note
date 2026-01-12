@@ -15,7 +15,9 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 
 class NoteCreatePopup extends StatefulWidget {
-  const NoteCreatePopup({super.key});
+  final Map<String, dynamic>? prefillData;
+  
+  const NoteCreatePopup({super.key, this.prefillData});
 
   @override
   State<NoteCreatePopup> createState() => _NoteCreatePopupState();
@@ -62,6 +64,59 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     final scaleFactor = screenWidth / AppSpacing.designWidth;
     // 최소/최대 스케일 팩터 제한 (0.3 ~ 1.2)
     return scaleFactor.clamp(0.3, 1.2);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // prefillData가 있으면 필드 자동 채우기
+    if (widget.prefillData != null) {
+      final data = widget.prefillData!;
+      
+      // 상세정보 섹션 자동 활성화
+      _showDetailSection = true;
+      
+      // 국가/지역
+      if (data['originLocation'] != null) {
+        _countryController.text = data['originLocation'] as String;
+      }
+      
+      // 품종
+      if (data['variety'] != null) {
+        _varietyController.text = data['variety'] as String;
+      }
+      
+      // 가공 방식
+      if (data['process'] != null && data['process'] is ProcessType) {
+        _selectedProcess = data['process'] as ProcessType;
+        if (_selectedProcess == ProcessType.etc && data['processText'] != null) {
+          _processTextController.text = data['processText'] as String;
+        }
+      }
+      
+      // 로스팅 포인트
+      if (data['roastingPoint'] != null && data['roastingPoint'] is RoastingPointType) {
+        _selectedRoasting = data['roastingPoint'] as RoastingPointType;
+        if (_selectedRoasting == RoastingPointType.etc && data['roastingPointText'] != null) {
+          _roastingPointTextController.text = data['roastingPointText'] as String;
+        }
+      }
+      
+      // 추출 방식
+      if (data['method'] != null && data['method'] is MethodType) {
+        _selectedMethod = data['method'] as MethodType;
+        if (_selectedMethod == MethodType.etc && data['methodText'] != null) {
+          _methodTextController.text = data['methodText'] as String;
+        }
+      }
+      
+      // 테이스팅 노트
+      if (data['tastingNotes'] != null && data['tastingNotes'] is List) {
+        final notes = (data['tastingNotes'] as List).cast<String>();
+        _tastingNotesTags = notes;
+        _tastingNotesController.text = notes.join(', ');
+      }
+    }
   }
 
   @override
