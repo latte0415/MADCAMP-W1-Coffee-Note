@@ -19,13 +19,13 @@ Widget buildLevelDisplay(String label, int value, double scale, Color color) {
             overflow: TextOverflow.ellipsis
         ),
       ),
-      SizedBox(width: 10 * scale),
+      SizedBox(width: 13 * scale),
       Row(
         children: List.generate(starCount, (index) {
           return Container(
-            width: 12 * scale,
-            height: 28 * scale,
-            margin: EdgeInsets.only(right: 6 * scale),
+            width: 10 * scale,
+            height: 24 * scale,
+            margin: EdgeInsets.only(right: 5 * scale),
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(2 * scale),

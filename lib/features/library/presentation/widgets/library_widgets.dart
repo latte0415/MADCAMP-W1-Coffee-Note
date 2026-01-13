@@ -199,6 +199,22 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                               ),
                             ],
                           ),
+                          SizedBox(width: 24 * scale),
+                          // 3. 별점 정보
+                          Row(
+                            children: [
+                              Icon(Icons.star_rounded, size: 28 * scale, color: AppColors.primaryText), // 별 아이콘
+                              SizedBox(width: 4 * scale),
+                              Text(
+                                '${note.score}', // 예: 4.5
+                                style: AppTextStyles.bodyText.copyWith(
+                                  fontSize: 30 * scale,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryText,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       SizedBox(height: 20 * scale),

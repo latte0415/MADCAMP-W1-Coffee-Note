@@ -205,16 +205,7 @@ POST /chat-for-sensory-guide
 **응답 필드**
 | 필드명 | 타입 | 필수 | 설명 |
 |--------|------|------|------|
-| mapping_result | object | ✅ | 매핑 결과 (ChatForMapping.Response와 동일한 구조) |
-| mapping_result.location | string | ❌ | 국가 및 지역 (예: "과테말라", "에티오피아 예가체프") |
-| mapping_result.variety | string | ❌ | 원산지 품종 |
-| mapping_result.process | enum | ❌ | 가공 방식의 enum 값 (`WASHED`, `NATURAL`, `PULPED_NATURAL`, `HONEY`, `ETC` 중 하나) |
-| mapping_result.process_text | string | ❌ | 가공 방식의 원문 (사용자 입력에 그대로 있던 표현, 예: "워시드", "내추럴") |
-| mapping_result.roasting_point | enum | ❌ | 로스팅 지점의 enum 값 (`LIGHT`, `MEDIUM`, `MEDIUM_DARK`, `DARK`, `ETC` 중 하나) |
-| mapping_result.roasting_point_text | string | ❌ | 로스팅 지점의 원문 (사용자 입력에 그대로 있던 표현, 예: "라이트", "미디움") |
-| mapping_result.method | enum | ❌ | 추출 방법의 enum 값 (`ESPRESSO`, `FILTER`, `COLD_BREW`, `ETC` 중 하나) |
-| mapping_result.method_text | string | ❌ | 추출 방법의 원문 (사용자 입력에 그대로 있던 표현, 예: "에스프레소", "필터") |
-| mapping_result.tasting_notes | string[] | ✅ | 맛, 향 등 테이스팅 노트 (최대 5개) |
+| mapping_result | object | ✅ | 매핑 결과 (위 3번 `/chat-for-mapping` 응답 구조와 동일) |
 | sensory_guide | string | ✅ | 초보자를 위한 센서리 가이드 메시지 (2~3줄 내외) |
 
 **Enum 값**

@@ -169,7 +169,7 @@ class _GalleryTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 10),
 
                   // 2. 맛 정보 (산미, 바디, 쓴맛 막대 바) [cite: 1-1-0]
                   buildLevelDisplay("산미", note.levelAcidity, scale * 1.5, Colors.white),
@@ -205,6 +205,26 @@ class _GalleryTile extends StatelessWidget {
                       Text(
                         note.drankAt.toString().split(' ')[0], // YYYY-MM-DD 형식
                         style: const TextStyle(color: Colors.white70, fontSize: 15),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+
+                  // 5. score
+                  Row(
+                    children: [
+                      // const Icon(Icons.star, size: 15, color: Colors.white70), // 헤더 아이콘
+                      // const SizedBox(width: 4),
+                      // 별을 score만큼 나열
+                      Row(
+                        children: List.generate(5, (index) {
+                          return Icon(
+                            // index가 score보다 작으면 꽉 찬 별, 크면 빈 별 표시
+                            index < note.score ? Icons.star : Icons.star_border,
+                            size: 15,
+                            color: Colors.white70,
+                          );
+                        }),
                       ),
                     ],
                   ),
