@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import '../../models/note.dart';
-import '../../services/note_service.dart';
+import '../../../models/note.dart';
+import '../../../services/note_service.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import '../../services/image_service.dart';
-import '../../services/detail_service.dart';
-import '../../models/detail.dart';
-import '../../models/enums/process_type.dart';
-import '../../models/enums/roasting_point_type.dart';
-import '../../models/enums/method_type.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
-import '../../widget/popup_widget.dart';
+import '../../../services/image_service.dart';
+import '../../../services/detail_service.dart';
+import '../../../models/detail.dart';
+import '../../../models/enums/process_type.dart';
+import '../../../models/enums/roasting_point_type.dart';
+import '../../../models/enums/method_type.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_spacing.dart';
+import '../widgets/popup_widget.dart';
 
 class NoteCreatePopup extends StatefulWidget {
   final Map<String, dynamic>? prefillData;

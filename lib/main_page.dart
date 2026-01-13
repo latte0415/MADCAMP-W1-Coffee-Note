@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'pages/library_page.dart';
-import 'pages/modals/creation_modal.dart';
-import 'pages/gallery_page.dart';
+import 'features/library/presentation/pages/library_page.dart';
+import 'shared/presentation/modals/creation_modal.dart';
+import 'features/gallery/presentation/pages/gallery_page.dart';
 import 'pages/ai_guide_page.dart';
 import 'theme/app_colors.dart';
 import 'features/library/controller/library_controller.dart';

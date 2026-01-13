@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../models/note.dart';
-import '../models/detail.dart';
-import '../services/detail_service.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
-import '../theme/app_text_styles.dart';
-import '../theme/app_component_styles.dart';
+import '../../../../models/note.dart';
+import '../../../../models/detail.dart';
+import '../../../../services/detail_service.dart';
+import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_spacing.dart';
+import '../../../../theme/app_text_styles.dart';
+import '../../../../theme/app_component_styles.dart';
 
 Widget sortButton(
     BuildContext context,
@@ -15,11 +15,11 @@ Widget sortButton(
     double scale,
     VoidCallback onTap
     ) {
-  // 기존 로직 유지: runtimeType 비교 [cite: 1-1-0]
+  // 기존 로직 유지: runtimeType 비교
   bool isSelected = (currentSort.runtimeType == option.runtimeType);
 
   return GestureDetector(
-    onTap: onTap, // 외부(부모)에서 넘겨준 setState 로직 실행 [cite: 1-1-0]
+    onTap: onTap,
     child: Container(
       padding: EdgeInsets.symmetric(horizontal: 30 * scale, vertical: 15 * scale),
       decoration: BoxDecoration(
@@ -34,7 +34,7 @@ Widget sortButton(
   );
 }
 
-/// 1. 빈 가이드 카드
+/// 빈 가이드 카드
 Widget buildEmptyGuideCard(double scale) {
   return Card(
     margin: EdgeInsets.symmetric(vertical: 20 * scale),
@@ -75,7 +75,62 @@ Widget buildEmptyGuideCard(double scale) {
   );
 }
 
-/// 2. 노트 카드 (refreshNotes 대신 onRefresh 콜백 사용)
+/// 레벨 표시 (막대 그래프) - buildNoteCard에서 사용
+Widget buildLevelDisplay(String label, int value, double scale, Color color) {
+  final starCount = (value / 2).ceil();
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Flexible(
+        flex: 2,
+        child: Text(
+            label,
+            style: AppTextStyles.bodyText.copyWith(
+                fontSize: 25 * scale,
+                color: color
+            ),
+            overflow: TextOverflow.ellipsis
+        ),
+      ),
+      SizedBox(width: 10 * scale),
+      Row(
+        children: List.generate(starCount, (index) {
+          return Container(
+            width: 12 * scale,
+            height: 28 * scale,
+            margin: EdgeInsets.only(right: 6 * scale),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(2 * scale),
+            ),
+          );
+        }),
+      ),
+    ],
+  );
+}
+
+/// 상세 정보 텍스트 (Wrap)
+Widget buildDetailInfo(Detail detail, double scale) {
+  final infoList = <String>[];
+  if (detail.originLocation != null && detail.originLocation!.isNotEmpty) infoList.add(detail.originLocation!);
+  if (detail.variety != null && detail.variety!.isNotEmpty) infoList.add(detail.variety!);
+  if (detail.process != null) infoList.add(detail.process!.displayName);
+  if (detail.roastingPoint != null) infoList.add(detail.roastingPoint!.displayName);
+  if (detail.method != null) infoList.add(detail.method!.displayName);
+
+  return Wrap(
+    spacing: 10 * scale,
+    runSpacing: 10 * scale,
+    children: infoList.map((info) => Text(
+      info,
+      style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale, fontWeight: FontWeight.w300, color: AppColors.primaryText),
+    )).toList(),
+  );
+}
+
+/// 노트 카드
 Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback onRefresh, Widget detailsModal) {
   return GestureDetector(
     onTap: () {
@@ -83,17 +138,17 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => detailsModal, // 외부에서 주입받은 모달 사용
+        builder: (context) => detailsModal,
       ).then((result) {
         if (result == true) {
-          onRefresh(); // 부모의 refreshNotes 실행
+          onRefresh();
         }
       });
     },
     child: Container(
       decoration: AppComponentStyles.noteCardDecoration.copyWith(
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSmall * scale),
-        border: Border.all(color: Colors.transparent, width: 0), // 가장 확실한 제거 방법
+        border: Border.all(color: Colors.transparent, width: 0),
       ),
       child: FutureBuilder<Detail?>(
         future: DetailService.instance.getDetailByNoteId(note.id),
@@ -158,31 +213,13 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                         note.comment,
                         style: AppTextStyles.bodyText.copyWith(fontSize: 35 * scale, color: AppColors.primaryText),
                       ),
-                      // if (hasDetail && detail != null && detail.tastingNotes != null && detail.tastingNotes!.isNotEmpty) ...[
-                      //   SizedBox(height: 15 * scale),
-                      //   Align(
-                      //     alignment: Alignment.centerRight,
-                      //     child: Wrap(
-                      //       spacing: 10 * scale,
-                      //       runSpacing: 10 * scale,
-                      //       children: detail.tastingNotes!.take(5).map((tag) => Container(
-                      //         padding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 8 * scale),
-                      //         decoration: AppComponentStyles.hashtagDecoration.copyWith(
-                      //           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusLarge * scale),
-                      //         ),
-                      //         child: Text("#$tag", style: AppComponentStyles.hashtagTextStyle.copyWith(fontSize: 30 * scale)),
-                      //       )).toList(),
-                      //     ),
-                      //   ),
-                      // ],
                     ],
                   ),
                 ),
                 SizedBox(width: 20 * scale),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.end, // ✅ 우측 정렬 설정 [cite: 1-1-0]
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // 수치 표시 박스
                     Container(
                       width: 220 * scale,
                       padding: EdgeInsets.symmetric(horizontal: 20 * scale, vertical: 20 * scale),
@@ -192,20 +229,18 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                       ),
                       child: Column(
                         children: [
-                          buildLevelDisplay("산미", note.levelAcidity, scale),
+                          buildLevelDisplay("산미", note.levelAcidity, scale, AppColors.primaryDark),
                           SizedBox(height: 20 * scale),
-                          buildLevelDisplay("바디", note.levelBody, scale),
+                          buildLevelDisplay("바디", note.levelBody, scale, AppColors.primaryDark),
                           SizedBox(height: 20 * scale),
-                          buildLevelDisplay("쓴맛", note.levelBitterness, scale),
+                          buildLevelDisplay("쓴맛", note.levelBitterness, scale, AppColors.primaryDark),
                         ],
                       ),
                     ),
-
-                    // ✅ 태그 영역을 수치 박스 아래로 이동 [cite: 1-1-0]
                     if (hasDetail && detail != null && detail.tastingNotes != null && detail.tastingNotes!.isNotEmpty) ...[
                       SizedBox(height: 15 * scale),
                       SizedBox(
-                        width: 220 * scale, // 박스 너비와 맞춰서 줄바꿈 유도
+                        width: 220 * scale,
                         child: Wrap(
                           alignment: WrapAlignment.end,
                           spacing: 10 * scale,
@@ -214,7 +249,7 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                             padding: EdgeInsets.symmetric(horizontal: 12 * scale, vertical: 6 * scale),
                             decoration: AppComponentStyles.hashtagDecoration.copyWith(
                               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusLarge * scale),
-                              color: AppColors.primaryDark, // 디자인 통일을 위해 어두운 색 적용 가능
+                              color: AppColors.primaryDark,
                             ),
                             child: Text(
                                 "#$tag",
@@ -235,55 +270,7 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
   );
 }
 
-/// 3. 상세 정보 텍스트 (Wrap)
-Widget buildDetailInfo(Detail detail, double scale) {
-  final infoList = <String>[];
-  if (detail.originLocation != null && detail.originLocation!.isNotEmpty) infoList.add(detail.originLocation!);
-  if (detail.variety != null && detail.variety!.isNotEmpty) infoList.add(detail.variety!);
-  if (detail.process != null) infoList.add(detail.process!.displayName);
-  if (detail.roastingPoint != null) infoList.add(detail.roastingPoint!.displayName);
-  if (detail.method != null) infoList.add(detail.method!.displayName);
-
-  return Wrap(
-    spacing: 10 * scale,
-    runSpacing: 10 * scale,
-    children: infoList.map((info) => Text(
-      info,
-      style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale, fontWeight: FontWeight.w300, color: AppColors.primaryText),
-    )).toList(),
-  );
-}
-
-/// 4. 레벨 표시 (막대 그래프)
-Widget buildLevelDisplay(String label, int value, double scale) {
-  final starCount = (value / 2).ceil();
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Flexible(
-        flex: 2,
-        child: Text(label, style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale), overflow: TextOverflow.ellipsis),
-      ),
-      SizedBox(width: 10 * scale),
-      Row(
-        children: List.generate(starCount, (index) {
-          return Container(
-            width: 12 * scale,
-            height: 28 * scale,
-            margin: EdgeInsets.only(right: 6 * scale),
-            decoration: BoxDecoration(
-              color: AppColors.primaryDark,
-              borderRadius: BorderRadius.circular(2 * scale),
-            ),
-          );
-        }),
-      ),
-    ],
-  );
-}
-
-/// 5. 상세 필터 슬라이더
+/// 상세 필터 슬라이더
 Widget buildFilterSlider(
   String label,
   double value,

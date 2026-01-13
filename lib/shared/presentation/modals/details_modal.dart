@@ -1,22 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../models/note.dart';
-import '../../services/note_service.dart';
-import '../../services/image_service.dart';
+import '../../../models/note.dart';
+import '../../../services/note_service.dart';
+import '../../../services/image_service.dart';
 import 'package:uuid/uuid.dart';
 // detail table 관련 import
-import '../../models/detail.dart';
-import '../../services/detail_service.dart';
-import '../../models/enums/process_type.dart';
-import '../../models/enums/roasting_point_type.dart';
-import '../../models/enums/method_type.dart';
+import '../../../models/detail.dart';
+import '../../../services/detail_service.dart';
+import '../../../models/enums/process_type.dart';
+import '../../../models/enums/roasting_point_type.dart';
+import '../../../models/enums/method_type.dart';
 // theme 관련 import
-import '../../theme/app_colors.dart';
-import '../../theme/app_spacing.dart';
-import '../../theme/app_text_styles.dart';
-import '../../theme/app_component_styles.dart';
-import '../../widget/popup_widget.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_spacing.dart';
+import '../../../theme/app_text_styles.dart';
+import '../../../theme/app_component_styles.dart';
+import '../widgets/popup_widget.dart';
 
 class NoteDetailsModal extends StatefulWidget {
   final Note note; // 클릭한 노트를 받아옵니다.

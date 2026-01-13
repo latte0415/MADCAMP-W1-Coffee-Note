@@ -2,12 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/note.dart';
-import '../pages/modals/details_modal.dart';
-import '../../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
-import '../../widget/page_widget.dart';
-import '../features/gallery/controller/gallery_controller.dart';
+import '../../../../models/note.dart';
+import '../../../../shared/presentation/modals/details_modal.dart';
+import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_spacing.dart';
+import '../widgets/gallery_widgets.dart';
+import '../../controller/gallery_controller.dart';
 
 class GalleryPage extends ConsumerWidget {
   const GalleryPage({super.key});

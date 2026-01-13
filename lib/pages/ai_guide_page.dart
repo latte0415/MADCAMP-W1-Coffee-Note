@@ -8,7 +8,7 @@ import '../services/api_service.dart';
 import '../models/enums/process_type.dart';
 import '../models/enums/roasting_point_type.dart';
 import '../models/enums/method_type.dart';
-import 'modals/creation_modal.dart';
+import '../shared/presentation/modals/creation_modal.dart';
 
 class AiGuidePage extends StatefulWidget {
   const AiGuidePage({super.key});
