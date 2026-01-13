@@ -487,12 +487,13 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
         await DetailService.instance.createDetail(newDetail);
       }
 
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("날짜 형식이 올바르지 않거나 오류가 발생했습니다.")),
       );
+      Navigator.pop(context, false);
     }
   }
 }

@@ -6,6 +6,7 @@ import 'features/gallery/presentation/pages/gallery_page.dart';
 import 'pages/ai_guide_page.dart';
 import 'theme/app_colors.dart';
 import 'features/library/controller/library_controller.dart';
+import 'features/gallery/controller/gallery_controller.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -71,9 +72,12 @@ class _MainPageState extends ConsumerState<MainPage> {
               //   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
               // ),
               builder: (context) => const NoteCreatePopup(),
-            ).then((_) {
-              // 팝업 닫힌 후 리스트를 다시 로드
-              ref.read(libraryControllerProvider.notifier).refresh();
+            ).then((result) {
+              // 노트 생성 성공 시 library와 gallery 모두 refresh
+              if (result == true) {
+                ref.read(libraryControllerProvider.notifier).refresh();
+                ref.read(galleryControllerProvider.notifier).refresh();
+              }
             });
           },
           backgroundColor: AppColors.primaryDark,
