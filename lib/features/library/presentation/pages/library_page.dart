@@ -30,15 +30,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Timer? _searchDebounce;
 
   @override
-  void initState() {
-    super.initState();
-    final initialFilter = ref.read(libraryControllerProvider).valueOrNull?.query
-            .filterState ??
-        const LibraryFilterState();
-    _syncFilterToLocal(initialFilter);
-  }
-
-  @override
   void dispose() {
     _filterDebounce?.cancel();
     _searchDebounce?.cancel();
@@ -108,7 +99,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
     final error = ref.watch(
       libraryControllerProvider.select(
-        (value) => value.whenOrNull(error: (e, _) => e),
+        (value) => value.valueOrNull?.error,
       ),
     );
     final searchQuery = ref.watch(
@@ -140,12 +131,35 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (error != null) {
-      return Center(child: Text('에러 발생: $error'));
-    }
-
     return Column(
       children: [
+        // 에러 배너
+        if (error != null)
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(12 * scale),
+            margin: EdgeInsets.symmetric(
+              horizontal: AppSpacing.horizontalPadding * scale,
+              vertical: 8 * scale,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.red[50],
+              border: Border.all(color: Colors.red[300]!),
+              borderRadius: BorderRadius.circular(8 * scale),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red[700], size: 20 * scale),
+                SizedBox(width: 8 * scale),
+                Expanded(
+                  child: Text(
+                    '에러 발생: $error',
+                    style: TextStyle(color: Colors.red[900], fontSize: 14 * scale),
+                  ),
+                ),
+              ],
+            ),
+          ),
         // 검색창
         Padding(
           padding:

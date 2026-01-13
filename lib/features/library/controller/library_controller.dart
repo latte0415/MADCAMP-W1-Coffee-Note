@@ -12,22 +12,27 @@ class LibraryViewData {
   final LibraryState query;
   final List<Note> notes;
   final bool isRefreshing;
+  final Object? error;
 
   const LibraryViewData({
     required this.query,
     required this.notes,
     this.isRefreshing = false,
+    this.error,
   });
 
   LibraryViewData copyWith({
     LibraryState? query,
     List<Note>? notes,
     bool? isRefreshing,
+    Object? error,
+    bool clearError = false,
   }) {
     return LibraryViewData(
       query: query ?? this.query,
       notes: notes ?? this.notes,
       isRefreshing: isRefreshing ?? this.isRefreshing,
+      error: clearError ? null : (error ?? this.error),
     );
   }
 }
@@ -127,6 +132,7 @@ class LibraryController extends AsyncNotifier<LibraryViewData> {
         prev.copyWith(
           query: nextQuery,
           isRefreshing: true,
+          clearError: true,
         ),
       );
     }
@@ -135,7 +141,13 @@ class LibraryController extends AsyncNotifier<LibraryViewData> {
 
     state = result.when(
       data: (data) => AsyncValue.data(data),
-      error: (e, st) => AsyncValue.error(e, st),
+      error: (e, st) {
+        // 에러 발생 시 이전 데이터를 유지하고 error 필드만 업데이트
+        if (prev != null) {
+          return AsyncValue.data(prev.copyWith(error: e, isRefreshing: false));
+        }
+        return AsyncValue.error(e, st);
+      },
       loading: () => const AsyncValue.loading(),
     );
   }
