@@ -2,15 +2,112 @@
 
 MADCAMP Week 1!
 
-## Getting Started
+목차
+1. 깃헙 다운로드해서 실행해보는 방법 (패키지 설치부터 애뮬레이터 연결 등)
+2. 어떻게 시작 했는지
+  1) 주어진 공통 과제 내용
+    - ## **공통과제 I : 탭 구조를 활용한 안드로이드 앱 제작**
+        - 목적: 서로 함께 공통의 과제를 함으로써, 개발에 빠르게 익숙해지기
+        - 결과물: 다음과 같은 세 개의 탭이 존재하는 안드로이드 앱(세 개 보다 많아도 무관합니다) 
+            | 탭1 | 리스트 형태의 페이지
+            예시) 연락처(휴대폰의 연락처 데이터를 활용하거나, JSON 형식을 이용해서 임의의 연락처 데이터를 구축), 상품 리스트, 맛집 리스트 등등
+            
+            추천: [ListView](https://developer.android.com/reference/android/widget/ListView.html)나 [RecyclerView](https://developer.android.com/guide/topics/ui/layout/recyclerview) 등을 이용해서 데이터 보여 주기 |
+            | --- | --- |
+            | 탭2 | 나만의 이미지 갤러리 구축.
+            대략 20개 이상의 이미지 필요. |
+            | 탭3 | 자유 주제 |
+        - 첫날 해야 하는 일 추천: [Android Studio](https://developer.android.com/studio) 설치하기 / Hello World 띄워 보기
+        - 과제 중 추가로 해야 할 일: 협업을 위한 도구 사용
+            - Git에 대한 이해도 높이기
+            - [github.com](http://github.com/)에서 public 프로젝트로 운영하는 것을 권고
+            (실제로 현업에서 많이 사용되기 때문에 그러함)
+  2) 아이디어 브레인스토밍 및 구체화
+    - 노션 활용
+    - 리스트, 갤러리를 활용하기 위해 기록이라는 기능에 집중.
+    - 공통 관심사 중 커피를 다뤄보기로 함
+    - 지점/카페/원두마다 다른 커피의 맛을 기록해두고, 그때그때 원하는 커피를 찾을 수 있게 하자라는 목표를 설정
+  3) 기능 명세
+    - 향, 맛을 초보자에게도 직관적으로 보여줄 수 있는 요소가 필요
+    - 정보 중심(카페, 날짜, 텍스트 등)으로 조회하는 방법과 시각적 기억 중심(사진)으로 조회하는 방법 각각을 2개의 탭으로 설정
+    - 마지막 3번째 탭에서는 사용자가 원하는 향과 맛에 맞는 커피를 찾아주는 기능을 구현하고자 함.
 
-This project is a starting point for a Flutter application.
+3. 상세 기획
+- 기능 명세에 맞게, IA, UI 프레임워크, DB 스키마를 우선 구현함
+- Figjam 사용 (추후 관련 이미지 첨부 예정)
+1) DB 스키마 (SQL문 변환해야 함)
+- 단순하게 테이블 하나만 사용해도 된다고 판단.
+- 초보자에게 직관적으로 보여줄 수 있는 향,맛으로 산미/바디/쓴맛을 1~10 레벨 개념으로 정의함
+- DB
+id: UUID, PK
+location: text (현재는 카페 이름, 추후 새로운 column 추가해서 API 연결할 수도 있음)
+menu: text
+level_acidity: int (1~10)
+level_body: int (1~10)
+level_bitterness: int (1~10)
+comment: text (한줄평 느낌. 텍스트 수 제한 필요)
+image: img
+score: int (1~5)
+recorded_at: (유저가 기록한 날짜. 시간은 X)
+created_at
+updated_at
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+2) IA (이미지 첨부 예정)
+- 최대한 뎁스를 낮추기 위해서 3개의 탭을 기본으로 하고, 상세 정보 및 생성하기는 팝업 모달로 기획
+3) UI 프레임워크 (이미지 첨부 예정)
+- 각 페이지별로 목적, 구성요소, 액션을 정의하고
+- Figjam으로 대략적인 프레임워크를 채워나감
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+4. 개발
+1) 스택 선정: 웹은 개발해본 경험이 있기도 하고, 빠르게 개발하기 좋다고 해서 flutter 선정
+2) github repository 생성: https://github.com/latte0415/MADCAMP-W1-Coffee-Note
+  - 브랜치 전략은 배포가 따로 없기에 main 브랜치를 기준으로 함
+  - 기능 구현은 feat, 리팩터링은 refactor, 기타 버그 픽스는 fix 정도로만 간결하게 정리
+  - 역할 분담
+    - 백엔드 역할을 하는 기능 구현: 라태형
+    - 프론트엔드 컴포넌트 및 연결: 장정우
+3) 아키텍처링 전략
+  - 이전 백엔드 구현 경험에서 참고하여 Layered Architecture 전략 유지
+  - 이전: API -> Service -> Repository -> Domain
+  - API 없이 바로 프론트엔드가 존재하므로 서비스 메서드를 바로 프론트엔드 레이어인 page 에서 사용하고자 함
+  - 또한 repository에서는 database_helper를 통해서 테이블 접근하도록 함
+4) 타임라인
+  - 1/8: 기획 및 개발 스택 선정, 기본 페이지 구조 구현
+  - 1/9: note 테이블에 대한 CRUD 메서드 + 검색/정렬/필터 서비스 구현
+  - 1/10: 기획안 수정 + 디자인
+  - 1/12: ai 기능 구현 + 디자인 적용
+  - 1/13: 리팩터링 + UI 누락된 기능 구현
+
+5. 기획 수정 + 디자인
+- 목적 1: 생각보다 시간 여유로움 + 1, 3번째 탭의 공통성이 발견되어 통합하고, 새로운 탭 개설
+- 목적 2: 유의미한 구현을 위해 디자인을 진행하기로 함
+1) 추가 기능 선정: 사용자가 가장 어려운 건 원두 정보만 보고 향을 추측하는 것. 이걸 ai 통해서 해결하고자 함.
+2) 위 내용을 반영하여 figma로 디자인 시작 (아래 이미지 첨부 예정)
+3) 역할 배분
+  - 라태형: 디자인 및 ai 연결
+  - 장정우: 디자인 코드로 마이그레이션 및 해당 프론트엔드 기능 구현 
+
+6. 디자인
+- 디자인 가이드 내용 알아서 적당히 작성해줘
+
+7. ai 연결
+- 파이썬 fastapi 백엔드 서버 개설
+- langchain + openai + tavily 사용
+  - openai: 모델
+  - langchain: 트레이싱 및 에이전트 구현
+  - tavily: web search tool
+- 순서
+  - chat 기능 테스트
+  - pydantic 을 이용한 응답형식 강제 
+  - agent를 이용한 web search tool 결합
+    - 응답형식 강제는 chain인 runnable에 대해서만 가능하므로, agent도 사용함
+  - agent를 통해서 1차 테이스팅 노트 + 센서리 가이드 제작 -> chain을 통해서 매핑
+  - 최종적으로는 2개의 api 구현
+- dio패키지를 통해서 불러와서 사용
+
+8. 리팩터링
+- Stateful widget에서 최적화를 위해서 riverpod 사용
+- 이거 알아서 적어줘
+
+9. 최종 산출물 실행 영상

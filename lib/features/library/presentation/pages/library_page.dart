@@ -14,6 +14,7 @@ import '../../controller/library_controller.dart';
 import '../../state/library_filter_state.dart';
 import '../../state/library_state.dart';
 import '../../../../shared/presentation/modals/details_modal.dart';
+import '../../../../providers/note_providers.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -332,7 +333,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                         notes[index],
                         scale,
                         () => controller.refresh(),
-                        NoteDetailsModal(note: notes[index]),
+                        NoteDetailsModal(
+                          note: notes[index],
+                          detailService: ref.read(detailServiceProvider),
+                        ),
                       ),
                     );
                   },

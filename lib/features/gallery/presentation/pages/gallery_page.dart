@@ -8,6 +8,7 @@ import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_spacing.dart';
 import '../widgets/gallery_widgets.dart';
 import '../../controller/gallery_controller.dart';
+import '../../../../providers/note_providers.dart';
 
 class GalleryPage extends ConsumerWidget {
   const GalleryPage({super.key});
@@ -134,7 +135,11 @@ class _GalleryTile extends StatelessWidget {
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
-            builder: (context) => NoteDetailsModal(note: note),
+            builder: (context) {
+              final container = ProviderScope.containerOf(context);
+              final detailService = container.read(detailServiceProvider);
+              return NoteDetailsModal(note: note, detailService: detailService);
+            },
           ).then((result) {
             if (result == true) onRefresh();
           });

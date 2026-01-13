@@ -13,8 +13,9 @@ import '../widgets/note_form_widgets.dart';
 
 class NoteDetailsModal extends StatefulWidget {
   final Note note;
+  final DetailService detailService;
 
-  const NoteDetailsModal({super.key, required this.note});
+  const NoteDetailsModal({super.key, required this.note, required this.detailService});
 
   @override
   State<NoteDetailsModal> createState() => _NoteDetailsModalState();
@@ -42,7 +43,7 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
 
   // detail table load 함수
   Future<void> _loadDetailData() async {
-    final detail = await DetailService.instance.getDetailByNoteId(widget.note.id);
+    final detail = await widget.detailService.getDetailByNoteId(widget.note.id);
     if (mounted) {
       setState(() {
         if (detail != null) {
@@ -51,10 +52,10 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
           _formState.countryController.text = detail.originLocation ?? "";
           _formState.varietyController.text = detail.variety ?? "";
 
-          // Enum 값들 설정
-          _formState.selectedProcess = detail.process ?? ProcessType.washed;
-          _formState.selectedRoasting = detail.roastingPoint ?? RoastingPointType.medium;
-          _formState.selectedMethod = detail.method ?? MethodType.filter;
+          // Enum 값들 설정 (null이면 기본값 "직접입력")
+          _formState.selectedProcess = detail.process ?? ProcessType.etc;
+          _formState.selectedRoasting = detail.roastingPoint ?? RoastingPointType.etc;
+          _formState.selectedMethod = detail.method ?? MethodType.etc;
 
           // 직접 입력했던 텍스트들을 각 컨트롤러에 넣어줌
           _formState.processTextController.text = detail.processText ?? "";
@@ -107,17 +108,17 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
       final updatedDetail = _formState.createDetailFromForm(widget.note.id, existingId: _detail?.id);
       if (updatedDetail != null) {
         if (_detail != null) {
-          await DetailService.instance.updateDetail(updatedDetail);
+          await widget.detailService.updateDetail(updatedDetail);
         } else {
-          await DetailService.instance.createDetail(updatedDetail);
+          await widget.detailService.createDetail(updatedDetail);
         }
       } else if (_detail != null) {
         // 모든 필드가 NULL이 되었고 기존 detail이 있으면 삭제
-        await DetailService.instance.deleteDetail(_detail!.id);
+        await widget.detailService.deleteDetail(_detail!.id);
       }
     } else if (_detail != null) {
       // 체크박스가 해제되었는데 기존 detail이 있으면 삭제
-      await DetailService.instance.deleteDetail(_detail!.id);
+      await widget.detailService.deleteDetail(_detail!.id);
     }
 
     if (mounted) Navigator.pop(context, true);
@@ -143,7 +144,7 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.close, color: AppColors.primaryDark, size: 16),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(context, false),
                 ),
                 Text(
                   _isEditing ? "노트 수정" : "노트 정보",

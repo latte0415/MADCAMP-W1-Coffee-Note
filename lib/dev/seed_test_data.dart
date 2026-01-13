@@ -12,14 +12,16 @@ import '../models/enums/roasting_point_type.dart';
 import '../models/note.dart';
 import '../repositories/detail_repository.dart';
 import '../repositories/note_repository.dart';
+import '../database/database_manager.dart';
 
 /// 디버그/테스트용 시드 데이터 주입 스크립트.
 /// 앱 시작 전 한 번 호출했다가 완료 후 제거하세요.
 Future<void> seedTestData() async {
   final now = DateTime.now();
   final uuid = const Uuid();
-  final noteRepo = NoteRepository.instance;
-  final detailRepo = DetailRepository.instance;
+  final dbManager = DatabaseManager.instance;
+  final noteRepo = NoteRepository(databaseManager: dbManager);
+  final detailRepo = DetailRepository(databaseManager: dbManager);
 
   // 앱에 번들된 테스트 이미지 자산 목록
   final imageAssets = [

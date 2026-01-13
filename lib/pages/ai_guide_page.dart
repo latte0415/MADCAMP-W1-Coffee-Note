@@ -9,9 +9,13 @@ import '../models/enums/process_type.dart';
 import '../models/enums/roasting_point_type.dart';
 import '../models/enums/method_type.dart';
 import '../shared/presentation/modals/creation_modal.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/note_providers.dart';
 
 class AiGuidePage extends StatefulWidget {
-  const AiGuidePage({super.key});
+  final APIService apiService;
+  
+  const AiGuidePage({super.key, required this.apiService});
 
   @override
   State<AiGuidePage> createState() => _AiGuidePageState();
@@ -49,7 +53,7 @@ class _AiGuidePageState extends State<AiGuidePage> {
     });
 
     try {
-      final result = await APIService.instance.chatForSensoryGuide(inputText);
+      final result = await widget.apiService.chatForSensoryGuide(inputText);
       setState(() {
         _mappingResult = result['mappingResult'] as Map<String, dynamic>?;
         _sensoryGuide = result['sensoryGuide'] as String? ?? '';
@@ -71,10 +75,13 @@ class _AiGuidePageState extends State<AiGuidePage> {
   void _handleContinueRecording() {
     if (_mappingResult == null) return;
     
+    final container = ProviderScope.containerOf(context);
+    final detailService = container.read(detailServiceProvider);
     showDialog(
       context: context,
       builder: (context) => NoteCreatePopup(
         prefillData: _mappingResult,
+        detailService: detailService,
       ),
     );
   }

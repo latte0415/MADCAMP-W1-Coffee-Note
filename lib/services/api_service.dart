@@ -5,35 +5,27 @@ import '../models/enums/method_type.dart';
 
 /// 백엔드 API와 통신하는 서비스 클래스
 class APIService {
-  static final APIService instance = APIService._init();
-
-  APIService._init();
-
   // Base URL
   static const String baseUrl = 'https://madcamp-w1-coffee-note-backend-production.up.railway.app';
 
   // Dio 인스턴스
   late final Dio _dio;
 
-  /// Dio 인스턴스 초기화
-  Dio get dio {
-    if (!_isInitialized) {
-      _dio = Dio(
-        BaseOptions(
-          baseUrl: baseUrl,
-          connectTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-      _isInitialized = true;
-    }
-    return _dio;
+  APIService() {
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      ),
+    );
   }
 
-  bool _isInitialized = false;
+  /// Dio 인스턴스 반환
+  Dio get dio => _dio;
 
   /// 일반 채팅 API 호출
   /// 

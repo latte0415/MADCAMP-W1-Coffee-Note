@@ -8,10 +8,13 @@ import '../../../theme/app_colors.dart';
 import '../../state/note_form_state.dart';
 import '../widgets/note_form_widgets.dart';
 
+
+
 class NoteCreatePopup extends StatefulWidget {
   final Map<String, dynamic>? prefillData;
+  final DetailService detailService;
   
-  const NoteCreatePopup({super.key, this.prefillData});
+  const NoteCreatePopup({super.key, this.prefillData, required this.detailService});
 
   @override
   State<NoteCreatePopup> createState() => _NoteCreatePopupState();
@@ -27,7 +30,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     _formState = NoteFormState.forCreation(prefillData: widget.prefillData);
     // prefillData가 있으면 상세정보 섹션 자동 활성화
     if (widget.prefillData != null) {
-      _showDetailSection = true;
+    _showDetailSection = true;
     }
   }
 
@@ -124,10 +127,10 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                     const SizedBox(height: 20),
                   ],
                 ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -169,7 +172,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
       if (_showDetailSection) {
         final newDetail = _formState.createDetailFromForm(noteId);
         if (newDetail != null) {
-          await DetailService.instance.createDetail(newDetail);
+          await widget.detailService.createDetail(newDetail);
         }
       }
 

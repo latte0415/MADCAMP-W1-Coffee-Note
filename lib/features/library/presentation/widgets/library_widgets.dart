@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../models/note.dart';
 import '../../../../models/detail.dart';
-import '../../../../services/detail_service.dart';
+import '../../../../shared/presentation/modals/details_modal.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_spacing.dart';
 import '../../../../theme/app_text_styles.dart';
@@ -151,7 +151,7 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
         border: Border.all(color: Colors.transparent, width: 0),
       ),
       child: FutureBuilder<Detail?>(
-        future: DetailService.instance.getDetailByNoteId(note.id),
+        future: (detailsModal as NoteDetailsModal).detailService.getDetailByNoteId(note.id),
         builder: (context, detailSnapshot) {
           final hasDetail = detailSnapshot.hasData && detailSnapshot.data != null;
           final detail = detailSnapshot.data;

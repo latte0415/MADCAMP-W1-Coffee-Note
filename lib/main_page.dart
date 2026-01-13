@@ -7,6 +7,7 @@ import 'pages/ai_guide_page.dart';
 import 'theme/app_colors.dart';
 import 'features/library/controller/library_controller.dart';
 import 'features/gallery/controller/gallery_controller.dart';
+import 'providers/note_providers.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -19,13 +20,6 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   int _selectedIndex = 0;
 
-  // 각 인덱스에 맞는 화면 리스트
-  List<Widget> get _pages => [
-    const LibraryPage(),
-    const GalleryPage(),
-    const AiGuidePage(),
-  ];
-
   // 탭을 클릭할 때 실행될 함수
   void _onItemTapped(int index) {
     setState(() {
@@ -35,6 +29,12 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      const LibraryPage(),
+      const GalleryPage(),
+      AiGuidePage(apiService: ref.read(apiServiceProvider)),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(""),
@@ -44,7 +44,7 @@ class _MainPageState extends ConsumerState<MainPage> {
         toolbarHeight: 10,            // AppBar의 높이 조절 (패딩 느낌 조절)
       ),
 
-      body: _pages[_selectedIndex],
+      body: pages[_selectedIndex],
 
         // 탭 선택: 화면 아래에 네비게이션 바를 배치합니다.
         bottomNavigationBar: BottomNavigationBar(
@@ -71,7 +71,9 @@ class _MainPageState extends ConsumerState<MainPage> {
               // shape: const RoundedRectangleBorder(
               //   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
               // ),
-              builder: (context) => const NoteCreatePopup(),
+              builder: (context) => NoteCreatePopup(
+                detailService: ref.read(detailServiceProvider),
+              ),
             ).then((result) {
               // 노트 생성 성공 시 library와 gallery 모두 refresh
               if (result == true) {

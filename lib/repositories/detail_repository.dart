@@ -8,13 +8,13 @@ import '../database/database_manager.dart';
 import '../services/note_service.dart';
 
 class DetailRepository {
-    static final DetailRepository instance = DetailRepository._init();
+    final DatabaseManager databaseManager;
 
-    DetailRepository._init();
+    DetailRepository({required this.databaseManager});
 
     /// DatabaseManager를 통해 공통 DB 인스턴스 사용
     Future<Database> get database async {
-        return await DatabaseManager.instance.database;
+        return await databaseManager.database;
     }
 
     // CRUD 메서드들
