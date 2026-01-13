@@ -51,7 +51,7 @@ enum RoastingPointType {
       case RoastingPointType.dark:
         return '다크';
       case RoastingPointType.etc:
-        return '기타';
+        return '직접입력';
     }
   }
 }
