@@ -1,27 +1,21 @@
-// lib/pages/ai_guide_page.dart
+// lib/features/ai_guide/presentation/pages/ai_guide_page.dart
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
-import '../theme/app_text_styles.dart';
-import '../theme/app_component_styles.dart';
-import '../services/api_service.dart';
-import '../models/enums/process_type.dart';
-import '../models/enums/roasting_point_type.dart';
-import '../models/enums/method_type.dart';
-import '../shared/presentation/modals/creation_modal.dart';
+import '../../../../theme/theme.dart';
+import '../../../../models/enums/process_type.dart';
+import '../../../../models/enums/roasting_point_type.dart';
+import '../../../../models/enums/method_type.dart';
+import '../../../../shared/presentation/modals/creation_modal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/note_providers.dart';
+import '../../../../backend/providers.dart';
 
-class AiGuidePage extends StatefulWidget {
-  final APIService apiService;
-  
-  const AiGuidePage({super.key, required this.apiService});
+class AiGuidePage extends ConsumerStatefulWidget {
+  const AiGuidePage({super.key});
 
   @override
-  State<AiGuidePage> createState() => _AiGuidePageState();
+  ConsumerState<AiGuidePage> createState() => _AiGuidePageState();
 }
 
-class _AiGuidePageState extends State<AiGuidePage> {
+class _AiGuidePageState extends ConsumerState<AiGuidePage> {
   final TextEditingController _inputController = TextEditingController();
   bool _isLoading = false;
   bool _hasResult = false;
@@ -53,7 +47,8 @@ class _AiGuidePageState extends State<AiGuidePage> {
     });
 
     try {
-      final result = await widget.apiService.chatForSensoryGuide(inputText);
+      final apiService = ref.read(apiServiceProvider);
+      final result = await apiService.chatForSensoryGuide(inputText);
       setState(() {
         _mappingResult = result['mappingResult'] as Map<String, dynamic>?;
         _sensoryGuide = result['sensoryGuide'] as String? ?? '';
@@ -75,13 +70,10 @@ class _AiGuidePageState extends State<AiGuidePage> {
   void _handleContinueRecording() {
     if (_mappingResult == null) return;
     
-    final container = ProviderScope.containerOf(context);
-    final detailService = container.read(detailServiceProvider);
     showDialog(
       context: context,
       builder: (context) => NoteCreatePopup(
         prefillData: _mappingResult,
-        detailService: detailService,
       ),
     );
   }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../theme/app_colors.dart';
-import '../../../theme/app_text_styles.dart';
-import '../../../theme/app_component_styles.dart';
+import '../../../theme/theme.dart';
 import '../../../models/enums/process_type.dart';
 import '../../../models/enums/roasting_point_type.dart';
 import '../../../models/enums/method_type.dart';

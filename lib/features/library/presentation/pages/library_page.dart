@@ -5,16 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../models/note.dart';
 import '../../../../models/sort_option.dart';
-import '../../../../theme/app_colors.dart';
-import '../../../../theme/app_spacing.dart';
-import '../../../../theme/app_text_styles.dart';
-import '../../../../theme/app_component_styles.dart';
+import '../../../../theme/theme.dart';
 import '../widgets/library_widgets.dart';
 import '../../controller/library_controller.dart';
 import '../../state/library_filter_state.dart';
 import '../../state/library_state.dart';
 import '../../../../shared/presentation/modals/details_modal.dart';
-import '../../../../providers/note_providers.dart';
+import '../../../../backend/providers.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -340,7 +337,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                         () => controller.refresh(),
                         NoteDetailsModal(
                           note: notes[index],
-                          detailService: ref.read(detailServiceProvider),
                         ),
                       ),
                     );

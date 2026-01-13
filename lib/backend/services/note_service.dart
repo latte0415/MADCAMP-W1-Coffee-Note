@@ -1,8 +1,8 @@
 import 'dart:math';
 import '../repositories/note_repository.dart';
-import '../models/note.dart';
-import '../models/sort_option.dart';
-import '../services/image_service.dart';
+import '../../models/note.dart';
+import '../../models/sort_option.dart';
+import 'image_service.dart';
 
 class NoteService {
     /// 기본 싱글턴은 유지하되, 주입식 생성을 허용한다.

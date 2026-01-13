@@ -1,11 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 import 'dart:convert';
-import '../models/detail.dart';
-import '../models/enums/process_type.dart';
-import '../models/enums/roasting_point_type.dart';
-import '../models/enums/method_type.dart';
-import '../database/database_manager.dart';
-import '../services/note_service.dart';
+import '../../models/detail.dart';
+import '../../models/enums/process_type.dart';
+import '../../models/enums/roasting_point_type.dart';
+import '../../models/enums/method_type.dart';
+import '../../database/database_manager.dart';
 
 class DetailRepository {
     final DatabaseManager databaseManager;

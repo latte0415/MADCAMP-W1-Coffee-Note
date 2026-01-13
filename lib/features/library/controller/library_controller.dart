@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/note.dart';
-import '../../../services/note_service.dart';
-import '../../../providers/note_providers.dart';
+import '../../../backend/providers.dart';
+import '../../../backend/services/note_service.dart';
 import '../state/library_state.dart';
 import '../state/library_filter_state.dart';
 import '../../../models/sort_option.dart';

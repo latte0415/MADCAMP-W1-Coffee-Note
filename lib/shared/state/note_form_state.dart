@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/note.dart';
 import '../../models/detail.dart';
 import '../../models/enums/process_type.dart';
 import '../../models/enums/roasting_point_type.dart';
 import '../../models/enums/method_type.dart';
-import '../../services/image_service.dart';
-import '../../theme/app_spacing.dart';
+import '../../backend/providers.dart';
+import '../../theme/theme.dart';
 
 /// Note 생성/수정 폼의 공통 상태 관리 클래스
 /// Creation과 Details modal이 공유하는 상태 변수와 메서드를 관리
@@ -212,6 +213,9 @@ class NoteFormState {
 
   /// 이미지 선택 bottom sheet 표시
   void showImagePicker(BuildContext context, VoidCallback setState) {
+    final container = ProviderScope.containerOf(context);
+    final imageService = container.read(imageServiceProvider);
+    
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -221,7 +225,7 @@ class NoteFormState {
               leading: const Icon(Icons.photo_library),
               title: const Text('갤러리에서 선택'),
               onTap: () async {
-                final img = await ImageService.instance.pickImage(ImageSource.gallery);
+                final img = await imageService.pickImage(ImageSource.gallery);
                 if (img != null) {
                   selectedImage = img;
                   existingImagePath = null; // 새 이미지 선택 시 기존 경로 제거
@@ -234,7 +238,7 @@ class NoteFormState {
               leading: const Icon(Icons.camera_alt),
               title: const Text('카메라로 촬영'),
               onTap: () async {
-                final img = await ImageService.instance.pickImage(ImageSource.camera);
+                final img = await imageService.pickImage(ImageSource.camera);
                 if (img != null) {
                   selectedImage = img;
                   existingImagePath = null; // 새 이미지 선택 시 기존 경로 제거

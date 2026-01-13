@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/note.dart';
-import '../../../services/note_service.dart';
 import 'package:uuid/uuid.dart';
-import '../../../services/image_service.dart';
-import '../../../services/detail_service.dart';
-import '../../../theme/app_colors.dart';
+import '../../../backend/providers.dart';
+import '../../../theme/theme.dart';
 import '../../state/note_form_state.dart';
 import '../widgets/note_form_widgets.dart';
 
 
 
-class NoteCreatePopup extends StatefulWidget {
+class NoteCreatePopup extends ConsumerStatefulWidget {
   final Map<String, dynamic>? prefillData;
-  final DetailService detailService;
   
-  const NoteCreatePopup({super.key, this.prefillData, required this.detailService});
+  const NoteCreatePopup({super.key, this.prefillData});
 
   @override
-  State<NoteCreatePopup> createState() => _NoteCreatePopupState();
+  ConsumerState<NoteCreatePopup> createState() => _NoteCreatePopupState();
 }
 
-class _NoteCreatePopupState extends State<NoteCreatePopup> {
+class _NoteCreatePopupState extends ConsumerState<NoteCreatePopup> {
   late NoteFormState _formState;
   bool _showDetailSection = false;
 
@@ -144,12 +142,16 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
     }
 
     try {
+      final noteService = ref.read(noteServiceProvider);
+      final imageService = ref.read(imageServiceProvider);
+      final detailService = ref.read(detailServiceProvider);
+      
       DateTime parsedDate = DateTime.parse(_formState.dateController.text);
       final String noteId = const Uuid().v4();
       String? savedImagePath;
 
       if (_formState.selectedImage != null) {
-        savedImagePath = await ImageService.instance.saveImage(_formState.selectedImage!, noteId);
+        savedImagePath = await imageService.saveImage(_formState.selectedImage!, noteId);
       }
 
       final newNote = Note(
@@ -167,12 +169,12 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
         updatedAt: DateTime.now(),
       );
 
-      await NoteService.instance.createNote(newNote);
+      await noteService.createNote(newNote);
 
       if (_showDetailSection) {
         final newDetail = _formState.createDetailFromForm(noteId);
         if (newDetail != null) {
-          await widget.detailService.createDetail(newDetail);
+          await detailService.createDetail(newDetail);
         }
       }
 

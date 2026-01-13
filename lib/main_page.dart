@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/library/presentation/pages/library_page.dart';
-import 'shared/presentation/modals/creation_modal.dart';
 import 'features/gallery/presentation/pages/gallery_page.dart';
-import 'pages/ai_guide_page.dart';
-import 'theme/app_colors.dart';
+import 'features/ai_guide/presentation/pages/ai_guide_page.dart';
+import 'shared/presentation/modals/creation_modal.dart';
+import 'theme/theme.dart';
 import 'features/library/controller/library_controller.dart';
 import 'features/gallery/controller/gallery_controller.dart';
-import 'providers/note_providers.dart';
+import 'backend/providers.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -32,7 +32,7 @@ class _MainPageState extends ConsumerState<MainPage> {
     final pages = [
       const LibraryPage(),
       const GalleryPage(),
-      AiGuidePage(apiService: ref.read(apiServiceProvider)),
+      const AiGuidePage(),
     ];
 
     return Scaffold(
@@ -71,9 +71,7 @@ class _MainPageState extends ConsumerState<MainPage> {
               // shape: const RoundedRectangleBorder(
               //   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
               // ),
-              builder: (context) => NoteCreatePopup(
-                detailService: ref.read(detailServiceProvider),
-              ),
+              builder: (context) => const NoteCreatePopup(),
             ).then((result) {
               // 노트 생성 성공 시 library와 gallery 모두 refresh
               if (result == true) {

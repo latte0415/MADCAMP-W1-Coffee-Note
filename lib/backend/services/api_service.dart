@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import '../models/enums/process_type.dart';
-import '../models/enums/roasting_point_type.dart';
-import '../models/enums/method_type.dart';
+import '../../models/enums/process_type.dart';
+import '../../models/enums/roasting_point_type.dart';
+import '../../models/enums/method_type.dart';
 
 /// 백엔드 API와 통신하는 서비스 클래스
 class APIService {

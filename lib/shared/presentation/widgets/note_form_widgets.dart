@@ -4,8 +4,7 @@ import '../../state/note_form_state.dart';
 import '../../../models/enums/process_type.dart';
 import '../../../models/enums/roasting_point_type.dart';
 import '../../../models/enums/method_type.dart';
-import '../../../theme/app_colors.dart';
-import '../../../theme/app_spacing.dart';
+import '../../../theme/theme.dart';
 import 'popup_widget.dart';
 
 /// 이미지 선택 및 표시 섹션

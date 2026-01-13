@@ -1,5 +1,5 @@
 import '../repositories/detail_repository.dart';
-import '../models/detail.dart';
+import '../../models/detail.dart';
 
 class DetailService {
     final DetailRepository detailRepository;

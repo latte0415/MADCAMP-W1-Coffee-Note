@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/note.dart';
-import '../../../providers/note_providers.dart';
-import '../../../services/note_service.dart';
+import '../../../backend/providers.dart';
+import '../../../backend/services/note_service.dart';
 import '../state/gallery_state.dart';
 
 final galleryControllerProvider =

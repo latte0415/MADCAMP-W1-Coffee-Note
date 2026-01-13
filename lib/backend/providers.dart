@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database/database_manager.dart';
-import '../services/image_service.dart';
-import '../repositories/note_repository.dart';
-import '../services/note_service.dart';
-import '../repositories/detail_repository.dart';
-import '../services/detail_service.dart';
-import '../services/api_service.dart';
+import 'services/image_service.dart';
+import 'repositories/note_repository.dart';
+import 'services/note_service.dart';
+import 'repositories/detail_repository.dart';
+import 'services/detail_service.dart';
+import 'services/api_service.dart';
 
 /// DatabaseManager Provider (필요 시 override 가능)
 final databaseManagerProvider = Provider<DatabaseManager>((ref) {

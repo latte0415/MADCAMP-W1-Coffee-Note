@@ -10,8 +10,8 @@ import '../models/enums/method_type.dart';
 import '../models/enums/process_type.dart';
 import '../models/enums/roasting_point_type.dart';
 import '../models/note.dart';
-import '../repositories/detail_repository.dart';
-import '../repositories/note_repository.dart';
+import '../backend/repositories/detail_repository.dart';
+import '../backend/repositories/note_repository.dart';
 import '../database/database_manager.dart';
 
 /// 디버그/테스트용 시드 데이터 주입 스크립트.

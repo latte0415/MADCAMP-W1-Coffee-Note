@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
-import '../models/note.dart';
-import '../models/sort_option.dart';
-import '../database/database_manager.dart';
+import '../../models/note.dart';
+import '../../models/sort_option.dart';
+import '../../database/database_manager.dart';
 
 class NoteRepository {
   /// 기본 싱글턴은 남겨 두되, 주입식 생성을 지원한다.

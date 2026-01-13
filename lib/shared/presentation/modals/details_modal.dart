@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/note.dart';
-import '../../../services/note_service.dart';
-import '../../../services/image_service.dart';
 import '../../../models/detail.dart';
-import '../../../services/detail_service.dart';
+import '../../../backend/providers.dart';
 import '../../../models/enums/process_type.dart';
 import '../../../models/enums/roasting_point_type.dart';
 import '../../../models/enums/method_type.dart';
-import '../../../theme/app_colors.dart';
+import '../../../theme/theme.dart';
 import '../../state/note_form_state.dart';
 import '../widgets/note_form_widgets.dart';
 
-class NoteDetailsModal extends StatefulWidget {
+class NoteDetailsModal extends ConsumerStatefulWidget {
   final Note note;
-  final DetailService detailService;
 
-  const NoteDetailsModal({super.key, required this.note, required this.detailService});
+  const NoteDetailsModal({super.key, required this.note});
 
   @override
-  State<NoteDetailsModal> createState() => _NoteDetailsModalState();
+  ConsumerState<NoteDetailsModal> createState() => _NoteDetailsModalState();
 }
 
-class _NoteDetailsModalState extends State<NoteDetailsModal> {
+class _NoteDetailsModalState extends ConsumerState<NoteDetailsModal> {
   late NoteFormState _formState;
   bool _isEditing = false;
   bool _showDetailSection = false;
@@ -43,7 +41,8 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
 
   // detail table load 함수
   Future<void> _loadDetailData() async {
-    final detail = await widget.detailService.getDetailByNoteId(widget.note.id);
+    final detailService = ref.read(detailServiceProvider);
+    final detail = await detailService.getDetailByNoteId(widget.note.id);
     if (mounted) {
       setState(() {
         if (detail != null) {
@@ -75,11 +74,15 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
 
   // 업데이트 로직
   Future<void> _updateSubmit() async {
+    final noteService = ref.read(noteServiceProvider);
+    final imageService = ref.read(imageServiceProvider);
+    final detailService = ref.read(detailServiceProvider);
+    
     String? savedImagePath;
 
     // 새로 선택한 이미지가 있으면 저장
     if (_formState.selectedImage != null) {
-      savedImagePath = await ImageService.instance.saveImage(_formState.selectedImage!, widget.note.id);
+      savedImagePath = await imageService.saveImage(_formState.selectedImage!, widget.note.id);
       // 기존 이미지 삭제 (선택사항 - 필요시 추가)
     } else if (_formState.existingImagePath != null) {
       // 기존 이미지 경로 유지
@@ -101,24 +104,24 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
       updatedAt: DateTime.now(),
     );
 
-    await NoteService.instance.updateNote(updatedNote);
+    await noteService.updateNote(updatedNote);
     
     // 상세 정보 섹션이 체크되어 있을 때만 detail 저장
     if (_showDetailSection) {
       final updatedDetail = _formState.createDetailFromForm(widget.note.id, existingId: _detail?.id);
       if (updatedDetail != null) {
         if (_detail != null) {
-          await widget.detailService.updateDetail(updatedDetail);
+          await detailService.updateDetail(updatedDetail);
         } else {
-          await widget.detailService.createDetail(updatedDetail);
+          await detailService.createDetail(updatedDetail);
         }
       } else if (_detail != null) {
         // 모든 필드가 NULL이 되었고 기존 detail이 있으면 삭제
-        await widget.detailService.deleteDetail(_detail!.id);
+        await detailService.deleteDetail(_detail!.id);
       }
     } else if (_detail != null) {
       // 체크박스가 해제되었는데 기존 detail이 있으면 삭제
-      await widget.detailService.deleteDetail(_detail!.id);
+      await detailService.deleteDetail(_detail!.id);
     }
 
     if (mounted) Navigator.pop(context, true);

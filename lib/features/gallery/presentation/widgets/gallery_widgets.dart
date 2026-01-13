@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../theme/app_text_styles.dart';
+import '../../../../theme/theme.dart';
 
 /// 레벨 표시 (막대 그래프)
 Widget buildLevelDisplay(String label, int value, double scale, Color color) {

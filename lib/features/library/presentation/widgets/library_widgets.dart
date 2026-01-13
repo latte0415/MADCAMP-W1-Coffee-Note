@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../models/note.dart';
 import '../../../../models/detail.dart';
 import '../../../../shared/presentation/modals/details_modal.dart';
-import '../../../../theme/app_colors.dart';
-import '../../../../theme/app_spacing.dart';
-import '../../../../theme/app_text_styles.dart';
-import '../../../../theme/app_component_styles.dart';
+import '../../../../backend/providers.dart';
+import '../../../../theme/theme.dart';
 
 Widget sortButton(
     BuildContext context,
@@ -150,13 +149,16 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusSmall * scale),
         border: Border.all(color: Colors.transparent, width: 0),
       ),
-      child: FutureBuilder<Detail?>(
-        future: (detailsModal as NoteDetailsModal).detailService.getDetailByNoteId(note.id),
-        builder: (context, detailSnapshot) {
-          final hasDetail = detailSnapshot.hasData && detailSnapshot.data != null;
-          final detail = detailSnapshot.data;
+      child: Consumer(
+        builder: (context, ref, child) {
+          final detailService = ref.read(detailServiceProvider);
+          return FutureBuilder<Detail?>(
+            future: detailService.getDetailByNoteId(note.id),
+            builder: (context, detailSnapshot) {
+              final hasDetail = detailSnapshot.hasData && detailSnapshot.data != null;
+              final detail = detailSnapshot.data;
 
-          return Padding(
+              return Padding(
             padding: EdgeInsets.all(20 * scale),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,6 +265,8 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                 ),
               ],
             ),
+          );
+            },
           );
         },
       ),

@@ -4,11 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../models/note.dart';
 import '../../../../shared/presentation/modals/details_modal.dart';
-import '../../../../theme/app_colors.dart';
-import '../../../../theme/app_spacing.dart';
+import '../../../../theme/theme.dart';
 import '../widgets/gallery_widgets.dart';
 import '../../controller/gallery_controller.dart';
-import '../../../../providers/note_providers.dart';
+import '../../../../backend/providers.dart';
 
 class GalleryPage extends ConsumerWidget {
   const GalleryPage({super.key});
@@ -135,11 +134,7 @@ class _GalleryTile extends StatelessWidget {
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
-            builder: (context) {
-              final container = ProviderScope.containerOf(context);
-              final detailService = container.read(detailServiceProvider);
-              return NoteDetailsModal(note: note, detailService: detailService);
-            },
+            builder: (context) => NoteDetailsModal(note: note),
           ).then((result) {
             if (result == true) onRefresh();
           });
