@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import '../../models/note.dart';
 import '../../models/detail.dart';
 import '../../models/enums/process_type.dart';
@@ -74,9 +75,9 @@ class NoteFormState {
     final roastingPointTextController = TextEditingController();
     final methodTextController = TextEditingController();
 
-    ProcessType selectedProcess = ProcessType.washed;
-    RoastingPointType selectedRoasting = RoastingPointType.medium;
-    MethodType selectedMethod = MethodType.filter;
+    ProcessType selectedProcess = ProcessType.etc;
+    RoastingPointType selectedRoasting = RoastingPointType.etc;
+    MethodType selectedMethod = MethodType.etc;
     List<String> tastingNotesTags = [];
 
     // prefillData가 있으면 필드 자동 채우기
@@ -164,9 +165,9 @@ class NoteFormState {
       roastingPointTextController: roastingPointTextController,
       methodTextController: methodTextController,
       existingImagePath: note.image,
-      selectedProcess: detail?.process ?? ProcessType.washed,
-      selectedRoasting: detail?.roastingPoint ?? RoastingPointType.medium,
-      selectedMethod: detail?.method ?? MethodType.filter,
+      selectedProcess: detail?.process ?? ProcessType.etc,
+      selectedRoasting: detail?.roastingPoint ?? RoastingPointType.etc,
+      selectedMethod: detail?.method ?? MethodType.etc,
       acidity: note.levelAcidity.toDouble(),
       body: note.levelBody.toDouble(),
       bitterness: note.levelBitterness.toDouble(),
@@ -261,4 +262,55 @@ class NoteFormState {
 
   /// 이미지가 있는지 확인 (기존 경로 또는 새로 선택한 이미지)
   bool get hasImage => selectedImage != null || existingImagePath != null;
+
+  /// Form 데이터로부터 Detail 객체 생성
+  /// 모든 필드가 NULL이면 null을 반환 (detail 저장 생략)
+  Detail? createDetailFromForm(String noteId, {String? existingId}) {
+    // "직접입력"(etc) 선택 시 텍스트가 빈칸이면 NULL로 처리
+    final processText = selectedProcess == ProcessType.etc && processTextController.text.trim().isNotEmpty
+        ? processTextController.text.trim()
+        : null;
+    final roastingPointText = selectedRoasting == RoastingPointType.etc && roastingPointTextController.text.trim().isNotEmpty
+        ? roastingPointTextController.text.trim()
+        : null;
+    final methodText = selectedMethod == MethodType.etc && methodTextController.text.trim().isNotEmpty
+        ? methodTextController.text.trim()
+        : null;
+    
+    // "직접입력"이 아닌 경우 enum 값 사용, "직접입력"이면 null
+    final process = selectedProcess == ProcessType.etc ? null : selectedProcess;
+    final roastingPoint = selectedRoasting == RoastingPointType.etc ? null : selectedRoasting;
+    final method = selectedMethod == MethodType.etc ? null : selectedMethod;
+    
+    final originLocation = countryController.text.trim().isEmpty ? null : countryController.text.trim();
+    final variety = varietyController.text.trim().isEmpty ? null : varietyController.text.trim();
+    final tastingNotes = tastingNotesTags.isNotEmpty ? tastingNotesTags : null;
+    
+    // 모든 필드가 NULL인지 확인
+    if (originLocation == null &&
+        variety == null &&
+        process == null &&
+        processText == null &&
+        roastingPoint == null &&
+        roastingPointText == null &&
+        method == null &&
+        methodText == null &&
+        tastingNotes == null) {
+      return null; // 모든 필드가 NULL이면 detail 저장 생략
+    }
+    
+    return Detail(
+      id: existingId ?? const Uuid().v4(),
+      noteId: noteId,
+      originLocation: originLocation,
+      variety: variety,
+      process: process,
+      processText: processText,
+      roastingPoint: roastingPoint,
+      roastingPointText: roastingPointText,
+      method: method,
+      methodText: methodText,
+      tastingNotes: tastingNotes,
+    );
+  }
 }

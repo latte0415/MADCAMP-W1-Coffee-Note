@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../models/note.dart';
 import '../../../services/note_service.dart';
 import '../../../services/image_service.dart';
-import 'package:uuid/uuid.dart';
 import '../../../models/detail.dart';
 import '../../../services/detail_service.dart';
 import '../../../models/enums/process_type.dart';
@@ -10,7 +9,7 @@ import '../../../models/enums/roasting_point_type.dart';
 import '../../../models/enums/method_type.dart';
 import '../../../theme/app_colors.dart';
 import '../../state/note_form_state.dart';
-import 'note_form_widgets.dart';
+import '../widgets/note_form_widgets.dart';
 
 class NoteDetailsModal extends StatefulWidget {
   final Note note;
@@ -101,38 +100,24 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
       updatedAt: DateTime.now(),
     );
 
-    final updatedDetail = Detail(
-      id: _detail?.id ?? const Uuid().v4(),
-      noteId: widget.note.id,
-      originLocation: _formState.countryController.text.isEmpty ? null : _formState.countryController.text,
-      variety: _formState.varietyController.text.isEmpty ? null : _formState.varietyController.text,
-      process: _formState.selectedProcess,
-      processText: _formState.selectedProcess == ProcessType.etc && _formState.processTextController.text.isNotEmpty
-          ? _formState.processTextController.text
-          : null,
-      roastingPoint: _formState.selectedRoasting,
-      roastingPointText: _formState.selectedRoasting == RoastingPointType.etc && _formState.roastingPointTextController.text.isNotEmpty
-          ? _formState.roastingPointTextController.text
-          : null,
-      method: _formState.selectedMethod,
-      methodText: _formState.selectedMethod == MethodType.etc && _formState.methodTextController.text.isNotEmpty
-          ? _formState.methodTextController.text
-          : null,
-      tastingNotes: _formState.tastingNotesTags.isNotEmpty ? _formState.tastingNotesTags : null,
-    );
-
     await NoteService.instance.updateNote(updatedNote);
     
     // 상세 정보 섹션이 체크되어 있을 때만 detail 저장
     if (_showDetailSection) {
-      if (_detail != null) {
-        await DetailService.instance.updateDetail(updatedDetail);
-      } else {
-        await DetailService.instance.createDetail(updatedDetail);
+      final updatedDetail = _formState.createDetailFromForm(widget.note.id, existingId: _detail?.id);
+      if (updatedDetail != null) {
+        if (_detail != null) {
+          await DetailService.instance.updateDetail(updatedDetail);
+        } else {
+          await DetailService.instance.createDetail(updatedDetail);
+        }
+      } else if (_detail != null) {
+        // 모든 필드가 NULL이 되었고 기존 detail이 있으면 삭제
+        await DetailService.instance.deleteDetail(_detail!.id);
       }
     } else if (_detail != null) {
-      // 체크박스가 해제되었는데 기존 detail이 있으면 삭제 (선택사항)
-      // 필요시 추가할 수 있음
+      // 체크박스가 해제되었는데 기존 detail이 있으면 삭제
+      await DetailService.instance.deleteDetail(_detail!.id);
     }
 
     if (mounted) Navigator.pop(context, true);
@@ -206,32 +191,15 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
 
                     const SizedBox(height: 20),
 
-                    // 상세정보 추가하기 토글 체크박스
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "상세정보 추가하기",
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-                        ),
-                        Checkbox(
-                          value: _showDetailSection,
-                          onChanged: _isEditing ? (value) => setState(() => _showDetailSection = value ?? false) : null,
-                          activeColor: AppColors.primaryDark,
-                        ),
-                      ],
+                    // 상세정보 추가하기 토글 체크박스 + 상세 정보 섹션
+                    NoteDetailSectionWithToggle(
+                      formState: _formState,
+                      isEditing: _isEditing,
+                      showDetailSection: _showDetailSection,
+                      onToggleChanged: (value) => setState(() => _showDetailSection = value),
+                      setState: () => setState(() {}),
+                      showAiButton: false,
                     ),
-
-                    // 상세 정보 섹션 (토글 상태에 따라 노출)
-                    if (_showDetailSection) ...[
-                      const SizedBox(height: 20),
-                      NoteDetailSection(
-                        formState: _formState,
-                        isEditing: _isEditing,
-                        setState: () => setState(() {}),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
                   ],
                 ),
               ),

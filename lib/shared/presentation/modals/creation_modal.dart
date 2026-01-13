@@ -4,13 +4,9 @@ import '../../../services/note_service.dart';
 import 'package:uuid/uuid.dart';
 import '../../../services/image_service.dart';
 import '../../../services/detail_service.dart';
-import '../../../models/detail.dart';
-import '../../../models/enums/process_type.dart';
-import '../../../models/enums/roasting_point_type.dart';
-import '../../../models/enums/method_type.dart';
 import '../../../theme/app_colors.dart';
 import '../../state/note_form_state.dart';
-import 'note_form_widgets.dart';
+import '../widgets/note_form_widgets.dart';
 
 class NoteCreatePopup extends StatefulWidget {
   final Map<String, dynamic>? prefillData;
@@ -97,62 +93,15 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                     ),
                     const SizedBox(height: 25),
 
-                    // 3. 상세정보 추가하기 토글 체크박스
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "상세정보 추가하기",
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-                        ),
-                        Checkbox(
-                          value: _showDetailSection,
-                          onChanged: (value) => setState(() => _showDetailSection = value ?? false),
-                          activeColor: AppColors.primaryDark,
-                        ),
-                      ],
+                    // 3. 상세정보 추가하기 토글 체크박스 + 상세 정보 섹션
+                    NoteDetailSectionWithToggle(
+                      formState: _formState,
+                      isEditing: true,
+                      showDetailSection: _showDetailSection,
+                      onToggleChanged: (value) => setState(() => _showDetailSection = value),
+                      setState: () => setState(() {}),
+                      showAiButton: true,
                     ),
-
-                    // --- 4. 상세 정보 섹션 (토글 상태에 따라 노출) ---
-                    if (_showDetailSection) ...[
-                      const SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: SizedBox(
-                          width: 90,
-                          height: 28,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[200],
-                              elevation: 0,
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: () {
-                              // AI 자동생성 로직 추가
-                            },
-                            child: const Text(
-                              "AI 자동생성",
-                              style: TextStyle(
-                                color: AppColors.primaryDark,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      NoteDetailSection(
-                        formState: _formState,
-                        isEditing: true,
-                        setState: () => setState(() {}),
-                      ),
-                      const SizedBox(height: 15),
-                    ],
 
                     const SizedBox(height: 40),
 
@@ -218,26 +167,10 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
       await NoteService.instance.createNote(newNote);
 
       if (_showDetailSection) {
-        final newDetail = Detail(
-          id: const Uuid().v4(),
-          noteId: noteId,
-          originLocation: _formState.countryController.text.isEmpty ? null : _formState.countryController.text,
-          variety: _formState.varietyController.text.isEmpty ? null : _formState.varietyController.text,
-          process: _formState.selectedProcess,
-          processText: _formState.selectedProcess == ProcessType.etc && _formState.processTextController.text.isNotEmpty
-              ? _formState.processTextController.text
-              : null,
-          roastingPoint: _formState.selectedRoasting,
-          roastingPointText: _formState.selectedRoasting == RoastingPointType.etc && _formState.roastingPointTextController.text.isNotEmpty
-              ? _formState.roastingPointTextController.text
-              : null,
-          method: _formState.selectedMethod,
-          methodText: _formState.selectedMethod == MethodType.etc && _formState.methodTextController.text.isNotEmpty
-              ? _formState.methodTextController.text
-              : null,
-          tastingNotes: _formState.tastingNotesTags.isNotEmpty ? _formState.tastingNotesTags : null,
-        );
-        await DetailService.instance.createDetail(newDetail);
+        final newDetail = _formState.createDetailFromForm(noteId);
+        if (newDetail != null) {
+          await DetailService.instance.createDetail(newDetail);
+        }
       }
 
       if (mounted) Navigator.pop(context, true);

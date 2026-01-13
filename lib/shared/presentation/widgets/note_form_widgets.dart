@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import '../../../shared/state/note_form_state.dart';
+import '../../state/note_form_state.dart';
 import '../../../models/enums/process_type.dart';
 import '../../../models/enums/roasting_point_type.dart';
 import '../../../models/enums/method_type.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
-import '../widgets/popup_widget.dart';
+import 'popup_widget.dart';
 
 /// 이미지 선택 및 표시 섹션
 class NoteImageSection extends StatelessWidget {
@@ -234,6 +234,91 @@ class NoteDetailSection extends StatelessWidget {
               )).toList(),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// 상세 정보 섹션과 체크박스를 함께 관리하는 위젯
+class NoteDetailSectionWithToggle extends StatelessWidget {
+  final NoteFormState formState;
+  final bool isEditing;
+  final bool showDetailSection;
+  final ValueChanged<bool> onToggleChanged;
+  final VoidCallback setState;
+  final bool showAiButton;
+
+  const NoteDetailSectionWithToggle({
+    super.key,
+    required this.formState,
+    required this.isEditing,
+    required this.showDetailSection,
+    required this.onToggleChanged,
+    required this.setState,
+    this.showAiButton = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 상세정보 추가하기 토글 체크박스
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "상세정보 추가하기",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
+            ),
+            Checkbox(
+              value: showDetailSection,
+              onChanged: isEditing ? (value) => onToggleChanged(value ?? false) : null,
+              activeColor: AppColors.primaryDark,
+            ),
+          ],
+        ),
+
+        // 상세 정보 섹션 (토글 상태에 따라 노출)
+        if (showDetailSection) ...[
+          SizedBox(height: showAiButton ? 10 : 20),
+          if (showAiButton)
+            Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                width: 90,
+                height: 28,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[200],
+                    elevation: 0,
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    // AI 자동생성 로직 추가
+                  },
+                  child: const Text(
+                    "AI 자동생성",
+                    style: TextStyle(
+                      color: AppColors.primaryDark,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (showAiButton) const SizedBox(height: 20),
+          NoteDetailSection(
+            formState: formState,
+            isEditing: isEditing,
+            setState: setState,
+          ),
+          SizedBox(height: showAiButton ? 15 : 20),
+        ],
       ],
     );
   }
