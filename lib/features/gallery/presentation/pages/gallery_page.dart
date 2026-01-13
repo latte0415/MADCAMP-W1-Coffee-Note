@@ -6,6 +6,7 @@ import '../../../../models/note.dart';
 import '../../../../shared/presentation/modals/details_modal.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_spacing.dart';
+import '../../../../theme/app_text_styles.dart';
 import '../widgets/gallery_widgets.dart';
 import '../../controller/gallery_controller.dart';
 import '../../../../providers/note_providers.dart';
@@ -167,6 +168,7 @@ class _GalleryTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                 // 메뉴명, 맛 정보, 카페명, 마신 날짜 정보 나열
+                  const SizedBox(height: 10),
                   Text(
                     note.menu,
                     textAlign: TextAlign.start,
@@ -210,6 +212,26 @@ class _GalleryTile extends StatelessWidget {
                       Text(
                         note.drankAt.toString().split(' ')[0], // YYYY-MM-DD 형식
                         style: const TextStyle(color: Colors.white70, fontSize: 15),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+
+                  // 5. score
+                  Row(
+                    children: [
+                      const Icon(Icons.star, size: 15, color: Colors.white70), // 헤더 아이콘
+                      const SizedBox(width: 4),
+                      // 별을 score만큼 나열
+                      Row(
+                        children: List.generate(5, (index) {
+                          return Icon(
+                            // index가 score보다 작으면 꽉 찬 별, 크면 빈 별 표시
+                            index < note.score ? Icons.star : Icons.star_border,
+                            size: 15,
+                            color: Colors.white70,
+                          );
+                        }),
                       ),
                     ],
                   ),

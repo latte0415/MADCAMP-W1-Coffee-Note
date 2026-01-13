@@ -168,6 +168,7 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          // 1. 위치 정보
                           Row(
                             children: [
                               Icon(Icons.location_on, size: 24 * scale, color: AppColors.primaryText),
@@ -183,6 +184,7 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                             ],
                           ),
                           SizedBox(width: 24 * scale),
+                          // 2. 날짜 정보
                           Row(
                             children: [
                               Icon(Icons.calendar_today, size: 24 * scale, color: AppColors.primaryText),
@@ -192,6 +194,22 @@ Widget buildNoteCard(BuildContext context, Note note, double scale, VoidCallback
                                 style: AppTextStyles.bodyText.copyWith(
                                   fontSize: 30 * scale,
                                   fontWeight: FontWeight.w300,
+                                  color: AppColors.primaryText,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(width: 24 * scale),
+                          // 3. 별점 정보
+                          Row(
+                            children: [
+                              Icon(Icons.star_rounded, size: 28 * scale, color: AppColors.primaryText), // 별 아이콘
+                              SizedBox(width: 4 * scale),
+                              Text(
+                                '${note.score}', // 예: 4.5
+                                style: AppTextStyles.bodyText.copyWith(
+                                  fontSize: 30 * scale,
+                                  fontWeight: FontWeight.w700,
                                   color: AppColors.primaryText,
                                 ),
                               ),
