@@ -164,7 +164,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         // 검색창
         Padding(
           padding:
-              EdgeInsets.fromLTRB(16 * scale, 20 * scale, 16 * scale, 10 * scale),
+            EdgeInsets.only(
+              left: AppSpacing.horizontalPadding * scale,
+              right: AppSpacing.horizontalPadding * scale,
+              top: 20 * scale,
+              bottom: 10 * scale,
+            ),
           child: TextField(
             style: AppTextStyles.bodyText.copyWith(fontSize: 30 * scale),
             decoration: AppComponentStyles.textInputDecoration(

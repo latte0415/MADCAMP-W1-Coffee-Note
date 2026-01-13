@@ -93,122 +93,126 @@ class _AiGuidePageState extends State<AiGuidePage> {
     final scale = scaleFactor.clamp(0.3, 1.2);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI 가이드'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: scaledPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 30 * scale),
-              // 제목
-              Text(
-                '커피에 대한 정보를 입력해주세요.',
-                style: AppTextStyles.bodyText.copyWith(
-                  fontSize: 45 * scale,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(height: 20 * scale),
-              // 입력창
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 20 * scale),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.black,
-                      width: 1,
+      body: Column(
+        children: [
+          // --- [고정 상단 영역] ---
+          Padding(
+            padding: EdgeInsets.fromLTRB(scaledPadding, 30 * scale, scaledPadding, 10 * scale),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // title
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center, // 아이콘과 글자 높이 맞춤
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 45 * scale, // 텍스트 폰트 사이즈와 맞춤 [cite: 1-1-0]
+                      color: Colors.black, // AI 느낌이 나도록 금색/노란색 계열 추천
                     ),
-                  ),
+                    SizedBox(width: 15 * scale), // 아이콘과 글자 사이 간격
+                    Text(
+                      '커피에 대한 정보를 입력해주세요',
+                      style: AppTextStyles.bodyText.copyWith(
+                        fontSize: 45 * scale,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-                child: TextField(
-                  controller: _inputController,
-                  style: AppTextStyles.bodyText.copyWith(
-                    fontSize: 40 * scale,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: '내용을 입력하세요.',
-                    hintStyle: AppTextStyles.bodyText.copyWith(
-                      fontSize: 40 * scale,
+                SizedBox(height: 20 * scale),
+                // 검색창
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 1),
+                  child: TextField(
+                    controller: _inputController,
+                    style: AppTextStyles.bodyText.copyWith(
+                      fontSize: 35 * scale,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primaryText.withOpacity(0.27),
                     ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
+                    decoration: AppComponentStyles.textInputDecoration(hintText: "예: 에티오피아 예가체프 워시드 중배전").copyWith(
+                      hintStyle: TextStyle(color: AppColors.primaryText.withOpacity(0.3)),
+                      contentPadding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+                      // 하단 밑줄 스타일
+                      border: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.border, width: 1),
+                      ),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.border, width: 1),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.border, width: 1),
+                      ),
+                    ),
+                    onChanged: (value) => setState(() => _hasResult = false),
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      _hasResult = false;
-                    });
-                  },
                 ),
-              ),
-              SizedBox(height: 20 * scale),
-              // 안내 텍스트
-              Text(
-                '* 국가/지역, 품종, 로스팅 포인트, 가공 방식 등을 자세히 입력할수록 더 정확한 테이스팅 노트를 추측할 수 있습니다.',
-                style: AppTextStyles.bodyText.copyWith(
-                  fontSize: 30 * scale,
-                  color: const Color(0xFF262626),
+                SizedBox(height: 15 * scale),
+                Text(
+                  '* 국가, 품종, 로스팅, 가공 방식 등을 자세히 입력할수록 \n 더 정확한 테이스팅 노트를 추측할 수 있습니다.',
+                  style: TextStyle(fontSize: 30 * scale, color: const Color(0xFF666666)),
                 ),
-              ),
-              SizedBox(height: 30 * scale),
-              // 가이드 받기 버튼
-              Center(
-                child: SizedBox(
-                  width: 352 * scale,
-                  height: 91 * scale,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleGetGuide,
-                    style: AppComponentStyles.primaryButton.copyWith(
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(85 * scale),
+                SizedBox(height: 30 * scale),
+                // 가이드 받기 버튼
+                Center(
+                  child: SizedBox(
+                    width: 352 * scale,
+                    height: 91 * scale,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _handleGetGuide,
+                      style: AppComponentStyles.primaryButton.copyWith(
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(85 * scale),
+                          ),
+                        ),
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      child: Text(
+                        _isLoading ? '생성 중...' : '가이드 받기',
+                        style: AppTextStyles.bodyTextWhite.copyWith(
+                          fontSize: 35 * scale,
                         ),
                       ),
-                      padding: MaterialStateProperty.all(EdgeInsets.zero),
-                    ),
-                    child: Text(
-                      _isLoading ? '처리 중...' : '가이드 받기',
-                      style: AppTextStyles.bodyTextWhite.copyWith(
-                        fontSize: 45 * scale,
-                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 30 * scale),
-              // 결과 카드 영역
-              Container(
+              ],
+            ),
+          ),
+          SizedBox(height: 30 * scale),
+          // --- [스크롤 영역] ---
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: scaledPadding),
+              child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(30 * scale),
+                // 결과 표시 영역의 최대 높이
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.5,
+                ),
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(bottom: 20 * scale), // 하단 여백 추가
+                padding: EdgeInsets.all(25 * scale),
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  border: Border.all(
-                    color: AppColors.primaryDark,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(50 * scale),
+                  border: Border.all(color: AppColors.border, width: 1),
+                  borderRadius: BorderRadius.circular(30 * scale),
                 ),
                 child: _hasResult && _mappingResult != null
                     ? _buildResultContent(scale)
                     : _buildEmptyContent(scale),
               ),
-              SizedBox(height: 30 * scale),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildEmptyContent(double scale) {
     return Text(
-      '입력하신 내용을 바탕으로 AI가 커피를 즐길 수 있게 도와줍니다 :)',
+      '입력하신 내용을 바탕으로 \n AI가 커피를 즐길 수 있게 도와줍니다 :)',
       style: AppTextStyles.bodyText.copyWith(
         fontSize: 40 * scale,
         fontWeight: FontWeight.w700,
@@ -225,17 +229,17 @@ class _AiGuidePageState extends State<AiGuidePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 상단 입력 텍스트 표시
-        if (_inputText.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.only(bottom: 20 * scale),
-            child: Text(
-              _inputText,
-              style: AppTextStyles.bodyText.copyWith(
-                fontSize: 40 * scale,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
+        // if (_inputText.isNotEmpty)
+        //   Padding(
+        //     padding: EdgeInsets.only(bottom: 20 * scale),
+        //     child: Text(
+        //       _inputText,
+        //       style: AppTextStyles.bodyText.copyWith(
+        //         fontSize: 40 * scale,
+        //         fontWeight: FontWeight.w700,
+        //       ),
+        //     ),
+        //   ),
         
         // 국가/지역
         _buildInfoRow('국가/지역', result['originLocation'] as String?, scale),
@@ -273,7 +277,7 @@ class _AiGuidePageState extends State<AiGuidePage> {
           MethodType.values,
           scale,
         ),
-        SizedBox(height: 20 * scale),
+        SizedBox(height: 30 * scale),
         
         // 테이스팅 노트
         _buildTastingNotes(result['tastingNotes'] as List<String>?, scale),
@@ -282,12 +286,12 @@ class _AiGuidePageState extends State<AiGuidePage> {
         // 센서리 가이드
         _buildSensoryGuide(scale),
         SizedBox(height: 30 * scale),
-        
+
         // 이어서 기록하기 버튼
         Align(
           alignment: Alignment.centerRight,
           child: SizedBox(
-            width: 450 * scale,
+            width: 352 * scale,
             height: 91 * scale,
             child: ElevatedButton(
               onPressed: _handleContinueRecording,
@@ -302,7 +306,7 @@ class _AiGuidePageState extends State<AiGuidePage> {
               child: Text(
                 '이어서 기록하기',
                 style: AppTextStyles.bodyTextWhite.copyWith(
-                  fontSize: 45 * scale,
+                  fontSize: 35 * scale,
                 ),
               ),
             ),
@@ -323,7 +327,7 @@ class _AiGuidePageState extends State<AiGuidePage> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        SizedBox(height: 10 * scale),
+        SizedBox(height: 20 * scale),
         Text(
           value ?? '알 수 없음',
           style: AppTextStyles.bodyText.copyWith(
@@ -332,12 +336,13 @@ class _AiGuidePageState extends State<AiGuidePage> {
             color: value != null ? Colors.black : AppColors.primaryText.withOpacity(0.27),
           ),
         ),
-        SizedBox(height: 10 * scale),
-        Container(
-          width: double.infinity,
-          height: 1,
-          color: Colors.black,
+        SizedBox(height: 20 * scale),
+        const Divider(
+            height: 1,
+            thickness: 0.5, // buildField와 동일한 0.5 두께
+            color: AppColors.border
         ),
+        SizedBox(height: 20 * scale), // 다음 항목과의 여백
       ],
     );
   }
@@ -351,7 +356,7 @@ class _AiGuidePageState extends State<AiGuidePage> {
   ) {
     String displayText = '알 수 없음';
     Color textColor = AppColors.primaryText.withOpacity(0.27);
-    
+
     if (enumValue != null) {
       if (enumValue is ProcessType) {
         displayText = enumValue.displayName;
@@ -375,6 +380,7 @@ class _AiGuidePageState extends State<AiGuidePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 가공 방식, 로스팅 포인트, 추출 방식 title
                   Text(
                     label,
                     style: AppTextStyles.bodyText.copyWith(
@@ -382,7 +388,8 @@ class _AiGuidePageState extends State<AiGuidePage> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 10 * scale),
+                  SizedBox(height: 20 * scale),
+                  // 각 label의 검색값
                   Text(
                     displayText,
                     style: AppTextStyles.bodyText.copyWith(
@@ -391,12 +398,13 @@ class _AiGuidePageState extends State<AiGuidePage> {
                       color: textColor,
                     ),
                   ),
-                  SizedBox(height: 10 * scale),
-                  Container(
-                    width: double.infinity,
-                    height: 1,
-                    color: Colors.black,
+                  SizedBox(height: 20 * scale),
+                  const Divider(
+                      height: 1,
+                      thickness: 0.5,
+                      color: AppColors.border
                   ),
+                  SizedBox(height: 20 * scale),
                 ],
               ),
             ),
@@ -461,12 +469,18 @@ class _AiGuidePageState extends State<AiGuidePage> {
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(height: 10 * scale),
-          Container(
-            width: double.infinity,
-            height: 1,
-            color: Colors.black,
+          SizedBox(height: 20 * scale),
+          Text(
+            "알 수 없음",
+            style: AppTextStyles.bodyText.copyWith(
+              fontSize: 35 * scale,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primaryText.withOpacity(0.27),
+            ),
           ),
+          SizedBox(height: 20 * scale),
+          const Divider(height: 1, thickness: 0.5, color: AppColors.border), // 밑줄 양식 통일
+          SizedBox(height: 20 * scale),
         ],
       );
     }
@@ -505,11 +519,12 @@ class _AiGuidePageState extends State<AiGuidePage> {
           }).toList(),
         ),
         SizedBox(height: 20 * scale),
-        Container(
-          width: double.infinity,
-          height: 1,
-          color: Colors.black,
+        const Divider(
+            height: 1,
+            thickness: 0.5, // buildField와 동일한 0.5 두께
+            color: AppColors.border
         ),
+        SizedBox(height: 20 * scale), // 다음 항목과의 여백
       ],
     );
   }
@@ -521,7 +536,7 @@ class _AiGuidePageState extends State<AiGuidePage> {
         Text(
           '센서리 가이드',
           style: AppTextStyles.bodyText.copyWith(
-            fontSize: 30 * scale,
+            fontSize: 35 * scale,
             fontWeight: FontWeight.w700,
           ),
         ),
