@@ -217,7 +217,7 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
           maxWidth: 500,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        // ✅ [수정] 상단바와 스크롤 영역을 하나의 Column으로 묶음
+        // 상단바와 스크롤 영역을 하나의 Column으로 묶음
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -329,16 +329,16 @@ class _NoteCreatePopupState extends State<NoteCreatePopup> {
                       buildField("품종", _varietyController, true),
                       const SizedBox(height: 10),
 
-                      buildDropdown<ProcessType>("가공방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!)),
-                      buildDropdown<RoastingPointType>("로스팅포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!)),
-                      buildDropdown<MethodType>("추출방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!)),
+                      buildDropdown<ProcessType>("가공방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!), etcController: _processTextController,),
+                      buildDropdown<RoastingPointType>("로스팅포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!), etcController: _roastingPointTextController,),
+                      buildDropdown<MethodType>("추출방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!), etcController: _methodTextController,),
 
                       const SizedBox(height: 15),
                       buildField(
                           "테이스팅 노트",
                           _tastingNotesController,
                           true,
-                          onChanged: _handleTastingNotes // ✅ 실시간 변환 로직 연결
+                          onChanged: _handleTastingNotes // 실시간 변환 로직 연결
                       ),
                       const SizedBox(height: 10),
                       if (_tastingNotesTags.isNotEmpty)

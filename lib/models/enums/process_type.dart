@@ -51,7 +51,7 @@ enum ProcessType {
       case ProcessType.honey:
         return '허니';
       case ProcessType.etc:
-        return '기타';
+        return '직접입력';
     }
   }
 }

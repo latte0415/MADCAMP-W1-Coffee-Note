@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/note_service.dart';
-import '../services/image_service.dart';
-import '../models/note.dart';
-import '../models/sort_option.dart';
+import '../../services/note_service.dart';
+import '../../services/image_service.dart';
+import '../../models/note.dart';
+import '../../models/sort_option.dart';
 
 class DbTestPage extends StatefulWidget {
   const DbTestPage({super.key});

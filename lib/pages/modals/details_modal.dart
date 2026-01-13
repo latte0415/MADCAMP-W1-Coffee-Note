@@ -44,6 +44,11 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
   RoastingPointType _selectedRoasting = RoastingPointType.medium;
   MethodType _selectedMethod = MethodType.filter;
 
+  // ETC 선택 시 직접 입력을 위한 controller 변수
+  final TextEditingController _processTextController = TextEditingController();
+  final TextEditingController _roastingPointTextController = TextEditingController();
+  final TextEditingController _methodTextController = TextEditingController();
+
   bool _isEditing = false; // 수정 모드인지 확인하는 플래그
   String? _currentImagePath;
   late double _acidity, _body, _bitterness;
@@ -79,9 +84,21 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
         _detail = detail;
         _countryController.text = detail.originLocation ?? "";
         _varietyController.text = detail.variety ?? "";
+
+        // 1. Enum 값들 설정
         _selectedProcess = detail.process ?? ProcessType.washed;
         _selectedRoasting = detail.roastingPoint ?? RoastingPointType.medium;
         _selectedMethod = detail.method ?? MethodType.filter;
+
+        // 2. [추가] 직접 입력했던 텍스트들을 각 컨트롤러에 넣어줌
+        // 이 로직이 있어야 '기타'를 눌렀을 때 이전에 썼던 글이 나타납니다.
+        _processTextController.text = detail.processText ?? "";
+        _roastingPointTextController.text = detail.roastingPointText ?? "";
+        _methodTextController.text = detail.methodText ?? "";
+
+        // _selectedProcess = detail.process ?? ProcessType.washed;
+        // _selectedRoasting = detail.roastingPoint ?? RoastingPointType.medium;
+        // _selectedMethod = detail.method ?? MethodType.filter;
         _tastingNotesTags = detail.tastingNotes ?? [];
       });
     }
@@ -119,9 +136,15 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
       noteId: widget.note.id,
       originLocation: _countryController.text.isEmpty ? null : _countryController.text,
       variety: _varietyController.text.isEmpty ? null : _varietyController.text,
+      // process: _selectedProcess,
+      // roastingPoint: _selectedRoasting,
+      // method: _selectedMethod,
       process: _selectedProcess,
+      processText: _selectedProcess == ProcessType.etc ? _processTextController.text : null,
       roastingPoint: _selectedRoasting,
+      roastingPointText: _selectedRoasting == RoastingPointType.etc ? _roastingPointTextController.text : null,
       method: _selectedMethod,
+      methodText: _selectedMethod == MethodType.etc ? _methodTextController.text : null,
       tastingNotes: _tastingNotesTags.isNotEmpty ? _tastingNotesTags : null,
     );
 
@@ -249,14 +272,29 @@ class _NoteDetailsModalState extends State<NoteDetailsModal> {
 
                       // 수정 모드 여부에 따른 가공/로스팅/추출 방식 표시 로직
                       if (_isEditing) ...[
-                        buildDropdown<ProcessType>("가공 방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!)),
-                        buildDropdown<RoastingPointType>("로스팅 포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!)),
-                        buildDropdown<MethodType>("추출 방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!)),
+                        buildDropdown<ProcessType>("가공방식", _selectedProcess, ProcessType.values, (v) => setState(() => _selectedProcess = v!), etcController: _processTextController,),
+                        buildDropdown<RoastingPointType>("로스팅포인트", _selectedRoasting, RoastingPointType.values, (v) => setState(() => _selectedRoasting = v!), etcController: _roastingPointTextController,),
+                        buildDropdown<MethodType>("추출방식", _selectedMethod, MethodType.values, (v) => setState(() => _selectedMethod = v!), etcController: _methodTextController,),
                         buildField("테이스팅 노트", _tastingNotesController, true, onChanged: _handleTastingNotes),
                       ] else ...[
-                        buildReadOnlyDetail("가공 방식", _selectedProcess.displayName),
-                        buildReadOnlyDetail("로스팅", _selectedRoasting.displayName),
-                        buildReadOnlyDetail("추출 방식", _selectedMethod.displayName),
+                        buildReadOnlyDetail(
+                            "가공 방식",
+                            _selectedProcess == ProcessType.etc
+                                ? _processTextController.text // '직접입력'일 땐 직접 입력한 텍스트
+                                : _selectedProcess.displayName,
+                        ),
+                        buildReadOnlyDetail(
+                          "로스팅",
+                          _selectedRoasting == RoastingPointType.etc
+                              ? _roastingPointTextController.text // '직접입력'일 땐 직접 입력한 텍스트
+                              : _selectedRoasting.displayName,
+                        ),
+                        buildReadOnlyDetail(
+                          "추출 방식",
+                          _selectedMethod == MethodType.etc
+                              ? _methodTextController.text // '직접입력'일 땐 직접 입력한 텍스트
+                              : _selectedMethod.displayName,
+                        ),
                         const SizedBox(height: 15),
                         Align(
                           alignment: Alignment.centerLeft,

@@ -69,7 +69,7 @@ Widget buildSlider(BuildContext context, String label, double value, ValueChange
           ),
         ),
 
-        // ✅ [수정됨] 수치 표시 영역: 슬라이더 우측에 현재 값을 숫자로 표시
+        // 수치 표시 영역: 슬라이더 우측에 현재 값을 숫자로 표시
         SizedBox(
           width: 30,
           child: Text(
@@ -87,7 +87,10 @@ Widget buildSlider(BuildContext context, String label, double value, ValueChange
   );
 }
 
-Widget buildDropdown<T>(String label, T value, List<T> items, ValueChanged<T?> onChanged) {
+Widget buildDropdown<T>(String label, T value, List<T> items, ValueChanged<T?> onChanged, {TextEditingController? etcController,}) {
+  // 직접입력 buildField 호출을 결정하는 변수
+  bool isEtc = value.toString().split('.').last == 'etc';
+
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
     child: Column(
@@ -125,8 +128,14 @@ Widget buildDropdown<T>(String label, T value, List<T> items, ValueChanged<T?> o
           }).toList(),
           onChanged: onChanged,
         ),
-        // 다른 필드들과 동일한 하단 밑줄 추가 [cite: 1-1-0]
+        // 다른 필드들과 동일한 하단 밑줄 추가
         const Divider(height: 1, thickness: 0.5, color: AppColors.border),
+
+        if (isEtc && etcController != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: buildField("${label}을 입력해보세요", etcController, true),
+          ),
       ],
     ),
   );
@@ -134,30 +143,28 @@ Widget buildDropdown<T>(String label, T value, List<T> items, ValueChanged<T?> o
 
 Widget buildReadOnlyDetail(String label, String value) {
   return Padding(
-    // ✅ _buildField와 동일하게 외부 간격 조정 [cite: 1-1-0]
+    // _buildField와 동일하게 외부 간격 조정
     padding: const EdgeInsets.symmetric(vertical: 2),
     child: TextField(
-      // ✅ 읽기 전용으로 설정하여 텍스트 선택은 가능하지만 수정은 불가능하게 함 [cite: 1-1-0]
+      // 읽기 전용으로 설정하여 텍스트 선택은 가능하지만 수정은 불가능하게 함
       controller: TextEditingController(text: value),
       readOnly: true,
       style: AppTextStyles.bodyText.copyWith(fontSize: 15, color: AppColors.primaryDark),
-      decoration: AppComponentStyles.textInputDecoration(hintText: label).copyWith(
+      decoration: AppComponentStyles.textInputDecoration(hintText: "").copyWith(
         labelText: label,
-        // ✅ [수정됨] 제목(라벨) 스타일 통일 [cite: 1-1-0]
+        // 제목(라벨) 스타일 통일
         labelStyle: const TextStyle(fontSize: 12, color: AppColors.primaryText, fontWeight: FontWeight.bold),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         isDense: true,
-        // ✅ [수정됨] 텍스트와 밑줄 사이 간격 통일 [cite: 1-1-0]
+        // 텍스트와 밑줄 사이 간격 통일
         contentPadding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
 
-        // ✅ [수정됨] 입력 필드와 동일한 하단 밑줄 적용 [cite: 1-1-0]
         border: const UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.border, width: 0.5),
         ),
         enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.border, width: 0.5),
         ),
-        // 조회 모드이므로 포커스 스타일은 따로 주지 않거나 기본 스타일 유지
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: AppColors.border, width: 0.5),
         ),

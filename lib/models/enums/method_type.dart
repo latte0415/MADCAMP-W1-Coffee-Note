@@ -44,7 +44,7 @@ enum MethodType {
       case MethodType.coldBrew:
         return '콜드브루';
       case MethodType.etc:
-        return '기타';
+        return '직접입력';
     }
   }
 }
