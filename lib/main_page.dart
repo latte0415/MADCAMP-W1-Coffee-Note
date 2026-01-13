@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/list_page.dart';
+import 'pages/library_page.dart';
 import 'pages/modals/creation_modal.dart';
 import 'pages/gallery_page.dart';
 import 'pages/ai_guide_page.dart';
