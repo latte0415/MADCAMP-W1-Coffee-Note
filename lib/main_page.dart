@@ -18,12 +18,10 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   int _selectedIndex = 0;
 
-  final GlobalKey<GalleryPageState> _galleryPageKey = GlobalKey<GalleryPageState>();
-
   // 각 인덱스에 맞는 화면 리스트
   List<Widget> get _pages => [
     const LibraryPage(),
-    GalleryPage(key: _galleryPageKey),
+    const GalleryPage(),
     const AiGuidePage(),
   ];
 

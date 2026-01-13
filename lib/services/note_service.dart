@@ -41,6 +41,14 @@ class NoteService {
         return notes;
     }
 
+    /// 이미지가 있는 노트만 가져오기 (갤러리용)
+    Future<List<Note>> getImageNotes({SortOption sortOption = const DateSortOption(ascending: false)}) async {
+        final notes = await getAllNotes(sortOption);
+        return notes
+            .where((note) => note.image != null && note.image!.isNotEmpty)
+            .toList();
+    }
+
     Future<List<Note>> getAllNotes(SortOption sortOption) async {
         return await noteRepository.getAllNotes(sortOption);
     }
