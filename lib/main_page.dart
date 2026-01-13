@@ -22,9 +22,23 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   // 탭을 클릭할 때 실행될 함수
   void _onItemTapped(int index) {
+    // 같은 탭을 다시 클릭한 경우 리프레시하지 않음
+    if (_selectedIndex == index) {
+      return;
+    }
+
     setState(() {
       _selectedIndex = index;
     });
+
+    // 라이브러리 탭으로 이동 시 리프레시
+    if (index == 0) {
+      ref.read(libraryControllerProvider.notifier).refresh();
+    }
+    // 갤러리 탭으로 이동 시 리프레시
+    else if (index == 1) {
+      ref.read(galleryControllerProvider.notifier).refresh();
+    }
   }
 
   @override

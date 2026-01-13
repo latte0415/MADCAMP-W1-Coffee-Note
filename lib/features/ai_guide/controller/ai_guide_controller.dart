@@ -70,7 +70,7 @@ class AiGuideController extends AsyncNotifier<AiGuideViewData> {
       );
     }
 
-    final result = await AsyncValue.guard(() async {
+    final result = await AsyncValue.guard<Map<String, dynamic>>(() async {
       final response = await _apiService.chatForSensoryGuide(inputText);
       return {
         'mappingResult': response['mappingResult'] as Map<String, dynamic>?,
@@ -81,19 +81,21 @@ class AiGuideController extends AsyncNotifier<AiGuideViewData> {
     state = result.when(
       data: (data) {
         final current = state.valueOrNull;
+        final mappingResult = data['mappingResult'] as Map<String, dynamic>?;
+        final sensoryGuide = data['sensoryGuide'] as String? ?? '';
         return AsyncValue.data(
           current?.copyWith(
             state: current.state.copyWith(
               isLoading: false,
               hasResult: true,
             ),
-            mappingResult: data['mappingResult'],
-            sensoryGuide: data['sensoryGuide'],
+            mappingResult: mappingResult,
+            sensoryGuide: sensoryGuide,
           ) ??
               AiGuideViewData(
                 state: const AiGuideState(),
-                mappingResult: data['mappingResult'],
-                sensoryGuide: data['sensoryGuide'],
+                mappingResult: mappingResult,
+                sensoryGuide: sensoryGuide,
               ),
         );
       },
