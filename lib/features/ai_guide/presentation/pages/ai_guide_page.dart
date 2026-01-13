@@ -6,7 +6,7 @@ import '../../../../models/enums/roasting_point_type.dart';
 import '../../../../models/enums/method_type.dart';
 import '../../../../shared/presentation/modals/creation_modal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../backend/providers.dart';
+import '../../controller/ai_guide_controller.dart';
 
 class AiGuidePage extends ConsumerStatefulWidget {
   const AiGuidePage({super.key});
@@ -17,13 +17,6 @@ class AiGuidePage extends ConsumerStatefulWidget {
 
 class _AiGuidePageState extends ConsumerState<AiGuidePage> {
   final TextEditingController _inputController = TextEditingController();
-  bool _isLoading = false;
-  bool _hasResult = false;
-  
-  // AI 생성 결과
-  Map<String, dynamic>? _mappingResult;
-  String _sensoryGuide = '';
-  String _inputText = '';
 
   @override
   void dispose() {
@@ -40,46 +33,44 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _hasResult = false;
-      _inputText = inputText;
-    });
-
-    try {
-      final apiService = ref.read(apiServiceProvider);
-      final result = await apiService.chatForSensoryGuide(inputText);
-      setState(() {
-        _mappingResult = result['mappingResult'] as Map<String, dynamic>?;
-        _sensoryGuide = result['sensoryGuide'] as String? ?? '';
-        _hasResult = true;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('오류가 발생했습니다: $e')),
-        );
-      }
-    }
+    final controller = ref.read(aiGuideControllerProvider.notifier);
+    await controller.requestGuide(inputText);
   }
 
-  void _handleContinueRecording() {
-    if (_mappingResult == null) return;
+  void _handleContinueRecording(Map<String, dynamic>? mappingResult) {
+    if (mappingResult == null) return;
     
     showDialog(
       context: context,
       builder: (context) => NoteCreatePopup(
-        prefillData: _mappingResult,
+        prefillData: mappingResult,
       ),
     );
   }
 
+  void _handleInputChanged(String value) {
+    final controller = ref.read(aiGuideControllerProvider.notifier);
+    controller.clearResult();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final asyncState = ref.watch(aiGuideControllerProvider);
+    
+    // 에러 발생 시 스낵바 표시
+    ref.listen<AsyncValue<AiGuideViewData>>(
+      aiGuideControllerProvider,
+      (previous, next) {
+        next.whenData((data) {
+          if (data.error != null && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('오류가 발생했습니다: ${data.error}')),
+            );
+          }
+        });
+      },
+    );
+    
     final scaleFactor = MediaQuery.of(context).size.width / AppSpacing.designWidth;
     final scaledPadding = AppSpacing.horizontalPadding * scaleFactor.clamp(0.3, 1.2);
     final scale = scaleFactor.clamp(0.3, 1.2);
@@ -136,7 +127,7 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
                         borderSide: BorderSide(color: AppColors.border, width: 1),
                       ),
                     ),
-                    onChanged: (value) => setState(() => _hasResult = false),
+                    onChanged: _handleInputChanged,
                   ),
                 ),
                 SizedBox(height: 15 * scale),
@@ -151,7 +142,7 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
                     width: 352 * scale,
                     height: 91 * scale,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleGetGuide,
+                      onPressed: asyncState.valueOrNull?.state.isLoading == true ? null : _handleGetGuide,
                       style: AppComponentStyles.primaryButton.copyWith(
                         shape: MaterialStateProperty.all(
                           RoundedRectangleBorder(
@@ -161,7 +152,7 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
                         padding: MaterialStateProperty.all(EdgeInsets.zero),
                       ),
                       child: Text(
-                        _isLoading ? '생성 중...' : '가이드 받기',
+                        asyncState.valueOrNull?.state.isLoading == true ? '생성 중...' : '가이드 받기',
                         style: AppTextStyles.bodyTextWhite.copyWith(
                           fontSize: 35 * scale,
                         ),
@@ -175,25 +166,44 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
           SizedBox(height: 30 * scale),
           // --- [스크롤 영역] ---
           Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: scaledPadding),
-              child: Container(
-                width: double.infinity,
-                // 결과 표시 영역의 최대 높이
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height * 0.5,
+            child: asyncState.when(
+              data: (data) => SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: scaledPadding),
+                child: Container(
+                  width: double.infinity,
+                  // 결과 표시 영역의 최대 높이
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height * 0.5,
+                  ),
+                  alignment: Alignment.center,
+                  margin: EdgeInsets.only(bottom: 20 * scale), // 하단 여백 추가
+                  padding: EdgeInsets.all(25 * scale),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    border: Border.all(color: AppColors.border, width: 1),
+                    borderRadius: BorderRadius.circular(30 * scale),
+                  ),
+                  child: data.state.hasResult && data.mappingResult != null
+                      ? _buildResultContent(data, scale)
+                      : _buildEmptyContent(scale),
                 ),
-                alignment: Alignment.center,
-                margin: EdgeInsets.only(bottom: 20 * scale), // 하단 여백 추가
-                padding: EdgeInsets.all(25 * scale),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  border: Border.all(color: AppColors.border, width: 1),
-                  borderRadius: BorderRadius.circular(30 * scale),
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '오류가 발생했습니다: $error',
+                      style: AppTextStyles.bodyText,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _handleGetGuide,
+                      child: const Text('다시 시도'),
+                    ),
+                  ],
                 ),
-                child: _hasResult && _mappingResult != null
-                    ? _buildResultContent(scale)
-                    : _buildEmptyContent(scale),
               ),
             ),
           ),
@@ -214,25 +224,12 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
     );
   }
 
-  Widget _buildResultContent(double scale) {
-    final result = _mappingResult!;
+  Widget _buildResultContent(AiGuideViewData data, double scale) {
+    final result = data.mappingResult!;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 상단 입력 텍스트 표시
-        // if (_inputText.isNotEmpty)
-        //   Padding(
-        //     padding: EdgeInsets.only(bottom: 20 * scale),
-        //     child: Text(
-        //       _inputText,
-        //       style: AppTextStyles.bodyText.copyWith(
-        //         fontSize: 40 * scale,
-        //         fontWeight: FontWeight.w700,
-        //       ),
-        //     ),
-        //   ),
-        
         // 국가/지역
         _buildInfoRow('국가/지역', result['originLocation'] as String?, scale),
         SizedBox(height: 20 * scale),
@@ -276,7 +273,7 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
         SizedBox(height: 30 * scale),
         
         // 센서리 가이드
-        _buildSensoryGuide(scale),
+        _buildSensoryGuide(data.sensoryGuide, scale),
         SizedBox(height: 30 * scale),
 
         // 이어서 기록하기 버튼
@@ -286,7 +283,7 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
             width: 352 * scale,
             height: 91 * scale,
             child: ElevatedButton(
-              onPressed: _handleContinueRecording,
+              onPressed: () => _handleContinueRecording(data.mappingResult),
               style: AppComponentStyles.primaryButton.copyWith(
                 shape: MaterialStateProperty.all(
                   RoundedRectangleBorder(
@@ -521,7 +518,7 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
     );
   }
 
-  Widget _buildSensoryGuide(double scale) {
+  Widget _buildSensoryGuide(String sensoryGuide, double scale) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -541,8 +538,8 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
             borderRadius: BorderRadius.circular(20 * scale),
           ),
           child: Text(
-            _sensoryGuide.isNotEmpty
-                ? _sensoryGuide
+            sensoryGuide.isNotEmpty
+                ? sensoryGuide
                 : '센서리 가이드를 불러오는 중...',
             style: AppTextStyles.bodyText.copyWith(
               fontSize: 30 * scale,
