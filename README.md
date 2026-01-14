@@ -74,78 +74,65 @@
 
 ```mermaid
 graph TB
-    subgraph UI["🎨 Presentation Layer"]
-        direction TB
-        Pages["📄 Pages<br/>LibraryPage<br/>GalleryPage<br/>AiGuidePage"]
-        Widgets["🧩 Widgets & Modals<br/>Shared Components<br/>Creation Modal<br/>Note Modal"]
-        Controllers["🎮 Controllers<br/>Riverpod AsyncNotifier<br/>LibraryController<br/>GalleryController<br/>AiGuideController<br/>NoteFormController"]
+    subgraph L1["Presentation Layer"]
+        UI["Pages / Widgets / Modals"]
+        CTRL["Controllers<br/>Riverpod AsyncNotifier"]
     end
     
-    subgraph Models["📦 Models"]
-        direction LR
-        NoteModel["Note Model"]
-        DetailModel["Detail Model"]
-        Enums["Enums<br/>ProcessType<br/>RoastingPointType<br/>MethodType"]
+    subgraph L2["Models"]
+        MODELS["Note / Detail / Enums"]
     end
     
-    subgraph Business["⚙️ Business Logic Layer"]
-        direction TB
-        NoteService["NoteService<br/>CRUD Operations"]
-        DetailService["DetailService<br/>Detail Management"]
-        ApiService["ApiService<br/>AI Integration"]
-        ImageService["ImageService<br/>Image Handling"]
+    subgraph L3["Business Logic Layer"]
+        SVC["Services<br/>NoteService / DetailService<br/>ApiService / ImageService"]
     end
     
-    subgraph Data["💾 Data Access Layer"]
-        direction TB
-        NoteRepo["NoteRepository<br/>SQL Operations"]
-        DetailRepo["DetailRepository<br/>SQL Operations"]
-        DBManager["DatabaseManager<br/>SQLite Singleton"]
+    subgraph L4["Data Access Layer"]
+        REPO["Repositories<br/>NoteRepository / DetailRepository"]
+        DB["DatabaseManager<br/>SQLite"]
     end
     
-    subgraph External["🌐 External Services"]
-        BackendAPI["Backend API<br/>FastAPI + LangChain<br/>OpenAI GPT + Tavily"]
+    subgraph L5["External Services"]
+        API["Backend API<br/>FastAPI + LangChain"]
     end
     
-    %% Presentation Layer connections
-    Pages --> Controllers
-    Widgets --> Controllers
-    Controllers --> Models
+    UI --> CTRL
+    CTRL --> MODELS
+    CTRL --> SVC
+    MODELS --> SVC
+    SVC --> REPO
+    REPO --> DB
+    SVC --> API
     
-    %% Business Logic connections
-    Controllers --> NoteService
-    Controllers --> DetailService
-    Controllers --> ApiService
-    Controllers --> ImageService
+    classDef layer1 fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    classDef layer2 fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    classDef layer3 fill:#E8F5E9,stroke:#388E3C,stroke-width:2px
+    classDef layer4 fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    classDef layer5 fill:#FFEBEE,stroke:#C62828,stroke-width:2px
     
-    %% Data Access connections
-    NoteService --> NoteRepo
-    DetailService --> DetailRepo
-    NoteService --> ImageService
-    NoteRepo --> DBManager
-    DetailRepo --> DBManager
-    
-    %% External connections
-    ApiService --> BackendAPI
-    
-    %% Model usage
-    NoteService --> NoteModel
-    DetailService --> DetailModel
-    Controllers --> Enums
-    
-    %% Styling
-    classDef uiLayer fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
-    classDef modelLayer fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
-    classDef businessLayer fill:#E8F5E9,stroke:#388E3C,stroke-width:2px
-    classDef dataLayer fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
-    classDef externalLayer fill:#FFEBEE,stroke:#C62828,stroke-width:2px
-    
-    class Pages,Widgets,Controllers uiLayer
-    class NoteModel,DetailModel,Enums modelLayer
-    class NoteService,DetailService,ApiService,ImageService businessLayer
-    class NoteRepo,DetailRepo,DBManager dataLayer
-    class BackendAPI externalLayer
+    class UI,CTRL layer1
+    class MODELS layer2
+    class SVC layer3
+    class REPO,DB layer4
+    class API layer5
 ```
+
+### LangChain 워크플로우
+
+본 서비스는 **ReAct Agent**와 **LCEL Chain**을 결합한 2단계 하이브리드 로직을 사용합니다.
+
+#### 1. ReAct Agent (정보 수집 단계)
+- **역할**: 사용자가 입력한 커피 정보를 바탕으로 부족한 지식이나 최신 정보를 웹에서 검색하여 보완합니다.
+- **에이전트**: `create_react_agent` (ReAct 방식)
+- **도구 (Tools)**: `TavilySearchResults` (실시간 웹 검색)
+- **작동**: 사용자의 질문을 분석하여 검색이 필요한 경우 웹 검색을 수행하고, 수집된 정보를 정리하여 다음 단계로 전달합니다.
+
+#### 2. LCEL Chain (구조화 및 가이드 생성 단계)
+- **역할**: 수집된 "풍부한 정보(Enriched Info)"를 바탕으로 최종 응답 형식을 생성합니다.
+- **구성**: `PromptTemplate | LLM | OutputParser`
+- **출력 파서 (Parser)**: `PydanticOutputParser`를 사용하여 JSON 응답의 안정성을 보장합니다.
+- **작동**: 에이전트가 수집한 정보를 바탕으로 사전에 정의된 Enum 값에 맞춰 데이터를 매핑하거나, 자연스러운 센서리 가이드 문장을 생성합니다.
+
 ---
 
 ## Database Schema
