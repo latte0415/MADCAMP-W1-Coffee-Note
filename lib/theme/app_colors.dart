@@ -29,7 +29,7 @@ class AppColors {
   /// 비활성화된 버튼 배경에 사용
   static const Color disabledButton = Color(0xFF9E9E9E);
 
-  /// Error: #DC3545
+  /// Error:rgb(213, 63, 78)
   /// 에러 메시지, 경고 텍스트에 사용
-  static const Color error = Color(0xFFDC3545);
+  static const Color error = Color(0xFFD53F4E);
 }

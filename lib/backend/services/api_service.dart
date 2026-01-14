@@ -55,15 +55,17 @@ class APIService {
   /// 채팅 매핑 API 호출 (커피 정보 추출)
   /// 
   /// [message] 커피 정보가 포함된 사용자 메시지
+  /// [cancelToken] 요청 취소를 위한 CancelToken (선택사항)
   /// 
   /// Returns 구조화된 커피 정보를 담은 Map
   /// 
   /// Throws [Exception] 네트워크 오류 또는 서버 오류 발생 시
-  Future<Map<String, dynamic>> chatForMapping(String message) async {
+  Future<Map<String, dynamic>> chatForMapping(String message, {CancelToken? cancelToken}) async {
     try {
       final response = await dio.post(
         '/chat-for-mapping',
         data: {'message': message},
+        cancelToken: cancelToken,
       );
 
       if (response.statusCode == 200) {
@@ -73,6 +75,10 @@ class APIService {
         throw Exception('서버 오류: ${response.statusCode}');
       }
     } catch (e) {
+      // 취소된 경우는 그대로 rethrow (컨트롤러에서 처리)
+      if (e is DioException && e.type == DioExceptionType.cancel) {
+        rethrow;
+      }
       _handleError(e);
     }
   }
@@ -124,6 +130,8 @@ class APIService {
   /// [e] 발생한 DioException 또는 일반 Exception
   /// 
   /// Throws [Exception] 처리된 에러 메시지와 함께
+  /// 
+  /// Note: 취소 에러(DioExceptionType.cancel)는 이 메서드를 호출하기 전에 처리해야 합니다.
   Never _handleError(dynamic e) {
     if (e is DioException) {
       if (e.type == DioExceptionType.connectionTimeout ||
