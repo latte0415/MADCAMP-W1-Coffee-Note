@@ -223,70 +223,103 @@ class _NoteDetailsModalState extends ConsumerState<NoteDetailsModal> {
               ],
             ),
 
-            // --- [2. 스크롤 영역] ---
+            // --- [2. 스크롤 영역 + 버튼 영역] ---
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    // 이미지 영역
-                    NoteImageSection(
-                      formState: _formState,
-                      scale: 1.0,
-                      enabled: _isEditing,
-                      setState: () => setState(() {}),
-                    ),
-                    if (_isEditing)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8),
-                        child: Text("사진을 터치하여 변경", style: TextStyle(fontSize: 16, color: Colors.grey)),
-                      ),
+              child: Stack(
+                children: [
+                  // 스크롤 가능한 컨텐츠
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        // 이미지 영역
+                        NoteImageSection(
+                          formState: _formState,
+                          scale: 1.0,
+                          enabled: _isEditing,
+                          setState: () => setState(() {}),
+                        ),
+                        if (_isEditing)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: Text("사진을 터치하여 변경", style: TextStyle(fontSize: 16, color: Colors.grey)),
+                          ),
 
-                    // 기본 입력 필드들
-                    const SizedBox(height: 20),
-                    NoteBasicFieldsSection(
-                      formState: _formState,
-                      isEditing: _isEditing,
-                      setState: () => setState(() {}),
-                    ),
+                        // 기본 입력 필드들
+                        const SizedBox(height: 20),
+                        NoteBasicFieldsSection(
+                          formState: _formState,
+                          isEditing: _isEditing,
+                          setState: () => setState(() {}),
+                        ),
 
-                    const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                    // 상세정보 추가하기 토글 체크박스 + 상세 정보 섹션
-                    NoteDetailSectionWithToggle(
-                      formState: _formState,
-                      isEditing: _isEditing,
-                      showDetailSection: _showDetailSection,
-                      onToggleChanged: (value) => setState(() => _showDetailSection = value),
-                      setState: () => setState(() {}),
-                      showAiButton: false,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-
-            // --- [3. 고정 영역] 저장 버튼 (수정 모드일 때만 표시) ---
-            if (_isEditing)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isFormValid() ? AppColors.primaryDark : Colors.grey,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    ),
-                    onPressed: _isFormValid() ? _updateSubmit : _showValidationError,
-                    child: const Text(
-                      "저장",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                        // 상세정보 추가하기 토글 체크박스 + 상세 정보 섹션
+                        NoteDetailSectionWithToggle(
+                          formState: _formState,
+                          isEditing: _isEditing,
+                          showDetailSection: _showDetailSection,
+                          onToggleChanged: (value) => setState(() => _showDetailSection = value),
+                          setState: () => setState(() {}),
+                          showAiButton: false,
+                        ),
+                        const SizedBox(height: 20),
+                        // 버튼 높이 + 패딩만큼 여백 추가 (수정 모드일 때만)
+                        if (_isEditing) const SizedBox(height: 75),
+                      ],
                     ),
                   ),
-                ),
+                  
+                  // 하단 그라데이션 오버레이 + 버튼 (수정 모드일 때만 표시)
+                  if (_isEditing)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // 그라데이션 오버레이
+                          Container(
+                            height: 30,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.white.withOpacity(0.0),
+                                  Colors.white.withOpacity(1.0),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // 저장 버튼
+                          Container(
+                            padding: const EdgeInsets.only(top: 10),
+                            color: Colors.white,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 55,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _isFormValid() ? AppColors.primaryDark : Colors.grey,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                ),
+                                onPressed: _isFormValid() ? _updateSubmit : _showValidationError,
+                                child: const Text(
+                                  "저장",
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
+            ),
           ],
         ),
       ),

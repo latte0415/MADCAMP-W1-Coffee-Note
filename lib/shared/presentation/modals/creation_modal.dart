@@ -70,63 +70,96 @@ class _NoteCreatePopupState extends ConsumerState<NoteCreatePopup> {
               ],
             ),
 
-            // --- [2. 스크롤 가능한 컨텐츠 영역] ---
+            // --- [2. 스크롤 가능한 컨텐츠 영역 + 버튼 영역] ---
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 1. 이미지 추가 영역
-                    NoteImageSection(
-                      formState: _formState,
-                      scale: scale,
-                      enabled: true,
-                      setState: () => setState(() {}),
+              child: Stack(
+                children: [
+                  // 스크롤 가능한 컨텐츠
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 1. 이미지 추가 영역
+                        NoteImageSection(
+                          formState: _formState,
+                          scale: scale,
+                          enabled: true,
+                          setState: () => setState(() {}),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // 2. 기본 입력 필드
+                        NoteBasicFieldsSection(
+                          formState: _formState,
+                          isEditing: true,
+                          setState: () => setState(() {}),
+                        ),
+                        const SizedBox(height: 25),
+
+                        // 3. 상세정보 추가하기 토글 체크박스 + 상세 정보 섹션
+                        NoteDetailSectionWithToggle(
+                          formState: _formState,
+                          isEditing: true,
+                          showDetailSection: _showDetailSection,
+                          onToggleChanged: (value) => setState(() => _showDetailSection = value),
+                          setState: () => setState(() {}),
+                          showAiButton: true,
+                        ),
+
+                        const SizedBox(height: 20),
+                        // 버튼 높이 + 패딩만큼 여백 추가
+                        const SizedBox(height: 75),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // 2. 기본 입력 필드
-                    NoteBasicFieldsSection(
-                      formState: _formState,
-                      isEditing: true,
-                      setState: () => setState(() {}),
-                    ),
-                    const SizedBox(height: 25),
-
-                    // 3. 상세정보 추가하기 토글 체크박스 + 상세 정보 섹션
-                    NoteDetailSectionWithToggle(
-                      formState: _formState,
-                      isEditing: true,
-                      showDetailSection: _showDetailSection,
-                      onToggleChanged: (value) => setState(() => _showDetailSection = value),
-                      setState: () => setState(() {}),
-                      showAiButton: true,
-                    ),
-
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-
-            // --- [3. 고정 영역] 기록하기 버튼 ---
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isFormValid() ? AppColors.primaryDark : Colors.grey,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                   ),
-                  onPressed: _isFormValid() ? _submitNote : _showValidationError,
-                  child: const Text(
-                    "기록하기",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  
+                  // 하단 그라데이션 오버레이 + 버튼
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 그라데이션 오버레이
+                        Container(
+                          height: 30,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.white.withOpacity(0.0),
+                                Colors.white.withOpacity(1.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // 기록하기 버튼
+                        Container(
+                          padding: const EdgeInsets.only(top: 10),
+                          color: Colors.white,
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 55,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isFormValid() ? AppColors.primaryDark : Colors.grey,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              ),
+                              onPressed: _isFormValid() ? _submitNote : _showValidationError,
+                              child: const Text(
+                                "기록하기",
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
