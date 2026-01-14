@@ -167,7 +167,7 @@ class _GalleryTile extends StatelessWidget {
                     textAlign: TextAlign.start,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   const SizedBox(height: 10),
 
@@ -183,14 +183,14 @@ class _GalleryTile extends StatelessWidget {
                   // 3. 카페명
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 15, color: Colors.white70),
+                      const Icon(Icons.location_on, size: 12, color: Colors.white70),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           note.location,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.white70, fontSize: 15),
+                          style: const TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ),
                     ],
@@ -200,11 +200,11 @@ class _GalleryTile extends StatelessWidget {
                   // 4. drankAt (날짜) [cite: 1-1-0]
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 15, color: Colors.white70),
+                      const Icon(Icons.calendar_today, size: 12, color: Colors.white70),
                       const SizedBox(width: 4),
                       Text(
                         note.drankAt.toString().split(' ')[0], // YYYY-MM-DD 형식
-                        style: const TextStyle(color: Colors.white70, fontSize: 15),
+                        style: const TextStyle(color: Colors.white70, fontSize: 12),
                       ),
                     ],
                   ),
@@ -221,7 +221,7 @@ class _GalleryTile extends StatelessWidget {
                           return Icon(
                             // index가 score보다 작으면 꽉 찬 별, 크면 빈 별 표시
                             index < note.score ? Icons.star : Icons.star_border,
-                            size: 15,
+                            size: 12,
                             color: Colors.white70,
                           );
                         }),

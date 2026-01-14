@@ -173,7 +173,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               hintText: "검색어를 입력하세요.",
             ).copyWith(
               hintStyle: AppTextStyles.bodyText.copyWith(
-                fontSize: 25 * scale,
+                fontSize: 30 * scale,
                 color: AppColors.primaryText.withOpacity(0.5),
               ),
             ),

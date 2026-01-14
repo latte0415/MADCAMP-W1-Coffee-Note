@@ -120,9 +120,7 @@ class _NoteDetailsModalState extends ConsumerState<NoteDetailsModal> with NoteMo
                         if (e.toString().contains('메뉴명')) {
                           showMenuValidationError(context);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("AI 자동생성 중 오류가 발생했습니다: ${e.toString()}")),
-                          );
+                          showApiError(context, e);
                         }
                       }
                     }

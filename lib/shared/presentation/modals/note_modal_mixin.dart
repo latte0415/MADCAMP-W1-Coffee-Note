@@ -25,6 +25,23 @@ mixin NoteModalMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     _showErrorOverlay(context, '메뉴명을(를) 입력해주세요');
   }
 
+  /// API 에러 표시 (네트워크 에러, 서버 에러 등)
+  void showApiError(BuildContext context, dynamic error) {
+    String errorMessage;
+    if (error is Exception) {
+      // Exception의 메시지만 추출 (예: "Exception: 메시지" -> "메시지")
+      final errorString = error.toString();
+      if (errorString.startsWith('Exception: ')) {
+        errorMessage = errorString.substring(11);
+      } else {
+        errorMessage = errorString;
+      }
+    } else {
+      errorMessage = error.toString();
+    }
+    _showErrorOverlay(context, errorMessage);
+  }
+
   /// 에러 오버레이 표시 (공통)
   void _showErrorOverlay(BuildContext context, String message) {
     final overlay = Overlay.of(context);
