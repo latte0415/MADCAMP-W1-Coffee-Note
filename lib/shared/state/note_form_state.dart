@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import '../../models/note.dart';
 import '../../models/detail.dart';
 import '../../models/enums/process_type.dart';
 import '../../models/enums/roasting_point_type.dart';
 import '../../models/enums/method_type.dart';
-import '../../backend/providers.dart';
 import '../../theme/theme.dart';
 
 /// Note 생성/수정 폼의 공통 상태 관리 클래스
@@ -36,6 +34,11 @@ class NoteFormState {
   double bitterness;
   int score;
   List<String> tastingNotesTags;
+  
+  // AI 자동생성 관련 상태
+  bool isGenerating = false;
+  Future<Map<String, dynamic>>? aiGenerationFuture;
+  CancelToken? aiGenerationCancelToken;
 
   /// 내부 생성자
   NoteFormState._({
@@ -211,47 +214,6 @@ class NoteFormState {
     }
   }
 
-  /// 이미지 선택 bottom sheet 표시
-  void showImagePicker(BuildContext context, VoidCallback setState) {
-    final container = ProviderScope.containerOf(context);
-    final imageService = container.read(imageServiceProvider);
-    
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('갤러리에서 선택'),
-              onTap: () async {
-                final img = await imageService.pickImage(ImageSource.gallery);
-                if (img != null) {
-                  selectedImage = img;
-                  existingImagePath = null; // 새 이미지 선택 시 기존 경로 제거
-                  setState();
-                }
-                if (context.mounted) Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('카메라로 촬영'),
-              onTap: () async {
-                final img = await imageService.pickImage(ImageSource.camera);
-                if (img != null) {
-                  selectedImage = img;
-                  existingImagePath = null; // 새 이미지 선택 시 기존 경로 제거
-                  setState();
-                }
-                if (context.mounted) Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   /// 스케일 팩터 계산
   double getScaleFactor(BuildContext context) {
@@ -267,54 +229,106 @@ class NoteFormState {
   /// 이미지가 있는지 확인 (기존 경로 또는 새로 선택한 이미지)
   bool get hasImage => selectedImage != null || existingImagePath != null;
 
-  /// Form 데이터로부터 Detail 객체 생성
-  /// 모든 필드가 NULL이면 null을 반환 (detail 저장 생략)
-  Detail? createDetailFromForm(String noteId, {String? existingId}) {
-    // "직접입력"(etc) 선택 시 텍스트가 빈칸이면 NULL로 처리
-    final processText = selectedProcess == ProcessType.etc && processTextController.text.trim().isNotEmpty
-        ? processTextController.text.trim()
-        : null;
-    final roastingPointText = selectedRoasting == RoastingPointType.etc && roastingPointTextController.text.trim().isNotEmpty
-        ? roastingPointTextController.text.trim()
-        : null;
-    final methodText = selectedMethod == MethodType.etc && methodTextController.text.trim().isNotEmpty
-        ? methodTextController.text.trim()
-        : null;
+  /// 상세정보 필드만 초기화
+  void resetDetailFields() {
+    countryController.clear();
+    varietyController.clear();
+    processTextController.clear();
+    roastingPointTextController.clear();
+    methodTextController.clear();
+    tastingNotesController.clear();
+    selectedProcess = ProcessType.etc;
+    selectedRoasting = RoastingPointType.etc;
+    selectedMethod = MethodType.etc;
+    tastingNotesTags.clear();
+  }
+
+  /// AI 생성 취소
+  void cancelAiGeneration() {
+    aiGenerationCancelToken?.cancel('사용자 취소');
+    aiGenerationCancelToken = null;
+    aiGenerationFuture = null;
+    isGenerating = false;
+  }
+
+  /// isGenerating 상태 업데이트 (상태 동기화를 위한 메서드)
+  void updateIsGenerating(bool value) {
+    isGenerating = value;
+    if (!value) {
+      // false로 설정 시 관련 리소스 정리
+      aiGenerationFuture = null;
+      aiGenerationCancelToken = null;
+    }
+  }
+
+  /// AI 생성 시작 (CancelToken 설정 포함)
+  void startAiGeneration(CancelToken cancelToken) {
+    if (isGenerating) {
+      cancelAiGeneration();
+    }
+    aiGenerationCancelToken = cancelToken;
+    isGenerating = true;
+  }
+
+  /// AI 생성 완료 처리
+  void completeAiGeneration() {
+    isGenerating = false;
+    aiGenerationFuture = null;
+    aiGenerationCancelToken = null;
+  }
+
+  /// AI 응답 데이터를 폼에 적용 (기존 정보 전부 덮어쓰기)
+  void applyAiResponse(Map<String, dynamic> aiData, VoidCallback setState) {
+    // originLocation - null이면 빈 문자열로 덮어쓰기
+    countryController.text = aiData['originLocation'] as String? ?? '';
     
-    // "직접입력"이 아닌 경우 enum 값 사용, "직접입력"이면 null
-    final process = selectedProcess == ProcessType.etc ? null : selectedProcess;
-    final roastingPoint = selectedRoasting == RoastingPointType.etc ? null : selectedRoasting;
-    final method = selectedMethod == MethodType.etc ? null : selectedMethod;
+    // variety - null이면 빈 문자열로 덮어쓰기
+    varietyController.text = aiData['variety'] as String? ?? '';
     
-    final originLocation = countryController.text.trim().isEmpty ? null : countryController.text.trim();
-    final variety = varietyController.text.trim().isEmpty ? null : varietyController.text.trim();
-    final tastingNotes = tastingNotesTags.isNotEmpty ? tastingNotesTags : null;
-    
-    // 모든 필드가 NULL인지 확인
-    if (originLocation == null &&
-        variety == null &&
-        process == null &&
-        processText == null &&
-        roastingPoint == null &&
-        roastingPointText == null &&
-        method == null &&
-        methodText == null &&
-        tastingNotes == null) {
-      return null; // 모든 필드가 NULL이면 detail 저장 생략
+    // process
+    if (aiData['process'] != null && aiData['process'] is ProcessType) {
+      selectedProcess = aiData['process'] as ProcessType;
+      processTextController.text = (selectedProcess == ProcessType.etc && aiData['processText'] != null)
+          ? aiData['processText'] as String
+          : '';
+    } else {
+      selectedProcess = ProcessType.etc;
+      processTextController.text = '';
     }
     
-    return Detail(
-      id: existingId ?? const Uuid().v4(),
-      noteId: noteId,
-      originLocation: originLocation,
-      variety: variety,
-      process: process,
-      processText: processText,
-      roastingPoint: roastingPoint,
-      roastingPointText: roastingPointText,
-      method: method,
-      methodText: methodText,
-      tastingNotes: tastingNotes,
-    );
+    // roastingPoint
+    if (aiData['roastingPoint'] != null && aiData['roastingPoint'] is RoastingPointType) {
+      selectedRoasting = aiData['roastingPoint'] as RoastingPointType;
+      roastingPointTextController.text = (selectedRoasting == RoastingPointType.etc && aiData['roastingPointText'] != null)
+          ? aiData['roastingPointText'] as String
+          : '';
+    } else {
+      selectedRoasting = RoastingPointType.etc;
+      roastingPointTextController.text = '';
+    }
+    
+    // method
+    if (aiData['method'] != null && aiData['method'] is MethodType) {
+      selectedMethod = aiData['method'] as MethodType;
+      methodTextController.text = (selectedMethod == MethodType.etc && aiData['methodText'] != null)
+          ? aiData['methodText'] as String
+          : '';
+    } else {
+      selectedMethod = MethodType.etc;
+      methodTextController.text = '';
+    }
+    
+    // tastingNotes - null이면 빈 리스트로 덮어쓰기
+    if (aiData['tastingNotes'] != null && aiData['tastingNotes'] is List) {
+      final notes = (aiData['tastingNotes'] as List).cast<String>();
+      tastingNotesTags = notes.take(5).toList(); // 최대 5개
+      tastingNotesController.text = tastingNotesTags.join(', ');
+    } else {
+      tastingNotesTags = [];
+      tastingNotesController.text = '';
+    }
+    
+    setState();
   }
+
 }

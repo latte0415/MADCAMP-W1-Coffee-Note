@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/note_form_state.dart';
+import '../../../backend/providers.dart';
 import '../../../models/enums/process_type.dart';
 import '../../../models/enums/roasting_point_type.dart';
 import '../../../models/enums/method_type.dart';
@@ -25,7 +28,7 @@ class NoteImageSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: enabled ? () => formState.showImagePicker(context, setState) : null,
+      onTap: enabled ? () => NoteImageSection.showImagePicker(context, formState, setState) : null,
       child: Container(
         width: double.infinity,
         height: 300 * scale,
@@ -60,6 +63,52 @@ class NoteImageSection extends StatelessWidget {
       ),
     );
   }
+
+  /// 이미지 선택 bottom sheet 표시
+  static void showImagePicker(
+    BuildContext context,
+    NoteFormState formState,
+    VoidCallback onImageSelected,
+  ) {
+    final container = ProviderScope.containerOf(context);
+    final imageService = container.read(imageServiceProvider);
+    
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('갤러리에서 선택'),
+              onTap: () async {
+                final img = await imageService.pickImage(ImageSource.gallery);
+                if (img != null) {
+                  formState.selectedImage = img;
+                  formState.existingImagePath = null; // 새 이미지 선택 시 기존 경로 제거
+                  onImageSelected();
+                }
+                if (context.mounted) Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('카메라로 촬영'),
+              onTap: () async {
+                final img = await imageService.pickImage(ImageSource.camera);
+                if (img != null) {
+                  formState.selectedImage = img;
+                  formState.existingImagePath = null; // 새 이미지 선택 시 기존 경로 제거
+                  onImageSelected();
+                }
+                if (context.mounted) Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// 기본 입력 필드 섹션 (메뉴, 카페, 날짜, 슬라이더, 한줄평, 별점)
@@ -80,9 +129,9 @@ class NoteBasicFieldsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildField("메뉴명", formState.menuController, isEditing),
-        buildField("카페명", formState.cafeController, isEditing),
-        buildField("날짜", formState.dateController, isEditing),
+        buildField("메뉴명", formState.menuController, isEditing, onChanged: isEditing ? (_) => setState() : null),
+        buildField("카페명", formState.cafeController, isEditing, onChanged: isEditing ? (_) => setState() : null),
+        buildField("날짜", formState.dateController, isEditing, hintText: "날짜를 입력하세요 (예: 2024-01-01)"),
         const SizedBox(height: 25),
 
         buildSlider(context, "산미", formState.acidity, (v) {
@@ -246,6 +295,8 @@ class NoteDetailSectionWithToggle extends StatelessWidget {
   final ValueChanged<bool> onToggleChanged;
   final VoidCallback setState;
   final bool showAiButton;
+  final VoidCallback? onAiGenerate;
+  final VoidCallback? onReset;
 
   const NoteDetailSectionWithToggle({
     super.key,
@@ -255,6 +306,8 @@ class NoteDetailSectionWithToggle extends StatelessWidget {
     required this.onToggleChanged,
     required this.setState,
     this.showAiButton = false,
+    this.onAiGenerate,
+    this.onReset,
   });
 
   @override
@@ -282,33 +335,59 @@ class NoteDetailSectionWithToggle extends StatelessWidget {
         if (showDetailSection) ...[
           SizedBox(height: showAiButton ? 10 : 20),
           if (showAiButton)
-            Align(
-              alignment: Alignment.centerRight,
-              child: SizedBox(
-                width: 90,
-                height: 28,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[200],
-                    elevation: 0,
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // 초기화 버튼
+                SizedBox(
+                  width: 70,
+                  height: 28,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      elevation: 0,
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    // AI 자동생성 로직 추가
-                  },
-                  child: const Text(
-                    "AI 자동생성",
-                    style: TextStyle(
-                      color: AppColors.primaryDark,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
+                    onPressed: onReset, // 생성 중에도 클릭 가능 (생성 취소 포함)
+                    child: const Text(
+                      "초기화",
+                      style: TextStyle(
+                        color: AppColors.primaryDark,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                // AI 자동생성 버튼
+                SizedBox(
+                  width: 90,
+                  height: 28,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: formState.isGenerating ? Colors.grey : AppColors.primaryDark,
+                      elevation: 0,
+                      padding: EdgeInsets.zero,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: formState.isGenerating ? null : onAiGenerate,
+                    child: Text(
+                      formState.isGenerating ? "생성 중..." : "AI 자동생성",
+                      style: TextStyle(
+                        color: formState.isGenerating ? Colors.white : Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           if (showAiButton) const SizedBox(height: 20),
           NoteDetailSection(

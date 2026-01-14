@@ -24,4 +24,12 @@ class AppColors {
   /// White Text: #FFFFFF
   /// 다크 배경 위 텍스트에 사용
   static const Color whiteText = Color(0xFFFFFFFF);
+
+  /// Disabled Button: #9E9E9E
+  /// 비활성화된 버튼 배경에 사용
+  static const Color disabledButton = Color(0xFF9E9E9E);
+
+  /// Error:rgb(213, 63, 78)
+  /// 에러 메시지, 경고 텍스트에 사용
+  static const Color error = Color(0xFFD53F4E);
 }
