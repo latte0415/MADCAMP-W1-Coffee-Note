@@ -74,29 +74,77 @@
 
 ```mermaid
 graph TB
-    subgraph "Presentation Layer"
-        Pages[Pages/Widgets]
-        Controllers[Controllers<br/>Riverpod AsyncNotifier]
+    subgraph UI["🎨 Presentation Layer"]
+        direction TB
+        Pages["📄 Pages<br/>LibraryPage<br/>GalleryPage<br/>AiGuidePage"]
+        Widgets["🧩 Widgets & Modals<br/>Shared Components<br/>Creation Modal<br/>Note Modal"]
+        Controllers["🎮 Controllers<br/>Riverpod AsyncNotifier<br/>LibraryController<br/>GalleryController<br/>AiGuideController<br/>NoteFormController"]
     end
     
-    subgraph "Business Logic Layer"
-        Services[Services<br/>NoteService, DetailService, ApiService]
+    subgraph Models["📦 Models"]
+        direction LR
+        NoteModel["Note Model"]
+        DetailModel["Detail Model"]
+        Enums["Enums<br/>ProcessType<br/>RoastingPointType<br/>MethodType"]
     end
     
-    subgraph "Data Access Layer"
-        Repositories[Repositories<br/>NoteRepository, DetailRepository]
-        DatabaseManager[DatabaseManager<br/>SQLite Singleton]
+    subgraph Business["⚙️ Business Logic Layer"]
+        direction TB
+        NoteService["NoteService<br/>CRUD Operations"]
+        DetailService["DetailService<br/>Detail Management"]
+        ApiService["ApiService<br/>AI Integration"]
+        ImageService["ImageService<br/>Image Handling"]
     end
     
-    subgraph "External Services"
-        BackendAPI[Backend API<br/>FastAPI + LangChain]
+    subgraph Data["💾 Data Access Layer"]
+        direction TB
+        NoteRepo["NoteRepository<br/>SQL Operations"]
+        DetailRepo["DetailRepository<br/>SQL Operations"]
+        DBManager["DatabaseManager<br/>SQLite Singleton"]
     end
     
+    subgraph External["🌐 External Services"]
+        BackendAPI["Backend API<br/>FastAPI + LangChain<br/>OpenAI GPT + Tavily"]
+    end
+    
+    %% Presentation Layer connections
     Pages --> Controllers
-    Controllers --> Services
-    Services --> Repositories
-    Repositories --> DatabaseManager
-    Services --> BackendAPI
+    Widgets --> Controllers
+    Controllers --> Models
+    
+    %% Business Logic connections
+    Controllers --> NoteService
+    Controllers --> DetailService
+    Controllers --> ApiService
+    Controllers --> ImageService
+    
+    %% Data Access connections
+    NoteService --> NoteRepo
+    DetailService --> DetailRepo
+    NoteService --> ImageService
+    NoteRepo --> DBManager
+    DetailRepo --> DBManager
+    
+    %% External connections
+    ApiService --> BackendAPI
+    
+    %% Model usage
+    NoteService --> NoteModel
+    DetailService --> DetailModel
+    Controllers --> Enums
+    
+    %% Styling
+    classDef uiLayer fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    classDef modelLayer fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    classDef businessLayer fill:#E8F5E9,stroke:#388E3C,stroke-width:2px
+    classDef dataLayer fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    classDef externalLayer fill:#FFEBEE,stroke:#C62828,stroke-width:2px
+    
+    class Pages,Widgets,Controllers uiLayer
+    class NoteModel,DetailModel,Enums modelLayer
+    class NoteService,DetailService,ApiService,ImageService businessLayer
+    class NoteRepo,DetailRepo,DBManager dataLayer
+    class BackendAPI externalLayer
 ```
 ---
 
