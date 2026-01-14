@@ -72,6 +72,61 @@ class _NoteDetailsModalState extends ConsumerState<NoteDetailsModal> {
     }
   }
 
+  bool _isFormValid() {
+    return _formState.cafeController.text.trim().isNotEmpty &&
+           _formState.menuController.text.trim().isNotEmpty;
+  }
+
+  void _showValidationError() {
+    final missingFields = <String>[];
+    if (_formState.cafeController.text.trim().isEmpty) {
+      missingFields.add('카페명');
+    }
+    if (_formState.menuController.text.trim().isEmpty) {
+      missingFields.add('메뉴명');
+    }
+    
+    if (missingFields.isNotEmpty) {
+      final overlay = Overlay.of(context);
+      final overlayEntry = OverlayEntry(
+        builder: (context) => Stack(
+          children: [
+            Positioned(
+              top: 40,
+              left: 20,
+              right: 20,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.error,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${missingFields.first}을(를) 입력해주세요',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      
+      overlay.insert(overlayEntry);
+      
+      Future.delayed(const Duration(seconds: 2), () {
+        overlayEntry.remove();
+      });
+    }
+  }
+
   // 업데이트 로직
   Future<void> _updateSubmit() async {
     final noteService = ref.read(noteServiceProvider);
@@ -153,16 +208,18 @@ class _NoteDetailsModalState extends ConsumerState<NoteDetailsModal> {
                   _isEditing ? "노트 수정" : "노트 정보",
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                TextButton(
-                  onPressed: () {
-                    if (_isEditing) {
-                      _updateSubmit();
-                    } else {
+                if (!_isEditing)
+                  TextButton(
+                    onPressed: () {
                       setState(() => _isEditing = true);
-                    }
-                  },
-                  child: Text(_isEditing ? "저장" : "수정"),
-                ),
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primaryDark,
+                    ),
+                    child: const Text("수정"),
+                  )
+                else
+                  const SizedBox(width: 48), // 대칭을 위한 공간
               ],
             ),
 
@@ -204,10 +261,32 @@ class _NoteDetailsModalState extends ConsumerState<NoteDetailsModal> {
                       setState: () => setState(() {}),
                       showAiButton: false,
                     ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
+
+            // --- [3. 고정 영역] 저장 버튼 (수정 모드일 때만 표시) ---
+            if (_isEditing)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isFormValid() ? AppColors.primaryDark : Colors.grey,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    ),
+                    onPressed: _isFormValid() ? _updateSubmit : _showValidationError,
+                    child: const Text(
+                      "저장",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

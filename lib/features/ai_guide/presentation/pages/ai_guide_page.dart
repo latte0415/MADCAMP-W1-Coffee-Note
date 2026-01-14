@@ -17,6 +17,25 @@ class AiGuidePage extends ConsumerStatefulWidget {
 
 class _AiGuidePageState extends ConsumerState<AiGuidePage> {
   final TextEditingController _inputController = TextEditingController();
+  bool _isInitialized = false;
+  String? _lastRestoredText;
+
+  @override
+  void initState() {
+    super.initState();
+    // 상태에서 저장된 입력 텍스트 복원
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final asyncState = ref.read(aiGuideControllerProvider);
+        final savedInputText = asyncState.valueOrNull?.state.inputText ?? '';
+        if (savedInputText.isNotEmpty && _inputController.text != savedInputText) {
+          _inputController.text = savedInputText;
+          _lastRestoredText = savedInputText;
+        }
+        _isInitialized = true;
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -40,6 +59,10 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
   void _handleContinueRecording(Map<String, dynamic>? mappingResult) {
     if (mappingResult == null) return;
     
+    // 이어서 기록하기 진행 시 결과 초기화
+    final controller = ref.read(aiGuideControllerProvider.notifier);
+    controller.clearResult();
+    
     showDialog(
       context: context,
       builder: (context) => NoteCreatePopup(
@@ -49,13 +72,30 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
   }
 
   void _handleInputChanged(String value) {
-    final controller = ref.read(aiGuideControllerProvider.notifier);
-    controller.clearResult();
+    // 입력 텍스트를 상태에 저장 (결과는 초기화하지 않음)
+    if (_isInitialized) {
+      final controller = ref.read(aiGuideControllerProvider.notifier);
+      controller.updateInputText(value);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(aiGuideControllerProvider);
+    
+    // 상태에서 저장된 입력 텍스트 복원 (페이지 복귀 시)
+    final savedInputText = asyncState.valueOrNull?.state.inputText ?? '';
+    if (_isInitialized && 
+        savedInputText.isNotEmpty && 
+        _inputController.text != savedInputText &&
+        _lastRestoredText != savedInputText) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _inputController.text != savedInputText) {
+          _inputController.text = savedInputText;
+          _lastRestoredText = savedInputText;
+        }
+      });
+    }
     
     // 에러 발생 시 스낵바 표시
     ref.listen<AsyncValue<AiGuideViewData>>(
@@ -142,8 +182,17 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
                     width: 352 * scale,
                     height: 91 * scale,
                     child: ElevatedButton(
-                      onPressed: asyncState.valueOrNull?.state.isLoading == true ? null : _handleGetGuide,
+                      onPressed: (asyncState.isLoading || asyncState.valueOrNull?.state.isLoading == true) ? null : _handleGetGuide,
                       style: AppComponentStyles.primaryButton.copyWith(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                            final isLoading = asyncState.isLoading || asyncState.valueOrNull?.state.isLoading == true;
+                            if (isLoading || states.contains(MaterialState.disabled)) {
+                              return AppColors.disabledButton;
+                            }
+                            return AppColors.primaryDark;
+                          },
+                        ),
                         shape: MaterialStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(85 * scale),
@@ -152,7 +201,7 @@ class _AiGuidePageState extends ConsumerState<AiGuidePage> {
                         padding: MaterialStateProperty.all(EdgeInsets.zero),
                       ),
                       child: Text(
-                        asyncState.valueOrNull?.state.isLoading == true ? '생성 중...' : '가이드 받기',
+                        (asyncState.isLoading || asyncState.valueOrNull?.state.isLoading == true) ? '생성 중...' : '가이드 받기',
                         style: AppTextStyles.bodyTextWhite.copyWith(
                           fontSize: 35 * scale,
                         ),

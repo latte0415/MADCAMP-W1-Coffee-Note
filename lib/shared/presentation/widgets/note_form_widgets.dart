@@ -80,8 +80,8 @@ class NoteBasicFieldsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildField("메뉴명", formState.menuController, isEditing),
-        buildField("카페명", formState.cafeController, isEditing),
+        buildField("메뉴명", formState.menuController, isEditing, onChanged: isEditing ? (_) => setState() : null),
+        buildField("카페명", formState.cafeController, isEditing, onChanged: isEditing ? (_) => setState() : null),
         buildField("날짜", formState.dateController, isEditing),
         const SizedBox(height: 25),
 

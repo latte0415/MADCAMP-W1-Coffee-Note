@@ -127,4 +127,16 @@ class AiGuideController extends AsyncNotifier<AiGuideViewData> {
       );
     }
   }
+
+  /// 입력 텍스트 저장 (결과는 초기화하지 않음)
+  void updateInputText(String inputText) {
+    final current = state.valueOrNull;
+    if (current != null) {
+      state = AsyncValue.data(
+        current.copyWith(
+          state: current.state.copyWith(inputText: inputText),
+        ),
+      );
+    }
+  }
 }

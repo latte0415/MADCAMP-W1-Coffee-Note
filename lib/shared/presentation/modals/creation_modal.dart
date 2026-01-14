@@ -71,7 +71,7 @@ class _NoteCreatePopupState extends ConsumerState<NoteCreatePopup> {
             ),
 
             // --- [2. 스크롤 가능한 컨텐츠 영역] ---
-            Flexible(
+            Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Column(
@@ -104,42 +104,93 @@ class _NoteCreatePopupState extends ConsumerState<NoteCreatePopup> {
                       showAiButton: true,
                     ),
 
-                    const SizedBox(height: 40),
-
-                    // 5. 기록하기 버튼
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryDark,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                        ),
-                        onPressed: _submitNote,
-                        child: const Text(
-                          "기록하기",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ),
                     const SizedBox(height: 20),
                   ],
                 ),
-                    ),
-                  ),
-                ],
               ),
+            ),
+
+            // --- [3. 고정 영역] 기록하기 버튼 ---
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isFormValid() ? AppColors.primaryDark : Colors.grey,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  ),
+                  onPressed: _isFormValid() ? _submitNote : _showValidationError,
+                  child: const Text(
+                    "기록하기",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _submitNote() async {
-    if (_formState.cafeController.text.isEmpty || _formState.menuController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("카페와 메뉴를 입력해주세요!")),
-      );
-      return;
+  bool _isFormValid() {
+    return _formState.cafeController.text.trim().isNotEmpty &&
+           _formState.menuController.text.trim().isNotEmpty;
+  }
+
+  void _showValidationError() {
+    final missingFields = <String>[];
+    if (_formState.cafeController.text.trim().isEmpty) {
+      missingFields.add('카페명');
     }
+    if (_formState.menuController.text.trim().isEmpty) {
+      missingFields.add('메뉴명');
+    }
+    
+    if (missingFields.isNotEmpty) {
+      final overlay = Overlay.of(context);
+      final overlayEntry = OverlayEntry(
+        builder: (context) => Stack(
+          children: [
+            Positioned(
+              top: 40,
+              left: 20,
+              right: 20,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.error,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${missingFields.first}을(를) 입력해주세요',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+      
+      overlay.insert(overlayEntry);
+      
+      Future.delayed(const Duration(seconds: 2), () {
+        overlayEntry.remove();
+      });
+    }
+  }
+
+  void _submitNote() async {
 
     try {
       final noteService = ref.read(noteServiceProvider);
