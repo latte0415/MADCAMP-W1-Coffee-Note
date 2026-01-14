@@ -4,7 +4,10 @@ import '../../../models/enums/process_type.dart';
 import '../../../models/enums/roasting_point_type.dart';
 import '../../../models/enums/method_type.dart';
 
-Widget buildField(String label, TextEditingController controller, bool isEditing, {ValueChanged<String>? onChanged}) {
+Widget buildField(String label, TextEditingController controller, bool isEditing, {ValueChanged<String>? onChanged, String? hintText}) {
+  // hintText가 제공되지 않으면 기본값으로 "{label}을(를) 입력하세요." 생성
+  final String placeholder = hintText ?? "$label을(를) 입력하세요.";
+  
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 1),
     child: TextField(
@@ -16,6 +19,11 @@ Widget buildField(String label, TextEditingController controller, bool isEditing
         labelText: label,
         labelStyle: const TextStyle(fontSize: 16, color: AppColors.primaryText, fontWeight: FontWeight.bold),
         floatingLabelBehavior: FloatingLabelBehavior.always,
+        hintText: isEditing ? placeholder : null,
+        hintStyle: TextStyle(
+          fontSize: 14,
+          color: Colors.grey[400],
+        ),
         contentPadding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
 
         // 하단 밑줄 스타일
@@ -132,7 +140,7 @@ Widget buildDropdown<T>(String label, T value, List<T> items, ValueChanged<T?> o
         if (isEtc && etcController != null)
           Padding(
             padding: const EdgeInsets.only(top: 5),
-            child: buildField("${label}을 입력해보세요", etcController, true),
+            child: buildField("${label}을 입력해보세요", etcController, true, hintText: ""),
           ),
       ],
     ),

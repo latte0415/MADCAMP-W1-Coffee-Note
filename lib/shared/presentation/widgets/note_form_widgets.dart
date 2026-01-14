@@ -82,7 +82,7 @@ class NoteBasicFieldsSection extends StatelessWidget {
       children: [
         buildField("메뉴명", formState.menuController, isEditing, onChanged: isEditing ? (_) => setState() : null),
         buildField("카페명", formState.cafeController, isEditing, onChanged: isEditing ? (_) => setState() : null),
-        buildField("날짜", formState.dateController, isEditing),
+        buildField("날짜", formState.dateController, isEditing, hintText: "날짜를 입력하세요 (예: 2024-01-01)"),
         const SizedBox(height: 25),
 
         buildSlider(context, "산미", formState.acidity, (v) {
